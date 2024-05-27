@@ -58,5 +58,25 @@ class BucketSortAggregationTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertEquals($expected, $aggregation->toArray());
+
+        $aggregation = new BucketSortAggregation('acme');
+        $sort = new FieldSort('test_field', FieldSort::ASC);
+        $aggregation->addSort($sort);
+        $aggregation->setSize(10);
+        $aggregation->setFrom(50);
+
+        $expected = [
+            'bucket_sort' => [
+                'sort' => [
+                    [
+                        'test_field' => ['order' => 'asc'],
+                    ]
+                ],
+                'size' => 10,
+                'from' => 50,
+            ],
+        ];
+
+        $this->assertEquals($expected, $aggregation->toArray());
     }
 }

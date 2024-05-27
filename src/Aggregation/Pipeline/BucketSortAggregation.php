@@ -27,6 +27,16 @@ class BucketSortAggregation extends AbstractPipelineAggregation
     private $sort = [];
 
     /**
+     * @var int
+     */
+    private $size;
+
+    /**
+     * @var int
+     */
+    private $from;
+
+    /**
      * @param string $name
      * @param string  $bucketsPath
      */
@@ -65,6 +75,44 @@ class BucketSortAggregation extends AbstractPipelineAggregation
         return $this;
     }
 
+    public function setSize($size)
+    {
+        $this->size = $size;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return int
+     */
+    public function getSize(): int
+    {
+        return (int) $this->size;
+    }
+
+    /**
+     * Return from.
+     *
+     * @return int
+     */
+    public function getFrom()
+    {
+        return $this->from;
+    }
+
+    /**
+     * @param int $from
+     *
+     * @return $this
+     */
+    public function setFrom($from)
+    {
+        $this->from = $from;
+
+        return $this;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -82,6 +130,8 @@ class BucketSortAggregation extends AbstractPipelineAggregation
             [
             'buckets_path' => $this->getBucketsPath(),
             'sort' => $this->getSort(),
+            'size' => $this->getSize(),
+            'from' => $this->getFrom(),
             ]
         );
 
