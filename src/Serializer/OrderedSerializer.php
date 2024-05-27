@@ -37,7 +37,7 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, $format = null, array $context = [])
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         return $this->serializer->normalize(
             is_array($data) ? $this->order($data) : $data,
@@ -49,7 +49,7 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         return $this->serializer->denormalize(
             is_array($data) ? $this->order($data) : $data,
@@ -104,7 +104,7 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return $this->serializer->supportsDenormalization($data, $format);
     }
@@ -112,8 +112,14 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $this->serializer->supportsNormalization($data, $format);
     }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return $this->serializer->getSupportedTypes($format);
+    }
+
 }

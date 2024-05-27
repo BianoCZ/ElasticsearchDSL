@@ -207,7 +207,7 @@ class Search
         if (static::$serializer === null) {
             static::$serializer = new OrderedSerializer(
                 [
-                    new CustomReferencedNormalizer(),
+                    new CustomReferencedNormalizer(new CustomNormalizer()),
                     new CustomNormalizer(),
                 ]
             );

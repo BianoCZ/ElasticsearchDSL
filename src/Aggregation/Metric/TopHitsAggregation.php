@@ -180,18 +180,4 @@ class TopHitsAggregation extends AbstractAggregation
 
         return null;
     }
-
-    /**
-     * @deprecated sorts now is a container, use `addSort()`instead.
-     *
-     * @param BuilderInterface $sort
-     *
-     * @return $this
-     */
-    public function setSort(BuilderInterface $sort)
-    {
-        $this->sort = $sort;
-
-        return $this;
-    }
 }

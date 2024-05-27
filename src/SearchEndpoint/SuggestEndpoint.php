@@ -11,7 +11,7 @@
 
 namespace ONGR\ElasticsearchDSL\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\Suggest\TermSuggest;
+use ONGR\ElasticsearchDSL\Suggest\Suggest;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -34,7 +34,7 @@ class SuggestEndpoint extends AbstractSearchEndpoint
     ): array|string|int|float|bool {
         $output = [];
         if (count($this->getAll()) > 0) {
-            /** @var TermSuggest $suggest */
+            /** @var Suggest $suggest */
             foreach ($this->getAll() as $suggest) {
                 $output = array_merge($output, $suggest->toArray());
             }
