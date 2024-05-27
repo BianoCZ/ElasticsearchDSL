@@ -60,5 +60,4 @@ class CustomReferencedNormalizer implements NormalizerInterface, SerializerAware
     {
         $this->customNormalizer->setSerializer($serializer);
     }
-
 }

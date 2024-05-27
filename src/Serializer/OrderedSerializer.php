@@ -37,8 +37,11 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
-    {
+    public function normalize(
+        mixed $data,
+        ?string $format = null,
+        array $context = []
+    ): array|string|int|float|bool|\ArrayObject|null {
         return $this->serializer->normalize(
             is_array($data) ? $this->order($data) : $data,
             $format,
@@ -104,8 +107,12 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
-    {
+    public function supportsDenormalization(
+        mixed $data,
+        string $type,
+        ?string $format = null,
+        array $context = []
+    ): bool {
         return $this->serializer->supportsDenormalization($data, $format);
     }
 
@@ -121,5 +128,4 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
     {
         return $this->serializer->getSupportedTypes($format);
     }
-
 }
