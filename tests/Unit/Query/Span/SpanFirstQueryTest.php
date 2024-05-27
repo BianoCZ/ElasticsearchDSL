@@ -23,7 +23,7 @@ class SpanFirstQueryTest extends \PHPUnit\Framework\TestCase
      */
     public function testToArray()
     {
-        $mock = $this->getMockBuilder('ONGR\ElasticsearchDSL\Query\Span\SpanQueryInterface')->getMock();
+        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\Query\Span\SpanQueryInterface::class)->getMock();
         $mock
             ->expects($this->once())
             ->method('toArray')

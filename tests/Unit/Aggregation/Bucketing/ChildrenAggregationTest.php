@@ -43,7 +43,7 @@ class ChildrenAggregationTest extends \PHPUnit\Framework\TestCase
      */
     public function testChildrenAggregationGetArray()
     {
-        $mock = $this->getMockBuilder('ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation')
+        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $aggregation = new ChildrenAggregation('foo');

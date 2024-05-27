@@ -33,7 +33,7 @@ class SignificantTextAggregationTest extends \PHPUnit\Framework\TestCase
      */
     public function testSignificantTermsAggregationGetArray()
     {
-        $mock = $this->getMockBuilder('ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation')
+        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $aggregation = new SignificantTextAggregation('foo', 'title');

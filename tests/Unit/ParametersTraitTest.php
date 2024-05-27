@@ -29,7 +29,7 @@ class ParametersTraitTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp(): void
     {
-        $this->parametersTraitMock = $this->getMockForTrait('ONGR\ElasticsearchDSL\ParametersTrait');
+        $this->parametersTraitMock = $this->getMockForTrait(\ONGR\ElasticsearchDSL\ParametersTrait::class);
     }
 
     /**

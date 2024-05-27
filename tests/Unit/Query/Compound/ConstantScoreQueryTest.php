@@ -20,7 +20,7 @@ class ConstantScoreQueryTest extends \PHPUnit\Framework\TestCase
      */
     public function testToArray()
     {
-        $mock = $this->getMockBuilder('ONGR\ElasticsearchDSL\BuilderInterface')->getMock();
+        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\BuilderInterface::class)->getMock();
         $mock
             ->expects($this->any())
             ->method('toArray')
