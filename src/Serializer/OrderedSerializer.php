@@ -13,6 +13,7 @@ use function array_diff_key;
 use function array_filter;
 use function array_merge;
 use function is_array;
+use function method_exists;
 use function uasort;
 
 /**
@@ -114,6 +115,10 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
+        if (!method_exists($this->serializer, 'getSupportedTypes')) {
+            return [];
+        }
+
         return $this->serializer->getSupportedTypes($format);
     }
 
