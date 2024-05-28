@@ -4,7 +4,6 @@ parameters:
 	paths:
 		- src
 #		- tests
-	treatPhpDocTypesAsCertain: false
 	ignoreErrors:
 		-
 		    message: '#^Method Biano\\ElasticsearchDSL\\Aggregation\\AbstractAggregation\:\:getAggregations\(\) should return array\<int, Biano\\ElasticsearchDSL\\Aggregation\\AbstractAggregation\> but returns array\<int, Biano\\ElasticsearchDSL\\BuilderInterface\>\.$#'

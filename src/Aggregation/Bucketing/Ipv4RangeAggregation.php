@@ -20,7 +20,7 @@ class Ipv4RangeAggregation extends AbstractBucketingAggregation
     private array $ranges = [];
 
     /**
-     * @param list<array<string,string>> $ranges
+     * @param list<array<string,string>|string> $ranges
      */
     public function __construct(string $name, ?string $field = null, array $ranges = [])
     {
