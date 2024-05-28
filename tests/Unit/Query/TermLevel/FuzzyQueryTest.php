@@ -1,24 +1,19 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\TermLevel;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\TermLevel;
 
-use ONGR\ElasticsearchDSL\Query\TermLevel\FuzzyQuery;
+use Biano\ElasticsearchDSL\Query\TermLevel\FuzzyQuery;
+use PHPUnit\Framework\TestCase;
 
-class FuzzyQueryTest extends \PHPUnit\Framework\TestCase
+class FuzzyQueryTest extends TestCase
 {
+
     /**
      * Tests toArray().
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $query = new FuzzyQuery('user', 'ki', ['boost' => 1.2]);
         $expected = [
@@ -32,4 +27,5 @@ class FuzzyQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expected, $query->toArray());
     }
+
 }

@@ -1,169 +1,105 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use LogicException;
 
 /**
- * Class representing Histogram aggregation.
- *
- * @link https://goo.gl/hGCdDd
+ * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-datehistogram-aggregation.html
  */
-class DateHistogramAggregation extends AbstractAggregation
+class DateHistogramAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
 
-    /**
-     * @var string
-     */
-    protected $interval;
+    private ?string $calendarInterval = null;
 
-    /**
-     * @var string
-     */
-    protected $calendarInterval;
+    private ?string $fixedInterval = null;
 
-    /**
-     * @var string
-     */
-    protected $fixedInterval;
+    private ?string $format = null;
 
-    /**
-     * @var string
-     */
-    protected $format;
-
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string|null $field
-     * @param string|null $interval
-     * @param string|null $format
-     */
-    public function __construct($name, string $field = null, string $interval = null, string $format = null)
+    public function __construct(string $name, ?string $field = null, ?string $interval = null, ?string $format = null)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setCalendarInterval($interval);
-        $this->setFormat($format);
+        if ($field !== null) {
+            $this->setField($field);
+        }
+
+        if ($interval !== null) {
+            $this->setCalendarInterval($interval);
+        }
+
+        if ($format !== null) {
+            $this->setFormat($format);
+        }
     }
 
-    /**
-     * @return string
-     * @deprecated use getCalendarInterval instead
-     */
-    public function getInterval()
-    {
-        return $this->calendarInterval;
-    }
-
-    /**
-     * @param string $interval
-     * @deprecated use setCalendarInterval instead
-     *
-     * @return $this
-     */
-    public function setInterval($interval)
-    {
-        $this->setCalendarInterval($interval);
-
-        return $this;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getFixedInterval()
+    public function getFixedInterval(): ?string
     {
         return $this->fixedInterval;
     }
 
-    /**
-     * @param string $interval
-     * @return $this
-     */
-    public function setFixedInterval($interval)
+    public function setFixedInterval(string $interval): self
     {
         $this->fixedInterval = $interval;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getCalendarInterval()
+    public function getCalendarInterval(): ?string
     {
         return $this->calendarInterval;
     }
 
-    /**
-     * @param string $interval
-     * @return $this
-     */
-    public function setCalendarInterval($interval)
+    public function setCalendarInterval(string $interval): self
     {
         $this->calendarInterval = $interval;
 
         return $this;
     }
 
-    /**
-     * @param string $format
-     *
-     * @return $this
-     */
-    public function setFormat($format)
+    public function getFormat(): ?string
+    {
+        return $this->format;
+    }
+
+    public function setFormat(string $format): self
     {
         $this->format = $format;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'date_histogram';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
-        if (!$this->getField() || !($this->getCalendarInterval() || $this->getFixedInterval())) {
-            throw new \LogicException('Date histogram aggregation must have field and interval set.');
+        if ($this->getField() === null || ($this->getCalendarInterval() === null && $this->getFixedInterval() === null)) {
+            throw new LogicException('Date histogram aggregation must have field and interval set.');
         }
 
-        $out = [
+        $data = [
             'field' => $this->getField(),
         ];
 
-        if ($this->getCalendarInterval()) {
-            $out['calendar_interval'] = $this->getCalendarInterval();
-        } elseif ($this->getFixedInterval()) {
-            $out['fixed_interval'] = $this->getFixedInterval();
+        if ($this->getCalendarInterval() !== null) {
+            $data['calendar_interval'] = $this->getCalendarInterval();
+        } elseif ($this->getFixedInterval() !== null) {
+            $data['fixed_interval'] = $this->getFixedInterval();
         }
 
-        if (!empty($this->format)) {
-            $out['format'] = $this->format;
+        if ($this->getFormat() !== null) {
+            $data['format'] = $this->getFormat();
         }
 
-        return $out;
+        return $data;
     }
+
 }

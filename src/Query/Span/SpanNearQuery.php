@@ -1,68 +1,48 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Span;
+namespace Biano\ElasticsearchDSL\Query\Span;
 
 /**
- * Elasticsearch span near query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-span-near-query.html
  */
 class SpanNearQuery extends SpanOrQuery implements SpanQueryInterface
 {
-    /**
-     * @var int
-     */
-    private $slop;
 
-    /**
-     * @return int
-     */
-    public function getSlop()
+    private int $slop;
+
+    public function getSlop(): int
     {
         return $this->slop;
     }
 
-    /**
-     * @param int $slop
-     *
-     * @return $this
-     */
-    public function setSlop($slop)
+    public function setSlop(int $slop): self
     {
         $this->slop = $slop;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'span_near';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [];
         foreach ($this->getQueries() as $type) {
             $query['clauses'][] = $type->toArray();
         }
+
         $query['slop'] = $this->getSlop();
         $output = $this->processArray($query);
 
         return [$this->getType() => $output];
     }
+
 }

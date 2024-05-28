@@ -1,36 +1,28 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Pipeline;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Pipeline;
 
-use ONGR\ElasticsearchDSL\Aggregation\Pipeline\BucketSortAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Pipeline\MovingFunctionAggregation;
-use ONGR\ElasticsearchDSL\Sort\FieldSort;
+use Biano\ElasticsearchDSL\Aggregation\Pipeline\BucketSortAggregation;
+use Biano\ElasticsearchDSL\Sort\FieldSort;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for the bucket sort aggregation.
  */
-class BucketSortAggregationTest extends \PHPUnit\Framework\TestCase
+class BucketSortAggregationTest extends TestCase
 {
+
     /**
      * Tests toArray method.
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $aggregation = new BucketSortAggregation('acme', 'test');
 
         $expected = [
-            'bucket_sort' => [
-                'buckets_path' => 'test',
-            ],
+            'bucket_sort' => ['buckets_path' => 'test'],
         ];
 
         $this->assertEquals($expected, $aggregation->toArray());
@@ -52,8 +44,8 @@ class BucketSortAggregationTest extends \PHPUnit\Framework\TestCase
                 'sort' => [
                     [
                         'test_field' => ['order' => 'asc'],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 
@@ -70,7 +62,7 @@ class BucketSortAggregationTest extends \PHPUnit\Framework\TestCase
                 'sort' => [
                     [
                         'test_field' => ['order' => 'asc'],
-                    ]
+                    ],
                 ],
                 'size' => 10,
                 'from' => 50,
@@ -79,4 +71,5 @@ class BucketSortAggregationTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expected, $aggregation->toArray());
     }
+
 }

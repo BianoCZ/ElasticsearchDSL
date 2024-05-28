@@ -1,73 +1,48 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use function array_filter;
 
 /**
- * Class representing geo diversified sampler aggregation.
- *
- * @link https://goo.gl/yzXvqD
+ * @link https://www.elastic.co/guide/en/elasticsearch/reference/5.1/search-aggregations-bucket-diversified-sampler-aggregation.html
  */
-class DiversifiedSamplerAggregation extends AbstractAggregation
+class DiversifiedSamplerAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
 
     /**
      * Defines how many results will be received from each shard
-     * @param integer $shardSize
      */
-    private $shardSize;
+    private ?int $shardSize = null;
 
-    /**
-     * DiversifiedSamplerAggregation constructor.
-     *
-     * @param string $name Aggregation name
-     * @param string $field Elasticsearch field name
-     * @param int $shardSize Shard size, by default it's 100
-     */
-    public function __construct($name, $field = null, $shardSize = null)
+    public function __construct(string $name, ?string $field = null, ?int $shardSize = null)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setShardSize($shardSize);
+        if ($field !== null) {
+            $this->setField($field);
+        }
+
+        if ($shardSize !== null) {
+            $this->setShardSize($shardSize);
+        }
     }
 
-    /**
-     * @return mixed
-     */
-    public function getShardSize()
+    public function getShardSize(): mixed
     {
         return $this->shardSize;
     }
 
-    /**
-     * @param mixed $shardSize
-     *
-     * @return $this
-     */
-    public function setShardSize($shardSize)
+    public function setShardSize(int $shardSize): self
     {
         $this->shardSize = $shardSize;
 
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'diversified_sampler';
     }
@@ -75,15 +50,14 @@ class DiversifiedSamplerAggregation extends AbstractAggregation
     /**
      * @inheritdoc
      */
-    protected function getArray()
+    protected function getArray(): array
     {
-        $out = array_filter(
+        return array_filter(
             [
                 'field' => $this->getField(),
                 'shard_size' => $this->getShardSize(),
-            ]
+            ],
         );
-
-        return $out;
     }
+
 }

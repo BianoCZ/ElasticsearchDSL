@@ -1,49 +1,49 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Compound;
+namespace Biano\ElasticsearchDSL\Query\Compound;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
+use UnexpectedValueException;
+use stdClass;
+use function array_merge;
+use function array_walk;
+use function assert;
+use function bin2hex;
+use function count;
+use function in_array;
+use function is_array;
+use function random_bytes;
+use function reset;
+use function sprintf;
 
 /**
- * Represents Elasticsearch "bool" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html
  */
 class BoolQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    const MUST = 'must';
-    const MUST_NOT = 'must_not';
-    const SHOULD = 'should';
-    const FILTER = 'filter';
+    public const MUST = 'must';
+    public const MUST_NOT = 'must_not';
+    public const SHOULD = 'should';
+    public const FILTER = 'filter';
+
+    /** @var array<string,array<string,\Biano\ElasticsearchDSL\BuilderInterface>> */
+    private array $container = [];
 
     /**
-     * @var array
-     */
-    private $container = [];
-
-    /**
-     * Constructor to prepare container.
-     *
-     * @param array $container
+     * @param array<string,array<string,\Biano\ElasticsearchDSL\BuilderInterface>> $container
      */
     public function __construct(array $container = [])
     {
         foreach ($container as $type => $queries) {
             $queries = is_array($queries) ? $queries : [$queries];
 
-            array_walk($queries, function ($query) use ($type) {
+            array_walk($queries, function ($query) use ($type): void {
                 $this->add($query, $type);
             });
         }
@@ -52,11 +52,9 @@ class BoolQuery implements BuilderInterface
     /**
      * Returns the query instances (by bool type).
      *
-     * @param  string|null $boolType
-     *
-     * @return array
+     * @return array<string,\Biano\ElasticsearchDSL\BuilderInterface>
      */
-    public function getQueries($boolType = null)
+    public function getQueries(?string $boolType = null): array
     {
         if ($boolType === null) {
             $queries = [];
@@ -75,21 +73,10 @@ class BoolQuery implements BuilderInterface
         return [];
     }
 
-    /**
-     * Add BuilderInterface object to bool operator.
-     *
-     * @param BuilderInterface $query Query add to the bool.
-     * @param string           $type  Bool type. Example: must, must_not, should.
-     * @param string           $key   Key that indicates a builder id.
-     *
-     * @return string Key of added builder.
-     *
-     * @throws \UnexpectedValueException
-     */
-    public function add(BuilderInterface $query, $type = self::MUST, $key = null)
+    public function add(BuilderInterface $query, string $type = self::MUST, ?string $key = null): string
     {
         if (!in_array($type, [self::MUST, self::MUST_NOT, self::SHOULD, self::FILTER])) {
-            throw new \UnexpectedValueException(sprintf('The bool operator %s is not supported', $type));
+            throw new UnexpectedValueException(sprintf('The bool operator %s is not supported', $type));
         }
 
         if (!$key) {
@@ -102,12 +89,11 @@ class BoolQuery implements BuilderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
-        if (count($this->container) === 1 && isset($this->container[self::MUST])
-                && count($this->container[self::MUST]) === 1) {
+        if (count($this->container) === 1 && isset($this->container[self::MUST]) && count($this->container[self::MUST]) === 1) {
             $query = reset($this->container[self::MUST]);
 
             return $query->toArray();
@@ -116,8 +102,8 @@ class BoolQuery implements BuilderInterface
         $output = [];
 
         foreach ($this->container as $boolType => $builders) {
-            /** @var BuilderInterface $builder */
             foreach ($builders as $builder) {
+                assert($builder instanceof BuilderInterface);
                 $output[$boolType][] = $builder->toArray();
             }
         }
@@ -125,17 +111,15 @@ class BoolQuery implements BuilderInterface
         $output = $this->processArray($output);
 
         if (empty($output)) {
-            $output = new \stdClass();
+            $output = new stdClass();
         }
 
         return [$this->getType() => $output];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'bool';
     }
+
 }

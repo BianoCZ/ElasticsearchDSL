@@ -1,24 +1,19 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\TermLevel;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\TermLevel;
 
-use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use Biano\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use PHPUnit\Framework\TestCase;
 
-class IdsQueryTest extends \PHPUnit\Framework\TestCase
+class IdsQueryTest extends TestCase
 {
+
     /**
      * Tests toArray().
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $query = new IdsQuery(['foo', 'bar']);
         $expected = [
@@ -29,4 +24,5 @@ class IdsQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expected, $query->toArray());
     }
+
 }

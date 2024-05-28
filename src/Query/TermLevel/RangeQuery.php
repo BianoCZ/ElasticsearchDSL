@@ -1,46 +1,34 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\TermLevel;
+namespace Biano\ElasticsearchDSL\Query\TermLevel;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "range" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
  */
 class RangeQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
     /**
      * Range control names.
      */
-    const LT = 'lt';
-    const GT = 'gt';
-    const LTE = 'lte';
-    const GTE = 'gte';
+    public const LT = 'lt';
+    public const GT = 'gt';
+    public const LTE = 'lte';
+    public const GTE = 'gte';
+
+    private string $field;
 
     /**
-     * @var string Field name.
+     * @param array<string,mixed> $parameters
      */
-    private $field;
-
-    /**
-     * @param string $field
-     * @param array  $parameters
-     */
-    public function __construct($field, array $parameters = [])
+    public function __construct(string $field, array $parameters = [])
     {
         $this->setParameters($parameters);
 
@@ -55,18 +43,15 @@ class RangeQuery implements BuilderInterface
         $this->field = $field;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'range';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $output = [
             $this->field => $this->getParameters(),
@@ -74,4 +59,5 @@ class RangeQuery implements BuilderInterface
 
         return [$this->getType() => $output];
     }
+
 }

@@ -1,42 +1,33 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\SearchEndpoint;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-/**
- * Search sort dsl endpoint.
- */
 class SortEndpoint extends AbstractSearchEndpoint
 {
-    /**
-     * Endpoint name
-     */
-    const NAME = 'sort';
+
+    public const NAME = 'sort';
+
+    protected function getName(): string
+    {
+        return self::NAME;
+    }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function normalize(
-        NormalizerInterface $normalizer,
-        $format = null,
-        array $context = []
-    ): array|string|int|float|bool {
-        $output = [];
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = []): array|string|int|float|bool
+    {
+        $result = [];
 
         foreach ($this->getAll() as $sort) {
-            $output[] = $sort->toArray();
+            $result[] = $sort->toArray();
         }
 
-        return $output;
+        return $result;
     }
+
 }

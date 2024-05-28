@@ -1,30 +1,23 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\SearchEndpoint\QueryEndpoint;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
+use Biano\ElasticsearchDSL\Query\MatchAllQuery;
+use Biano\ElasticsearchDSL\SearchEndpoint\QueryEndpoint;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use function assert;
 
 /**
  * Unit test class for the QueryEndpoint.
  */
-class QueryEndpointTest extends \PHPUnit\Framework\TestCase
+class QueryEndpointTest extends TestCase
 {
-    /**
-     * Tests constructor.
-     */
-    public function testItCanBeInstantiated()
+
+    public function testItCanBeInstantiated(): void
     {
         $this->assertInstanceOf(QueryEndpoint::class, new QueryEndpoint());
     }
@@ -32,7 +25,7 @@ class QueryEndpointTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if correct order is returned. Query must be executed after filter and post filter.
      */
-    public function testGetOrder()
+    public function testGetOrder(): void
     {
         $instance = new QueryEndpoint();
         $this->assertEquals(2, $instance->getOrder());
@@ -41,13 +34,13 @@ class QueryEndpointTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if endpoint return correct normalized data.
      */
-    public function testEndpoint()
+    public function testEndpoint(): void
     {
         $instance = new QueryEndpoint();
-        /** @var NormalizerInterface|MockObject $normalizerInterface */
         $normalizerInterface = $this->getMockForAbstractClass(
-            NormalizerInterface::class
+            NormalizerInterface::class,
         );
+        assert($normalizerInterface instanceof NormalizerInterface || $normalizerInterface instanceof MockObject);
 
         $this->assertFalse($instance->normalize($normalizerInterface));
 
@@ -56,14 +49,14 @@ class QueryEndpointTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             $matchAll->toArray(),
-            $instance->normalize($normalizerInterface)
+            $instance->normalize($normalizerInterface),
         );
     }
 
     /**
      * Tests if endpoint returns builders.
      */
-    public function testEndpointGetter()
+    public function testEndpointGetter(): void
     {
         $queryName = 'acme_query';
         $query = new MatchAllQuery();
@@ -74,4 +67,5 @@ class QueryEndpointTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $builders);
         $this->assertSame($query, $builders[$queryName]);
     }
+
 }

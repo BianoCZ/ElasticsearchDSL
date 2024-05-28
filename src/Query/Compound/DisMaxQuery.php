@@ -1,37 +1,25 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Compound;
+namespace Biano\ElasticsearchDSL\Query\Compound;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "dis_max" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-dis-max-query.html
  */
 class DisMaxQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var BuilderInterface[]
-     */
-    private $queries = [];
+    /** @var list<\Biano\ElasticsearchDSL\BuilderInterface> */
+    private array $queries = [];
 
     /**
-     * Initializes Dis Max query.
-     *
-     * @param array $parameters
+     * @param array<string,mixed> $parameters
      */
     public function __construct(array $parameters = [])
     {
@@ -40,37 +28,32 @@ class DisMaxQuery implements BuilderInterface
 
     /**
      * Add query.
-     *
-     * @param BuilderInterface $query
-     *
-     * @return DisMaxQuery
      */
-    public function addQuery(BuilderInterface $query)
+    public function addQuery(BuilderInterface $query): self
     {
         $this->queries[] = $query;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'dis_max';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [];
         foreach ($this->queries as $type) {
             $query[] = $type->toArray();
         }
+
         $output = $this->processArray(['queries' => $query]);
 
         return [$this->getType() => $output];
     }
+
 }

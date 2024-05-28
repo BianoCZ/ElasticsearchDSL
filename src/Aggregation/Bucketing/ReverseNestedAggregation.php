@@ -1,86 +1,57 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use stdClass;
 
 /**
- * Class representing ReverseNestedAggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-reverse-nested-aggregation.html
  */
-class ReverseNestedAggregation extends AbstractAggregation
+class ReverseNestedAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
 
-    /**
-     * @var string
-     */
-    private $path;
+    private ?string $path = null;
 
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $path
-     */
-    public function __construct($name, $path = null)
+    public function __construct(string $name, ?string $path = null)
     {
         parent::__construct($name);
 
-        $this->setPath($path);
+        if ($path !== null) {
+            $this->setPath($path);
+        }
     }
 
     /**
      * Return path.
-     *
-     * @return string
      */
-    public function getPath()
+    public function getPath(): ?string
     {
         return $this->path;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return $this
-     */
-    public function setPath($path)
+    public function setPath(string $path): self
     {
         $this->path = $path;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'reverse_nested';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
+    public function getArray(): array|stdClass
     {
-        $output = new \stdClass();
-        if ($this->getPath()) {
-            $output = ['path' => $this->getPath()];
+        if ($this->getPath() === null) {
+            return new stdClass();
         }
 
-        return $output;
+        return [
+            'path' => $this->getPath(),
+        ];
     }
+
 }

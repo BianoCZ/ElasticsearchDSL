@@ -1,25 +1,22 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\ReverseNestedAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\TermsAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\ReverseNestedAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\TermsAggregation;
+use PHPUnit\Framework\TestCase;
+use stdClass;
+use function json_encode;
 
-class ReverseNestedAggregationTest extends \PHPUnit\Framework\TestCase
+class ReverseNestedAggregationTest extends TestCase
 {
+
     /**
      * Test for reverse_nested aggregation toArray() method exception.
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $termAggregation = new TermsAggregation('acme');
 
@@ -40,7 +37,7 @@ class ReverseNestedAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for reverse_nested aggregation toArray() without path.
      */
-    public function testToArrayNoPath()
+    public function testToArrayNoPath(): void
     {
         $termAggregation = new TermsAggregation('acme');
 
@@ -48,7 +45,7 @@ class ReverseNestedAggregationTest extends \PHPUnit\Framework\TestCase
         $aggregation->addAggregation($termAggregation);
 
         $expectedResult = [
-            'reverse_nested' => new \stdClass(),
+            'reverse_nested' => new stdClass(),
             'aggregations' => [
                 $termAggregation->getName() => $termAggregation->toArray(),
             ],
@@ -56,7 +53,8 @@ class ReverseNestedAggregationTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             json_encode($expectedResult),
-            json_encode($aggregation->toArray())
+            json_encode($aggregation->toArray()),
         );
     }
+
 }

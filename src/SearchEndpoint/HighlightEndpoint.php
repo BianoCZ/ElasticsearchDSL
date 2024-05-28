@@ -1,17 +1,11 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use OverflowException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -19,62 +13,60 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class HighlightEndpoint extends AbstractSearchEndpoint
 {
-    /**
-     * Endpoint name
-     */
-    const NAME = 'highlight';
+
+    public const NAME = 'highlight';
+
+    private ?BuilderInterface $highlight = null;
 
     /**
-     * @var BuilderInterface
+     * Key for highlight storing.
      */
-    private $highlight;
+    private ?string $key = null;
+
+    protected function getName(): string
+    {
+        return self::NAME;
+    }
 
     /**
-     * @var string Key for highlight storing.
+     * @inheritDoc
      */
-    private $key;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function normalize(
-        NormalizerInterface $normalizer,
-        $format = null,
-        array $context = []
-    ): array|string|int|float|bool {
-        if ($this->highlight) {
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = []): array|string|int|float|bool
+    {
+        if ($this->highlight !== null) {
             return $this->highlight->toArray();
         }
 
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function add(BuilderInterface $builder, $key = null)
+    public function add(BuilderInterface $builder, ?string $key = null): string
     {
-        if ($this->highlight) {
-            throw new \OverflowException('Only one highlight can be set');
+        if ($this->highlight !== null) {
+            throw new OverflowException('Only one highlight can be set');
         }
 
         $this->key = $key;
         $this->highlight = $builder;
+
+        return $key ?? '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAll($boolType = null)
-    {
-        return [$this->key => $this->highlight];
-    }
-
-    /**
-     * @return BuilderInterface
-     */
-    public function getHighlight()
+    public function getHighlight(): ?BuilderInterface
     {
         return $this->highlight;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAll(?string $boolType = null): array
+    {
+        if ($this->highlight === null) {
+            return [];
+        }
+
+        return [$this->key => $this->highlight];
+    }
+
 }

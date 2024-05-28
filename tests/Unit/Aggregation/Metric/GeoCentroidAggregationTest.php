@@ -1,29 +1,25 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\Metric\GeoCentroidAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Metric\GeoCentroidAggregation;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for children aggregation.
  */
-class GeoCentroidAggregationTest extends \PHPUnit\Framework\TestCase
+class GeoCentroidAggregationTest extends TestCase
 {
+
     /**
      * Test if exception is thrown when field is not provided
      */
-    public function testGetArrayException()
+    public function testGetArrayException(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $aggregation = new GeoCentroidAggregation('foo');
         $aggregation->getArray();
     }
@@ -31,7 +27,7 @@ class GeoCentroidAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getType method.
      */
-    public function testGeoCentroidAggregationGetType()
+    public function testGeoCentroidAggregationGetType(): void
     {
         $aggregation = new GeoCentroidAggregation('foo');
         $this->assertEquals('geo_centroid', $aggregation->getType());
@@ -40,9 +36,10 @@ class GeoCentroidAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      */
-    public function testGeoCentroidAggregationGetArray()
+    public function testGeoCentroidAggregationGetArray(): void
     {
         $aggregation = new GeoCentroidAggregation('foo', 'location');
         $this->assertEquals(['field' => 'location'], $aggregation->getArray());
     }
+
 }

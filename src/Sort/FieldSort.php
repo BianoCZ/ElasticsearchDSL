@@ -1,70 +1,53 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Sort;
+namespace Biano\ElasticsearchDSL\Sort;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
+use stdClass;
+use function count;
 
 /**
  * Holds all the values required for basic sorting.
  */
 class FieldSort implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    const ASC = 'asc';
-    const DESC = 'desc';
+    public const ASC = 'asc';
+    public const DESC = 'desc';
+
+    private string $field;
+
+    /** @var string|array<string,mixed>|null */
+    private string|array|null $order = null;
+
+    private ?BuilderInterface $nestedFilter = null;
 
     /**
-     * @var string
+     * @param string|array<string,mixed>|null $order
+     * @param array<string,mixed> $parameters
      */
-    private $field;
-
-    /**
-     * @var string
-     */
-    private $order;
-
-    /**
-     * @var BuilderInterface
-     */
-    private $nestedFilter;
-
-    /**
-     * @param string $field  Field name.
-     * @param string $order  Order direction.
-     * @param array  $params Params that can be set to field sort.
-     */
-    public function __construct($field, $order = null, $params = [])
+    public function __construct(string $field, string|array|null $order = null, array $parameters = [])
     {
-        $this->field = $field;
-        $this->order = $order;
-        $this->setParameters($params);
+        $this->setField($field);
+
+        if ($order !== null) {
+            $this->setOrder($order);
+        }
+
+        $this->setParameters($parameters);
     }
 
-    /**
-     * @return string
-     */
-    public function getField()
+    public function getField(): string
     {
         return $this->field;
     }
 
-    /**
-     * @param string $field
-     *
-     * @return $this
-     */
-    public function setField($field)
+    public function setField(string $field): self
     {
         $this->field = $field;
 
@@ -72,72 +55,56 @@ class FieldSort implements BuilderInterface
     }
 
     /**
-     * @return string
+     * @return string|array<string,mixed>|null
      */
-    public function getOrder()
+    public function getOrder(): string|array|null
     {
         return $this->order;
     }
 
     /**
-     * @param string $order
-     *
-     * @return $this
+     * @param string|array<string,mixed> $order
      */
-    public function setOrder($order)
+    public function setOrder(string|array $order): self
     {
         $this->order = $order;
 
         return $this;
     }
 
-    /**
-     * @return BuilderInterface
-     */
-    public function getNestedFilter()
+    public function getNestedFilter(): ?BuilderInterface
     {
         return $this->nestedFilter;
     }
 
-    /**
-     * @param BuilderInterface $nestedFilter
-     *
-     * @return $this
-     */
-    public function setNestedFilter(BuilderInterface $nestedFilter)
+    public function setNestedFilter(BuilderInterface $nestedFilter): self
     {
         $this->nestedFilter = $nestedFilter;
 
         return $this;
     }
 
-    /**
-     * Returns element type.
-     *
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'sort';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
-        if ($this->order) {
-            $this->addParameter('order', $this->order);
+        if ($this->getOrder() !== null) {
+            $this->addParameter('order', $this->getOrder());
         }
 
-        if ($this->nestedFilter) {
-            $this->addParameter('nested', $this->nestedFilter->toArray());
+        if ($this->getNestedFilter() !== null) {
+            $this->addParameter('nested', $this->getNestedFilter()->toArray());
         }
 
-        $output = [
-            $this->field => !$this->getParameters() ? new \stdClass() : $this->getParameters(),
+        return [
+            $this->field => count($this->getParameters()) > 0 ? $this->getParameters() : new stdClass(),
         ];
-
-        return $output;
     }
+
 }

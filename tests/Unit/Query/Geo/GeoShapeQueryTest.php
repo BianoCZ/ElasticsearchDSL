@@ -1,24 +1,19 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\Geo;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Geo;
 
-use ONGR\ElasticsearchDSL\Query\Geo\GeoShapeQuery;
+use Biano\ElasticsearchDSL\Query\Geo\GeoShapeQuery;
+use PHPUnit\Framework\TestCase;
 
-class GeoShapeQueryTest extends \PHPUnit\Framework\TestCase
+class GeoShapeQueryTest extends TestCase
 {
+
     /**
      * Tests toArray() method.
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $filter = new GeoShapeQuery(['param1' => 'value1']);
         $filter->addShape('location', 'envelope', [[13, 53], [14, 52]], GeoShapeQuery::INTERSECTS);
@@ -30,7 +25,7 @@ class GeoShapeQueryTest extends \PHPUnit\Framework\TestCase
                         'type' => 'envelope',
                         'coordinates' => [[13, 53], [14, 52]],
                     ],
-                    'relation' => 'intersects'
+                    'relation' => 'intersects',
                 ],
                 'param1' => 'value1',
             ],
@@ -42,7 +37,7 @@ class GeoShapeQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for toArray() in case of pre-indexed shape.
      */
-    public function testToArrayIndexed()
+    public function testToArrayIndexed(): void
     {
         $filter = new GeoShapeQuery(['param1' => 'value1']);
         $filter->addPreIndexedShape('location', 'DEU', 'countries', 'shapes', 'location', GeoShapeQuery::WITHIN);
@@ -56,7 +51,7 @@ class GeoShapeQueryTest extends \PHPUnit\Framework\TestCase
                         'index' => 'shapes',
                         'path' => 'location',
                     ],
-                    'relation' => 'within'
+                    'relation' => 'within',
                 ],
                 'param1' => 'value1',
             ],
@@ -64,4 +59,5 @@ class GeoShapeQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expected, $filter->toArray());
     }
+
 }

@@ -1,83 +1,60 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use LogicException;
+use function array_filter;
+use function count;
+use function sprintf;
 
 /**
- * Class representing ChildrenAggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-children-aggregation.html
  */
-class ChildrenAggregation extends AbstractAggregation
+class ChildrenAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
 
-    /**
-     * @var string
-     */
-    private $children;
+    private ?string $children = null;
 
-    /**
-     * Return children.
-     *
-     * @return string
-     */
-    public function getChildren()
+    public function __construct(string $name, ?string $children = null)
+    {
+        parent::__construct($name);
+
+        if ($children !== null) {
+            $this->setChildren($children);
+        }
+    }
+
+    public function getChildren(): ?string
     {
         return $this->children;
     }
 
-    /**
-     * @param string $name
-     * @param string $children
-     */
-    public function __construct($name, $children = null)
-    {
-        parent::__construct($name);
-
-        $this->setChildren($children);
-    }
-
-    /**
-     * @param string $children
-     *
-     * @return $this
-     */
-    public function setChildren($children)
+    public function setChildren(string $children): self
     {
         $this->children = $children;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'children';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
-        if (count($this->getAggregations()) == 0) {
-            throw new \LogicException("Children aggregation `{$this->getName()}` has no aggregations added");
+        if (count($this->getAggregations()) === 0) {
+            throw new LogicException(sprintf('Children aggregation `%s` has no aggregations added', $this->getName()));
         }
 
-        return ['type' => $this->getChildren()];
+        return array_filter([
+            'type' => $this->getChildren(),
+        ]);
     }
+
 }

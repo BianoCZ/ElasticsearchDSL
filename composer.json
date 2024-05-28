@@ -6,14 +6,14 @@
     "authors": [
         {
             "name": "ONGR team",
-            "homepage": "http://www.ongr.io"
+            "homepage": "https://github.com/ongr-io/ElasticsearchDSL/ElasticsearchDSL/graphs/contributors"
         },
         {
-            "name": "Handcrafted in the Alps Team",
+            "name": "Handcrafted in the Alps team",
             "homepage": "https://github.com/handcraftedinthealps/ElasticsearchDSL/graphs/contributors"
         },
         {
-            "name": "Biano",
+            "name": "Biano team",
             "homepage": "https://github.com/bianocz/elasticsearchdsl/graphs/contributors"
         }
     ],
@@ -24,26 +24,21 @@
         "symfony/serializer": "^4.0 || ^5.0 || ^6.0 || ^7.0"
     },
     "require-dev": {
-        "nyholm/psr7": "^1.5",
+        "biano/coding-standard": "^4.0",
+        "phpstan/phpstan": "^1.11",
         "phpunit/phpunit": "^9.6",
+        "shipmonk/composer-dependency-analyser": "^1.5",
         "squizlabs/php_codesniffer": "^3.9"
-    },
-    "suggest": {
-      "elasticsearch/elasticsearch": "This library is for elasticsearch/elasticsearch client to enhance it with DSL functionality."
     },
     "autoload": {
         "psr-4": {
-            "ONGR\\ElasticsearchDSL\\": "src/"
-        },
-        "exclude-from-classmap": ["/tests/"]
+            "Biano\\ElasticsearchDSL\\": "src/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "ONGR\\ElasticsearchDSL\\Tests\\": "tests/"
+            "Biano\\ElasticsearchDSL\\Tests\\": "tests/"
         }
-    },
-    "replace": {
-        "ongr/elasticsearch-dsl": "self.version"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -53,7 +48,48 @@
         },
         "sort-packages": true,
         "allow-plugins": {
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
+    },
+    "scripts": {
+        "test": [
+            "@style:phpcs",
+            "@test:unit",
+            "@style:phpstan",
+            "@check:dependency",
+            "@test:functional"
+        ],
+        "test:test": [
+            "@test:unit",
+            "@test:functional"
+        ],
+        "test:unit": [
+            "@phpunit --testsuite=Unit"
+        ],
+        "test:functional": [
+            "@phpunit --testsuite=Functional"
+        ],
+        "style:phpcs": [
+            "@phpcs"
+        ],
+        "style:phpstan": [
+            "@phpstan"
+        ],
+        "style:check": [
+            "@style:phpcs",
+            "@style:phpstan"
+        ],
+        "style:fix": [
+            "@phpcbf src tests"
+        ],
+        "check:dependency": [
+            "@composer-dependency-analyser"
+        ],
+        "phpunit": "./vendor/bin/phpunit",
+        "phpcs": "./vendor/bin/phpcs -p -s --extensions=php --colors --report-width=140",
+        "phpstan": "./vendor/bin/phpstan analyse -c phpstan.neon",
+        "phpcbf": "./vendor/bin/phpcbf -p --extensions=php",
+        "composer-dependency-analyser": "./vendor/bin/composer-dependency-analyser"
     }
 }

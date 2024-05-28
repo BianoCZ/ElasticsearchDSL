@@ -1,142 +1,102 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation;
+namespace Biano\ElasticsearchDSL\Aggregation;
 
-use ONGR\ElasticsearchDSL\BuilderBag;
-use ONGR\ElasticsearchDSL\NameAwareTrait;
-use ONGR\ElasticsearchDSL\NamedBuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderBag;
+use Biano\ElasticsearchDSL\NameAwareTrait;
+use Biano\ElasticsearchDSL\NamedBuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
+use stdClass;
+use function count;
+use function is_array;
 
-/**
- * AbstractAggregation class.
- */
 abstract class AbstractAggregation implements NamedBuilderInterface
 {
+
     use ParametersTrait;
     use NameAwareTrait;
 
-    /**
-     * @var string
-     */
-    private $field;
+    private ?string $field = null;
+
+    private ?BuilderBag $aggregations = null;
+
+    abstract protected function supportsNesting(): bool;
 
     /**
-     * @var BuilderBag
+     * @return array<mixed>|\stdClass
      */
-    private $aggregations;
+    abstract protected function getArray(): array|stdClass;
 
-    /**
-     * Abstract supportsNesting method.
-     *
-     * @return bool
-     */
-    abstract protected function supportsNesting();
-
-    /**
-     * @return array|\stdClass
-     */
-    abstract protected function getArray();
-
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->setName($name);
     }
 
-    /**
-     * @param string $field
-     *
-     * @return $this
-     */
-    public function setField($field)
+    public function setField(string $field): self
     {
         $this->field = $field;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getField()
+    public function getField(): ?string
     {
         return $this->field;
     }
 
     /**
      * Adds a sub-aggregation.
-     *
-     * @param AbstractAggregation $abstractAggregation
-     *
-     * @return $this
      */
-    public function addAggregation(AbstractAggregation $abstractAggregation)
+    public function addAggregation(AbstractAggregation $abstractAggregation): self
     {
-        if (!$this->aggregations) {
+        if ($this->aggregations === null) {
             $this->aggregations = $this->createBuilderBag();
         }
 
         $this->aggregations->add($abstractAggregation);
-        
+
         return $this;
     }
 
     /**
      * Returns all sub aggregations.
      *
-     * @return BuilderBag[]|NamedBuilderInterface[]
+     * @return list<\Biano\ElasticsearchDSL\Aggregation\AbstractAggregation>
      */
-    public function getAggregations()
+    public function getAggregations(): array
     {
-        if ($this->aggregations) {
-            return $this->aggregations->all();
-        } else {
-            return [];
-        }
+        return $this->aggregations?->all() ?? [];
     }
 
     /**
      * Returns sub aggregation.
-     * @param string $name Aggregation name to return.
-     *
-     * @return AbstractAggregation|NamedBuilderInterface|null
      */
-    public function getAggregation($name)
+    public function getAggregation(string $name): ?AbstractAggregation
     {
-        if ($this->aggregations && $this->aggregations->has($name)) {
+        if ($this->aggregations?->has($name) ?? false) {
             return $this->aggregations->get($name);
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
-        $array = $this->getArray();
+        $data = $this->getArray();
+
         $result = [
-            $this->getType() => is_array($array) ? $this->processArray($array) : $array,
+            $this->getType() => is_array($data) ? $this->processArray($data) : $data,
         ];
 
         if ($this->supportsNesting()) {
             $nestedResult = $this->collectNestedAggregations();
 
-            if (!empty($nestedResult)) {
+            if (count($nestedResult) > 0) {
                 $result['aggregations'] = $nestedResult;
             }
         }
@@ -147,12 +107,12 @@ abstract class AbstractAggregation implements NamedBuilderInterface
     /**
      * Process all nested aggregations.
      *
-     * @return array
+     * @return array<string,array<mixed>>
      */
-    protected function collectNestedAggregations()
+    protected function collectNestedAggregations(): array
     {
         $result = [];
-        /** @var AbstractAggregation $aggregation */
+
         foreach ($this->getAggregations() as $aggregation) {
             $result[$aggregation->getName()] = $aggregation->toArray();
         }
@@ -160,13 +120,9 @@ abstract class AbstractAggregation implements NamedBuilderInterface
         return $result;
     }
 
-    /**
-     * Creates BuilderBag new instance.
-     *
-     * @return BuilderBag
-     */
-    private function createBuilderBag()
+    private function createBuilderBag(): BuilderBag
     {
         return new BuilderBag();
     }
+
 }

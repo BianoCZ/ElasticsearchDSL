@@ -1,41 +1,25 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Span;
+namespace Biano\ElasticsearchDSL\Query\Span;
 
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Elasticsearch Span not query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-span-not-query.html
  */
 class SpanNotQuery implements SpanQueryInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var SpanQueryInterface
-     */
-    private $include;
+    private SpanQueryInterface $include;
+
+    private SpanQueryInterface $exclude;
 
     /**
-     * @var SpanQueryInterface
-     */
-    private $exclude;
-
-    /**
-     * @param SpanQueryInterface $include
-     * @param SpanQueryInterface $exclude
-     * @param array              $parameters
+     * @param array<string,mixed> $parameters
      */
     public function __construct(SpanQueryInterface $include, SpanQueryInterface $exclude, array $parameters = [])
     {
@@ -44,18 +28,15 @@ class SpanNotQuery implements SpanQueryInterface
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'span_not';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [
             'include' => $this->include->toArray(),
@@ -64,4 +45,5 @@ class SpanNotQuery implements SpanQueryInterface
 
         return [$this->getType() => $this->processArray($query)];
     }
+
 }

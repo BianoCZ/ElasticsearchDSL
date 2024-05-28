@@ -1,57 +1,43 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use LogicException;
 
 /**
- * Class representing missing aggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-missing-aggregation.html
  */
-class MissingAggregation extends AbstractAggregation
+class MissingAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
 
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $field
-     */
-    public function __construct($name, $field = null)
+    public function __construct(string $name, ?string $field = null)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
-    {
-        if ($this->getField()) {
-            return ['field' => $this->getField()];
+        if ($field !== null) {
+            $this->setField($field);
         }
-        throw new \LogicException('Missing aggregation must have a field set.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'missing';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArray(): array
+    {
+        if ($this->getField() === null) {
+            throw new LogicException('Missing aggregation must have a field set.');
+        }
+
+        return [
+            'field' => $this->getField(),
+        ];
+    }
+
 }

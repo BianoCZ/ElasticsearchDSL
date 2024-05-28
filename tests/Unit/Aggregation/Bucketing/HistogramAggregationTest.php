@@ -1,30 +1,26 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\HistogramAggregation;
+use Biano\ElasticsearchDSL\Aggregation\AbstractAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\HistogramAggregation;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for children aggregation.
  */
-class HistogramAggregationTest extends \PHPUnit\Framework\TestCase
+class HistogramAggregationTest extends TestCase
 {
+
     /**
      * Tests if ChildrenAggregation#getArray throws exception when expected.
      */
-    public function testGetArrayException()
+    public function testGetArrayException(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $aggregation = new HistogramAggregation('foo');
         $aggregation->getArray();
     }
@@ -32,9 +28,9 @@ class HistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if ChildrenAggregation#getArray throws exception when expected.
      */
-    public function testGetArrayExceptionWhenDontSendInterval()
+    public function testGetArrayExceptionWhenDontSendInterval(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $aggregation = new HistogramAggregation('foo', 'age');
         $aggregation->getArray();
     }
@@ -42,7 +38,7 @@ class HistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getType method.
      */
-    public function testHistogramAggregationGetType()
+    public function testHistogramAggregationGetType(): void
     {
         $aggregation = new HistogramAggregation('foo');
         $result = $aggregation->getType();
@@ -52,11 +48,12 @@ class HistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      */
-    public function testChildrenAggregationGetArray()
+    public function testChildrenAggregationGetArray(): void
     {
         $mock = $this->getMockBuilder(AbstractAggregation::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
+        $mock->setName('name');
         $aggregation = new HistogramAggregation('foo');
         $aggregation->addAggregation($mock);
         $aggregation->setField('age');
@@ -69,7 +66,7 @@ class HistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      */
-    public function testIntervalGetArray()
+    public function testIntervalGetArray(): void
     {
         $aggregation = new HistogramAggregation('foo');
         $aggregation->setField('age');
@@ -82,7 +79,7 @@ class HistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      */
-    public function testExtendedBoundsGetArray()
+    public function testExtendedBoundsGetArray(): void
     {
         $aggregation = new HistogramAggregation('foo');
         $aggregation->setField('age');
@@ -97,7 +94,7 @@ class HistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      */
-    public function testExtendedBoundsWithNullGetArray()
+    public function testExtendedBoundsWithNullGetArray(): void
     {
         $aggregation = new HistogramAggregation('foo');
         $aggregation->setField('age');
@@ -108,4 +105,5 @@ class HistogramAggregationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['min' => 0], $aggregation->getExtendedBounds());
         $this->assertEquals($expected, $result);
     }
+
 }

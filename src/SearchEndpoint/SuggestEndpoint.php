@@ -1,45 +1,37 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\Suggest\Suggest;
+use Biano\ElasticsearchDSL\Suggest\Suggest;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use function array_merge;
+use function assert;
 
-/**
- * Search suggest dsl endpoint.
- */
 class SuggestEndpoint extends AbstractSearchEndpoint
 {
-    /**
-     * Endpoint name
-     */
-    const NAME = 'suggest';
+
+    public const NAME = 'suggest';
+
+    protected function getName(): string
+    {
+        return self::NAME;
+    }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function normalize(
-        NormalizerInterface $normalizer,
-        $format = null,
-        array $context = []
-    ): array|string|int|float|bool {
-        $output = [];
-        if (count($this->getAll()) > 0) {
-            /** @var Suggest $suggest */
-            foreach ($this->getAll() as $suggest) {
-                $output = array_merge($output, $suggest->toArray());
-            }
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = []): array|string|int|float|bool
+    {
+        $result = [];
+
+        foreach ($this->getAll() as $suggest) {
+            assert($suggest instanceof Suggest);
+            $result = array_merge($result, $suggest->toArray());
         }
 
-        return $output;
+        return $result;
     }
+
 }

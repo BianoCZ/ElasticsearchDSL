@@ -1,64 +1,32 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\MetricTrait;
-use ONGR\ElasticsearchDSL\ScriptAwareTrait;
+use function array_filter;
 
 /**
- * Class representing StatsAggregation.
- *
- * @link http://goo.gl/JbQsI3
+ * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-scripted-metric-aggregation.html
  */
-class ScriptedMetricAggregation extends AbstractAggregation
+class ScriptedMetricAggregation extends AbstractMetricAggregation
 {
-    use MetricTrait;
 
-    /**
-     * @var mixed
-     */
-    private $initScript;
+    private mixed $initScript;
 
-    /**
-     * @var mixed
-     */
-    private $mapScript;
+    private mixed $mapScript;
 
-    /**
-     * @var mixed
-     */
-    private $combineScript;
+    private mixed $combineScript;
 
-    /**
-     * @var mixed
-     */
-    private $reduceScript;
-    /**
-     * ScriptedMetricAggregation constructor.
-     * @param string $name
-     * @param mixed $initScript
-     * @param mixed $mapScript
-     * @param mixed $combineScript
-     * @param mixed $reduceScript
-     */
+    private mixed $reduceScript;
+
     public function __construct(
-        $name,
-        $initScript = null,
-        $mapScript = null,
-        $combineScript = null,
-        $reduceScript = null
+        string $name,
+        mixed $initScript = null,
+        mixed $mapScript = null,
+        mixed $combineScript = null,
+        mixed $reduceScript = null,
     ) {
-    
         parent::__construct($name);
 
         $this->setInitScript($initScript);
@@ -67,108 +35,72 @@ class ScriptedMetricAggregation extends AbstractAggregation
         $this->setReduceScript($reduceScript);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'scripted_metric';
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getInitScript()
+    public function getInitScript(): mixed
     {
         return $this->initScript;
     }
 
-    /**
-     * @param mixed $initScript
-     *
-     * @return $this
-     */
-    public function setInitScript($initScript)
+    public function setInitScript(mixed $initScript): self
     {
         $this->initScript = $initScript;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMapScript()
+    public function getMapScript(): mixed
     {
         return $this->mapScript;
     }
 
-    /**
-     * @param mixed $mapScript
-     *
-     * @return $this
-     */
-    public function setMapScript($mapScript)
+    public function setMapScript(mixed $mapScript): self
     {
         $this->mapScript = $mapScript;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCombineScript()
+    public function getCombineScript(): mixed
     {
         return $this->combineScript;
     }
 
-    /**
-     * @param mixed $combineScript
-     *
-     * @return $this
-     */
-    public function setCombineScript($combineScript)
+    public function setCombineScript(mixed $combineScript): self
     {
         $this->combineScript = $combineScript;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getReduceScript()
+    public function getReduceScript(): mixed
     {
         return $this->reduceScript;
     }
 
-    /**
-     * @param mixed $reduceScript
-     *
-     * @return $this
-     */
-    public function setReduceScript($reduceScript)
+    public function setReduceScript(mixed $reduceScript): self
     {
         $this->reduceScript = $reduceScript;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
+    public function getType(): string
     {
-        $out = array_filter(
+        return 'scripted_metric';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArray(): array
+    {
+        return array_filter(
             [
                 'init_script' => $this->getInitScript(),
                 'map_script' => $this->getMapScript(),
                 'combine_script' => $this->getCombineScript(),
                 'reduce_script' => $this->getReduceScript(),
-            ]
+            ],
         );
-
-        return $out;
     }
+
 }

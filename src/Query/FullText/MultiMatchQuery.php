@@ -1,22 +1,14 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\FullText;
+namespace Biano\ElasticsearchDSL\Query\FullText;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
+use function count;
 
 /**
- * Represents Elasticsearch "multi_match" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-multi-match-query.html
  *
  * Allows `$fields` to be an empty array to represent 'no fields'. From the Elasticsearch documentation:
@@ -27,42 +19,34 @@ use ONGR\ElasticsearchDSL\ParametersTrait;
  */
 class MultiMatchQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var array
-     */
-    private $fields = [];
+    /** @var list<string> */
+    private array $fields;
+
+    private string $query;
 
     /**
-     * @var string
+     * @param list<string> $fields
+     * @param array<string,mixed> $parameters
      */
-    private $query;
-
-    /**
-     * @param array  $fields
-     * @param string $query
-     * @param array  $parameters
-     */
-    public function __construct(array $fields, $query, array $parameters = [])
+    public function __construct(array $fields, string $query, array $parameters = [])
     {
         $this->fields = $fields;
         $this->query = $query;
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'multi_match';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [
             'query' => $this->query,
@@ -75,4 +59,5 @@ class MultiMatchQuery implements BuilderInterface
 
         return [$this->getType() => $output];
     }
+
 }

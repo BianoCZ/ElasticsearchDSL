@@ -1,27 +1,23 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\SignificantTermsAggregation;
+use Biano\ElasticsearchDSL\Aggregation\AbstractAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\SignificantTermsAggregation;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for children aggregation.
  */
-class SignificantTermsAggregationTest extends \PHPUnit\Framework\TestCase
+class SignificantTermsAggregationTest extends TestCase
 {
+
     /**
      * Tests getType method.
      */
-    public function testSignificantTermsAggregationGetType()
+    public function testSignificantTermsAggregationGetType(): void
     {
         $aggregation = new SignificantTermsAggregation('foo');
         $result = $aggregation->getType();
@@ -31,15 +27,17 @@ class SignificantTermsAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      */
-    public function testSignificantTermsAggregationGetArray()
+    public function testSignificantTermsAggregationGetArray(): void
     {
-        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation::class)
+        $mock = $this->getMockBuilder(AbstractAggregation::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
+        $mock->setName('name');
         $aggregation = new SignificantTermsAggregation('foo', 'title');
         $aggregation->addAggregation($mock);
         $result = $aggregation->getArray();
         $expected = ['field' => 'title'];
         $this->assertEquals($expected, $result);
     }
+
 }

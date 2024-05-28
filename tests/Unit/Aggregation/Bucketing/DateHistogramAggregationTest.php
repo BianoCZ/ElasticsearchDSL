@@ -1,30 +1,26 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\DateHistogramAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
+use Biano\ElasticsearchDSL\Aggregation\AbstractAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\DateHistogramAggregation;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for children aggregation.
  */
-class DateHistogramAggregationTest extends \PHPUnit\Framework\TestCase
+class DateHistogramAggregationTest extends TestCase
 {
+
     /**
      * Tests if ChildrenAggregation#getArray throws exception when expected.
      */
-    public function testGetArrayException()
+    public function testGetArrayException(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $aggregation = new DateHistogramAggregation('foo');
         $aggregation->getArray();
     }
@@ -32,9 +28,9 @@ class DateHistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if ChildrenAggregation#getArray throws exception when expected.
      */
-    public function testGetArrayExceptionWhenDontSendInterval()
+    public function testGetArrayExceptionWhenDontSendInterval(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $aggregation = new DateHistogramAggregation('foo', 'date');
         $aggregation->getArray();
     }
@@ -42,7 +38,7 @@ class DateHistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getType method.
      */
-    public function testDateHistogramAggregationGetType()
+    public function testDateHistogramAggregationGetType(): void
     {
         $aggregation = new DateHistogramAggregation('foo');
         $result = $aggregation->getType();
@@ -52,11 +48,12 @@ class DateHistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      */
-    public function testChildrenAggregationGetArray()
+    public function testChildrenAggregationGetArray(): void
     {
         $mock = $this->getMockBuilder(AbstractAggregation::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
+        $mock->setName('name');
         $aggregation = new DateHistogramAggregation('foo');
         $aggregation->addAggregation($mock);
         $aggregation->setField('date');
@@ -69,7 +66,7 @@ class DateHistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      */
-    public function testCalendarIntervalGetArray()
+    public function testCalendarIntervalGetArray(): void
     {
         $aggregation = new DateHistogramAggregation('foo');
         $aggregation->setField('date');
@@ -82,7 +79,7 @@ class DateHistogramAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      */
-    public function testFixedIntervalGetArray()
+    public function testFixedIntervalGetArray(): void
     {
         $aggregation = new DateHistogramAggregation('foo');
         $aggregation->setField('date');
@@ -91,4 +88,5 @@ class DateHistogramAggregationTest extends \PHPUnit\Framework\TestCase
         $expected = ['field' => 'date', 'fixed_interval' => 'month'];
         $this->assertEquals($expected, $result);
     }
+
 }

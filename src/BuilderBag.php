@@ -1,30 +1,28 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL;
+namespace Biano\ElasticsearchDSL;
+
+use function array_filter;
+use function array_merge;
+use function array_values;
+use function bin2hex;
+use function random_bytes;
 
 /**
  * Container for named builders.
  */
 class BuilderBag
 {
-    /**
-     * @var BuilderInterface[]
-     */
-    private $bag = [];
+
+    /** @var array<string,\Biano\ElasticsearchDSL\BuilderInterface> */
+    private array $bag = [];
 
     /**
-     * @param BuilderInterface[] $builders
+     * @param list<\Biano\ElasticsearchDSL\BuilderInterface> $builders
      */
-    public function __construct($builders = [])
+    public function __construct(array $builders = [])
     {
         foreach ($builders as $builder) {
             $this->add($builder);
@@ -33,14 +31,10 @@ class BuilderBag
 
     /**
      * Adds a builder.
-     *
-     * @param BuilderInterface $builder
-     *
-     * @return string
      */
-    public function add(BuilderInterface $builder)
+    public function add(BuilderInterface $builder): string
     {
-        if (method_exists($builder, 'getName')) {
+        if ($builder instanceof NamedBuilderInterface) {
             $name = $builder->getName();
         } else {
             $name = bin2hex(random_bytes(30));
@@ -53,22 +47,16 @@ class BuilderBag
 
     /**
      * Checks if builder exists by a specific name.
-     *
-     * @param string $name Builder name.
-     *
-     * @return bool
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return isset($this->bag[$name]);
     }
 
     /**
      * Removes a builder by name.
-     *
-     * @param string $name Builder name.
      */
-    public function remove($name)
+    public function remove(string $name): void
     {
         unset($this->bag[$name]);
     }
@@ -76,19 +64,15 @@ class BuilderBag
     /**
      * Clears contained builders.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->bag = [];
     }
 
     /**
      * Returns a builder by name.
-     *
-     * @param string $name Builder name.
-     *
-     * @return BuilderInterface
      */
-    public function get($name)
+    public function get(string $name): BuilderInterface
     {
         return $this->bag[$name];
     }
@@ -96,31 +80,28 @@ class BuilderBag
     /**
      * Returns all builders contained.
      *
-     * @param string|null $type Builder type.
-     *
-     * @return BuilderInterface[]
+     * @return list<\Biano\ElasticsearchDSL\BuilderInterface>
      */
-    public function all(string $type = null)
+    public function all(?string $type = null): array
     {
-        return array_filter(
+        return array_values(array_filter(
             $this->bag,
-            /** @var BuilderInterface $builder */
-            static function (BuilderInterface $builder) use ($type) {
-                return $type === null || $builder->getType() === $type;
-            }
-        );
+            static fn (BuilderInterface $builder): bool => $type === null || $builder->getType() === $type,
+        ));
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<mixed>
      */
-    public function toArray()
+    public function toArray(): array
     {
-        $output = [];
+        $data = [];
+
         foreach ($this->all() as $builder) {
-            $output = array_merge($output, $builder->toArray());
+            $data = array_merge($data, $builder->toArray());
         }
 
-        return $output;
+        return $data;
     }
+
 }

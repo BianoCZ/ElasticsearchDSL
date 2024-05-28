@@ -1,43 +1,27 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL;
+namespace Biano\ElasticsearchDSL;
 
 /**
  * A trait which handles elasticsearch aggregation script.
  */
 trait ScriptAwareTrait
 {
-    /**
-     * @var string
-     */
-    private $script;
 
-    /**
-     * @return string
-     */
-    public function getScript()
+    private ?string $script = null;
+
+    public function getScript(): ?string
     {
         return $this->script;
     }
 
-    /**
-     * @param string $script
-     *
-     * @return $this
-     */
-    public function setScript($script)
+    public function setScript(string $script): self
     {
         $this->script = $script;
 
         return $this;
     }
+
 }

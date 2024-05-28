@@ -1,27 +1,23 @@
 <?php
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
+declare(strict_types = 1);
 
-use ONGR\ElasticsearchDSL\Aggregation\Metric\TopHitsAggregation;
-use ONGR\ElasticsearchDSL\Sort\FieldSort;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
+
+use Biano\ElasticsearchDSL\Aggregation\Metric\TopHitsAggregation;
+use Biano\ElasticsearchDSL\Sort\FieldSort;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit tests for top hits aggregation.
  */
-class TopHitsAggregationTest extends \PHPUnit\Framework\TestCase
+class TopHitsAggregationTest extends TestCase
 {
+
     /**
      * Check if aggregation returns the expected array.
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $sort = new FieldSort('acme', FieldSort::ASC);
         $aggregation = new TopHitsAggregation('acme', 1, 1, $sort);
@@ -42,7 +38,7 @@ class TopHitsAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Check if parameters can be set to agg.
      */
-    public function testParametersAddition()
+    public function testParametersAddition(): void
     {
         $aggregation = new TopHitsAggregation('acme', 0, 1);
         $aggregation->addParameter('_source', ['include' => ['title']]);
@@ -59,4 +55,5 @@ class TopHitsAggregationTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame($expected, $aggregation->toArray());
     }
+
 }

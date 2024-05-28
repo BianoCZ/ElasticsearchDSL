@@ -1,19 +1,22 @@
 <?php
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\InnerHit;
+declare(strict_types = 1);
 
-use ONGR\ElasticsearchDSL\InnerHit\ParentInnerHit;
-use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
-use ONGR\ElasticsearchDSL\Search;
+namespace Biano\ElasticsearchDSL\Tests\Unit\InnerHit;
 
-class ParentInnerHitTest extends \PHPUnit\Framework\TestCase
+use Biano\ElasticsearchDSL\InnerHit\ParentInnerHit;
+use Biano\ElasticsearchDSL\Query\TermLevel\TermQuery;
+use Biano\ElasticsearchDSL\Search;
+use PHPUnit\Framework\TestCase;
+
+class ParentInnerHitTest extends TestCase
 {
-    public function testToArray()
+
+    public function testToArray(): void
     {
         $query = new TermQuery('foo', 'bar');
         $search = new Search();
         $search->addQuery($query);
-
 
         $hit = new ParentInnerHit('test', 'acme', $search);
         $expected = [
@@ -25,4 +28,5 @@ class ParentInnerHitTest extends \PHPUnit\Framework\TestCase
         ];
         $this->assertEquals($expected, $hit->toArray());
     }
+
 }

@@ -1,66 +1,43 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
-use ONGR\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use LogicException;
 
 /**
- * Class representing filters aggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-filters-aggregation.html
  */
-class FiltersAggregation extends AbstractAggregation
+class FiltersAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
+
+    /** @var array<string,array<mixed>> */
+    private array $filters = [];
+
+    private bool $anonymous = false;
 
     /**
-     * @var BuilderInterface[]
+     * @param array<string,\Biano\ElasticsearchDSL\BuilderInterface> $filters
      */
-    private $filters = [];
-
-    /**
-     * @var bool
-     */
-    private $anonymous = false;
-
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string             $name
-     * @param BuilderInterface[] $filters
-     * @param bool               $anonymous
-     */
-    public function __construct($name, $filters = [], $anonymous = false)
+    public function __construct(string $name, array $filters = [], bool $anonymous = false)
     {
         parent::__construct($name);
 
         $this->setAnonymous($anonymous);
+
         foreach ($filters as $name => $filter) {
-            if ($anonymous) {
-                $this->addFilter($filter);
-            } else {
-                $this->addFilter($filter, $name);
-            }
+            $this->addFilter($filter, $anonymous ? null : $name);
         }
     }
 
-    /**
-     * @param bool $anonymous
-     *
-     * @return $this
-     */
-    public function setAnonymous($anonymous)
+    public function isAnonymous(): bool
+    {
+        return $this->anonymous;
+    }
+
+    public function setAnonymous(bool $anonymous): self
     {
         $this->anonymous = $anonymous;
 
@@ -68,18 +45,20 @@ class FiltersAggregation extends AbstractAggregation
     }
 
     /**
-     * @param BuilderInterface $filter
-     * @param string           $name
-     *
-     * @throws \LogicException
-     *
-     * @return FiltersAggregation
+     * @return  array<string,array<mixed>>
      */
-    public function addFilter(BuilderInterface $filter, $name = '')
+    public function getFilters(): array
     {
-        if ($this->anonymous === false && empty($name)) {
-            throw new \LogicException('In not anonymous filters filter name must be set.');
-        } elseif ($this->anonymous === false && !empty($name)) {
+        return $this->filters;
+    }
+
+    public function addFilter(BuilderInterface $filter, ?string $name = null): FiltersAggregation
+    {
+        if ($this->isAnonymous() === false && $name === null) {
+            throw new LogicException('In not anonymous filters filter name must be set.');
+        }
+
+        if ($this->isAnonymous() === false && $name !== null) {
             $this->filters['filters'][$name] = $filter->toArray();
         } else {
             $this->filters['filters'][] = $filter->toArray();
@@ -88,19 +67,17 @@ class FiltersAggregation extends AbstractAggregation
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
-    {
-        return $this->filters;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'filters';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArray(): array
+    {
+        return $this->getFilters();
+    }
+
 }

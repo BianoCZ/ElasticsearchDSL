@@ -1,53 +1,29 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Suggest;
+namespace Biano\ElasticsearchDSL\Suggest;
 
-use ONGR\ElasticsearchDSL\NamedBuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Biano\ElasticsearchDSL\NamedBuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 class Suggest implements NamedBuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
+
+    private string $type;
+
+    private string $text;
+
+    private string $field;
 
     /**
-     * @var string
+     * @param array<string,mixed> $parameters
      */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $text;
-
-    /**
-     * @var string
-     */
-    private $field;
-
-    /**
-     * TermSuggest constructor.
-     * @param string $name
-     * @param string $type
-     * @param string $text
-     * @param string $field
-     * @param array $parameters
-     */
-    public function __construct($name, $type, $text, $field, $parameters = [])
+    public function __construct(string $name, string $type, string $text, string $field, array $parameters = [])
     {
         $this->setName($name);
         $this->setType($type);
@@ -57,11 +33,14 @@ class Suggest implements NamedBuilderInterface
     }
 
     /**
-     * @param string $name
-     *
-     * @return $this
+     * Returns suggest name
      */
-    public function setName($name)
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -69,71 +48,38 @@ class Suggest implements NamedBuilderInterface
     }
 
     /**
-     * Returns suggest name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
      * Returns element type.
-     *
-     * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @param string $type
-     *
-     * @return $this
-     */
-    public function setType($type)
+    public function setType(string $type): self
     {
         $this->type = $type;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getText()
+    public function getText(): string
     {
         return $this->text;
     }
 
-    /**
-     * @param string $text
-     *
-     * @return $this
-     */
-    public function setText($text)
+    public function setText(string $text): self
     {
         $this->text = $text;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getField()
+    public function getField(): string
     {
         return $this->field;
     }
 
-    /**
-     * @param string $field
-     *
-     * @return $this
-     */
-    public function setField($field)
+    public function setField(string $field): self
     {
         $this->field = $field;
 
@@ -141,17 +87,16 @@ class Suggest implements NamedBuilderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
-        $output = [
+        return [
             $this->getName() => [
                 'text' => $this->getText(),
                 $this->getType() => $this->processArray(['field' => $this->getField()]),
-            ]
+            ],
         ];
-
-        return $output;
     }
+
 }

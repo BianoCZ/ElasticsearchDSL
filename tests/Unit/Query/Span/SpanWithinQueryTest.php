@@ -1,31 +1,28 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\Span;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Span;
 
-use ONGR\ElasticsearchDSL\Query\Span\SpanWithinQuery;
+use Biano\ElasticsearchDSL\Query\Span\SpanQueryInterface;
+use Biano\ElasticsearchDSL\Query\Span\SpanWithinQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for SpanWithinQuery.
  */
-class SpanWithinQueryTest extends \PHPUnit\Framework\TestCase
+class SpanWithinQueryTest extends TestCase
 {
+
     /**
      * Tests for toArray().
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $query = new SpanWithinQuery(
             $this->getSpanQueryMock('foo'),
-            $this->getSpanQueryMock('bar')
+            $this->getSpanQueryMock('bar'),
         );
         $result = [
             'span_within' => [
@@ -41,17 +38,17 @@ class SpanWithinQueryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $value
-     *
-     * @returns \PHPUnit_Framework_MockObject_MockObject
+     * @returns \PHPUnit\Framework\MockObject\MockObject
      */
-    private function getSpanQueryMock($value)
+    private function getSpanQueryMock(string $value): MockObject
     {
-        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\Query\Span\SpanQueryInterface::class)->getMock();
+        $mock = $this->getMockBuilder(SpanQueryInterface::class)->getMock();
         $mock
             ->expects($this->once())
             ->method('toArray')
             ->willReturn(['span_term' => ['user' => $value]]);
+
         return $mock;
     }
+
 }

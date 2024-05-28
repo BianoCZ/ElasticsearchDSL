@@ -1,27 +1,20 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\SearchEndpoint\SuggestEndpoint;
-use ONGR\ElasticsearchDSL\Suggest\Suggest;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
+use Biano\ElasticsearchDSL\SearchEndpoint\SuggestEndpoint;
+use Biano\ElasticsearchDSL\Suggest\Suggest;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use function assert;
 
-class SuggestEndpointTest extends \PHPUnit\Framework\TestCase
+class SuggestEndpointTest extends TestCase
 {
-    /**
-     * Tests constructor.
-     */
-    public function testItCanBeInstantiated()
+
+    public function testItCanBeInstantiated(): void
     {
         $this->assertInstanceOf(SuggestEndpoint::class, new SuggestEndpoint());
     }
@@ -29,7 +22,7 @@ class SuggestEndpointTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if endpoint returns builders.
      */
-    public function testEndpointGetter()
+    public function testEndpointGetter(): void
     {
         $suggestName = 'acme_suggest';
         $text = 'foo';
@@ -45,21 +38,22 @@ class SuggestEndpointTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests endpoint normalization.
      */
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $instance = new SuggestEndpoint();
 
-        /** @var NormalizerInterface|MockObject $normalizerInterface */
         $normalizerInterface = $this->getMockForAbstractClass(
-            NormalizerInterface::class
+            NormalizerInterface::class,
         );
+        assert($normalizerInterface instanceof NormalizerInterface || $normalizerInterface instanceof MockObject);
 
         $suggest = new Suggest('foo', 'bar', 'acme', 'foo');
         $instance->add($suggest);
 
         $this->assertEquals(
             $suggest->toArray(),
-            $instance->normalize($normalizerInterface)
+            $instance->normalize($normalizerInterface),
         );
     }
+
 }

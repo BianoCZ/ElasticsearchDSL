@@ -77,7 +77,10 @@ jobs:
 
             - name: Fix code style
               if: ${{ matrix.lint }}
-              run: vendor/bin/phpcs -p --standard=PSR2 --ignore=vendor/ ./
+              run: |
+                  vendor/bin/phpcs src tests
+                  vendor/bin/phpstan analyse -c phpstan.neon
+                  vendor/bin/composer-dependency-analyser
 
             - name: Run tests
               run: vendor/bin/phpunit --coverage-clover=coverage.xml

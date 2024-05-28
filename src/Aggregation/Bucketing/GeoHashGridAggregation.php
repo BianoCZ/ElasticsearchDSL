@@ -1,155 +1,101 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use LogicException;
+use function array_filter;
 
 /**
- * Class representing geohash grid aggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geohashgrid-aggregation.html
  */
-class GeoHashGridAggregation extends AbstractAggregation
+class GeoHashGridAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
 
-    /**
-     * @var int
-     */
-    private $precision;
+    private ?int $precision = null;
 
-    /**
-     * @var int
-     */
-    private $size;
+    private ?int $size = null;
 
-    /**
-     * @var int
-     */
-    private $shardSize;
+    private ?int $shardSize = null;
 
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $field
-     * @param int    $precision
-     * @param int    $size
-     * @param int    $shardSize
-     */
-    public function __construct($name, $field = null, $precision = null, $size = null, $shardSize = null)
+    public function __construct(string $name, ?string $field = null, ?int $precision = null, ?int $size = null, ?int $shardSize = null)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setPrecision($precision);
-        $this->setSize($size);
-        $this->setShardSize($shardSize);
+        if ($field !== null) {
+            $this->setField($field);
+        }
+
+        if ($precision !== null) {
+            $this->setPrecision($precision);
+        }
+
+        if ($size !== null) {
+            $this->setSize($size);
+        }
+
+        if ($shardSize !== null) {
+            $this->setShardSize($shardSize);
+        }
     }
 
-    /**
-     * @return int
-     */
-    public function getPrecision()
+    public function getPrecision(): ?int
     {
         return $this->precision;
     }
 
-    /**
-     * @param int $precision
-     *
-     * @return $this
-     */
-    public function setPrecision($precision)
+    public function setPrecision(int $precision): self
     {
         $this->precision = $precision;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getSize()
+    public function getSize(): ?int
     {
         return $this->size;
     }
 
-    /**
-     * @param int $size
-     *
-     * @return $this
-     */
-    public function setSize($size)
+    public function setSize(int $size): self
     {
         $this->size = $size;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getShardSize()
+    public function getShardSize(): ?int
     {
         return $this->shardSize;
     }
 
-    /**
-     * @param int $shardSize
-     *
-     * @return $this
-     */
-    public function setShardSize($shardSize)
+    public function setShardSize(int $shardSize): self
     {
         $this->shardSize = $shardSize;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
-    {
-        $data = [];
-
-        if ($this->getField()) {
-            $data['field'] = $this->getField();
-        } else {
-            throw new \LogicException('Geo bounds aggregation must have a field set.');
-        }
-
-        if ($this->getPrecision()) {
-            $data['precision'] = $this->getPrecision();
-        }
-
-        if ($this->getSize()) {
-            $data['size'] = $this->getSize();
-        }
-
-        if ($this->getShardSize()) {
-            $data['shard_size'] = $this->getShardSize();
-        }
-
-        return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'geohash_grid';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArray(): array
+    {
+        if ($this->getField() === null) {
+            throw new LogicException('Geo bounds aggregation must have a field set.');
+        }
+
+        return array_filter([
+            'field' => $this->getField(),
+            'precision' => $this->getPrecision(),
+            'size' => $this->getSize(),
+            'shard_size' => $this->getShardSize(),
+        ]);
+    }
+
 }

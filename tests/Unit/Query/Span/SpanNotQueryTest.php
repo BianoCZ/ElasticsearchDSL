@@ -1,29 +1,25 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\Span;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Span;
 
-use ONGR\ElasticsearchDSL\Query\Span\SpanNotQuery;
+use Biano\ElasticsearchDSL\Query\Span\SpanNotQuery;
+use Biano\ElasticsearchDSL\Query\Span\SpanQueryInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for SpanNotQuery.
  */
-class SpanNotQueryTest extends \PHPUnit\Framework\TestCase
+class SpanNotQueryTest extends TestCase
 {
+
     /**
      * Tests for toArray().
      */
-    public function testSpanNotQueryToArray()
+    public function testSpanNotQueryToArray(): void
     {
-        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\Query\Span\SpanQueryInterface::class)->getMock();
+        $mock = $this->getMockBuilder(SpanQueryInterface::class)->getMock();
         $mock
             ->expects($this->exactly(2))
             ->method('toArray')
@@ -42,4 +38,5 @@ class SpanNotQueryTest extends \PHPUnit\Framework\TestCase
         ];
         $this->assertEquals($result, $query->toArray());
     }
+
 }

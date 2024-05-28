@@ -1,26 +1,22 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\Compound;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Compound;
 
-use ONGR\ElasticsearchDSL\Query\Compound\DisMaxQuery;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\Query\Compound\DisMaxQuery;
+use PHPUnit\Framework\TestCase;
 
-class DisMaxQueryTest extends \PHPUnit\Framework\TestCase
+class DisMaxQueryTest extends TestCase
 {
+
     /**
      * Tests toArray().
      */
-    public function testToArray()
+    public function testToArray(): void
     {
-        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\BuilderInterface::class)->getMock();
+        $mock = $this->getMockBuilder(BuilderInterface::class)->getMock();
         $mock
             ->expects($this->any())
             ->method('toArray')
@@ -41,4 +37,5 @@ class DisMaxQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expected, $query->toArray());
     }
+
 }

@@ -1,99 +1,62 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Span;
+namespace Biano\ElasticsearchDSL\Query\Span;
 
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Elasticsearch span containing query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-span-containing-query.html
  */
 class SpanContainingQuery implements SpanQueryInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @param SpanQueryInterface
-     */
-    private $little;
+    private SpanQueryInterface $little;
 
-    /**
-     * @param SpanQueryInterface
-     */
-    private $big;
+    private SpanQueryInterface $big;
 
-    /**
-     * @param SpanQueryInterface $little
-     * @param SpanQueryInterface $big
-     */
     public function __construct(SpanQueryInterface $little, SpanQueryInterface $big)
     {
         $this->setLittle($little);
         $this->setBig($big);
     }
 
-    /**
-     * @return SpanQueryInterface
-     */
-    public function getLittle()
+    public function getLittle(): SpanQueryInterface
     {
         return $this->little;
     }
 
-    /**
-     * @param SpanQueryInterface $little
-     *
-     * @return $this
-     */
-    public function setLittle(SpanQueryInterface $little)
+    public function setLittle(SpanQueryInterface $little): self
     {
         $this->little = $little;
 
         return $this;
     }
 
-    /**
-     * @return SpanQueryInterface
-     */
-    public function getBig()
+    public function getBig(): SpanQueryInterface
     {
         return $this->big;
     }
 
-    /**
-     * @param SpanQueryInterface $big
-     *
-     * @return $this
-     */
-    public function setBig(SpanQueryInterface $big)
+    public function setBig(SpanQueryInterface $big): self
     {
         $this->big = $big;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'span_containing';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $output = [
             'little' => $this->getLittle()->toArray(),
@@ -104,4 +67,5 @@ class SpanContainingQuery implements SpanQueryInterface
 
         return [$this->getType() => $output];
     }
+
 }

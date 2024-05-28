@@ -1,49 +1,42 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\SearchEndpoint;
 
-/**
- * Factory for search endpoints.
- */
+use RuntimeException;
+use function array_key_exists;
+
 class SearchEndpointFactory
 {
+
     /**
-     * @var array Holds namespaces for endpoints.
+     * Holds namespaces for endpoints.
+     *
+     * @var array<string,class-string<\Biano\ElasticsearchDSL\SearchEndpoint\SearchEndpointInterface>>
      */
-    private static $endpoints = [
-        'query' => \ONGR\ElasticsearchDSL\SearchEndpoint\QueryEndpoint::class,
-        'post_filter' => \ONGR\ElasticsearchDSL\SearchEndpoint\PostFilterEndpoint::class,
-        'sort' => \ONGR\ElasticsearchDSL\SearchEndpoint\SortEndpoint::class,
-        'highlight' => \ONGR\ElasticsearchDSL\SearchEndpoint\HighlightEndpoint::class,
-        'aggregations' => \ONGR\ElasticsearchDSL\SearchEndpoint\AggregationsEndpoint::class,
-        'suggest' => \ONGR\ElasticsearchDSL\SearchEndpoint\SuggestEndpoint::class,
-        'inner_hits' => \ONGR\ElasticsearchDSL\SearchEndpoint\InnerHitsEndpoint::class,
+    private static array $endpoints = [
+        'query' => QueryEndpoint::class,
+        'post_filter' => PostFilterEndpoint::class,
+        'sort' => SortEndpoint::class,
+        'highlight' => HighlightEndpoint::class,
+        'aggregations' => AggregationsEndpoint::class,
+        'suggest' => SuggestEndpoint::class,
+        'inner_hits' => InnerHitsEndpoint::class,
     ];
 
     /**
      * Returns a search endpoint instance.
      *
-     * @param string $type Type of endpoint.
-     *
-     * @return SearchEndpointInterface
-     *
      * @throws \RuntimeException Endpoint does not exist.
      */
-    public static function get($type)
+    public static function get(string $type): SearchEndpointInterface
     {
         if (!array_key_exists($type, self::$endpoints)) {
-            throw new \RuntimeException('Endpoint does not exist.');
+            throw new RuntimeException('Endpoint does not exist.');
         }
 
         return new self::$endpoints[$type]();
     }
+
 }

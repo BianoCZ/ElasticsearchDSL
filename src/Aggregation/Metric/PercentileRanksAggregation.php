@@ -1,111 +1,91 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\MetricTrait;
-use ONGR\ElasticsearchDSL\ScriptAwareTrait;
+use Biano\ElasticsearchDSL\ScriptAwareTrait;
+use LogicException;
+use function array_filter;
+use function array_key_exists;
+use function is_numeric;
 
 /**
- * Class representing Percentile Ranks Aggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-percentile-rank-aggregation.html
  */
-class PercentileRanksAggregation extends AbstractAggregation
+class PercentileRanksAggregation extends AbstractMetricAggregation
 {
-    use MetricTrait;
+
     use ScriptAwareTrait;
 
-    /**
-     * @var array
-     */
-    private $values;
+    /** @var list<int|float>|null */
+    private ?array $values = null;
+
+    private ?int $compression = null;
 
     /**
-     * @var int
+     * @param list<int|float>|null $values
      */
-    private $compression;
-
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $field
-     * @param array  $values
-     * @param string $script
-     * @param int    $compression
-     */
-    public function __construct($name, $field = null, $values = null, $script = null, $compression = null)
+    public function __construct(string $name, ?string $field = null, ?array $values = null, ?string $script = null, ?int $compression = null)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setValues($values);
-        $this->setScript($script);
-        $this->setCompression($compression);
+        if ($field !== null) {
+            $this->setField($field);
+        }
+
+        if ($values !== null) {
+            $this->setValues($values);
+        }
+
+        if ($script !== null) {
+            $this->setScript($script);
+        }
+
+        if ($compression !== null) {
+            $this->setCompression($compression);
+        }
     }
 
     /**
-     * @return array
+     * @return list<int|float>|null
      */
-    public function getValues()
+    public function getValues(): ?array
     {
         return $this->values;
     }
 
     /**
-     * @param array $values
-     *
-     * @return $this
+     * @param list<int|float> $values
      */
-    public function setValues($values)
+    public function setValues(array $values): self
     {
         $this->values = $values;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getCompression()
+    public function getCompression(): ?int
     {
         return $this->compression;
     }
 
-    /**
-     * @param int $compression
-     *
-     * @return $this
-     */
-    public function setCompression($compression)
+    public function setCompression(int $compression): self
     {
         $this->compression = $compression;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'percentile_ranks';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
         $out = array_filter(
             [
@@ -114,9 +94,9 @@ class PercentileRanksAggregation extends AbstractAggregation
                 'values' => $this->getValues(),
                 'compression' => $this->getCompression(),
             ],
-            function ($val) {
-                return ($val || is_numeric($val));
-            }
+            static function ($val) {
+                return $val || is_numeric($val);
+            },
         );
 
         $this->isRequiredParametersSet($out);
@@ -125,18 +105,20 @@ class PercentileRanksAggregation extends AbstractAggregation
     }
 
     /**
-     * @param array $a
+     * @param array<mixed> $data
      *
-     * @return bool
      * @throws \LogicException
      */
-    private function isRequiredParametersSet($a)
+    private function isRequiredParametersSet(array $data): bool
     {
-        if (array_key_exists('field', $a) && array_key_exists('values', $a)
-            || (array_key_exists('script', $a) && array_key_exists('values', $a))
+        if (
+            array_key_exists('field', $data) && array_key_exists('values', $data)
+            || (array_key_exists('script', $data) && array_key_exists('values', $data))
         ) {
             return true;
         }
-        throw new \LogicException('Percentile ranks aggregation must have field and values or script and values set.');
+
+        throw new LogicException('Percentile ranks aggregation must have field and values or script and values set.');
     }
+
 }

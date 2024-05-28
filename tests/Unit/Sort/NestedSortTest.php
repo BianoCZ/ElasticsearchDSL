@@ -1,35 +1,27 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Sort;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Sort;
 
-use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
-use ONGR\ElasticsearchDSL\Sort\NestedSort;
+use Biano\ElasticsearchDSL\Query\TermLevel\TermQuery;
+use Biano\ElasticsearchDSL\Sort\NestedSort;
+use PHPUnit\Framework\TestCase;
 
-class NestedSortTest extends \PHPUnit\Framework\TestCase
+class NestedSortTest extends TestCase
 {
+
     /**
      * Test for single nested.
-     *
      */
-    public function testSingle()
+    public function testSingle(): void
     {
         $query = new NestedSort('somePath', new TermQuery('somePath.id', 10));
         $expected = [
             'path'   => 'somePath',
             'filter' => [
-                'term' => [
-                    'somePath.id' => 10,
-                ]
-            ]
+                'term' => ['somePath.id' => 10],
+            ],
         ];
         $result = $query->toArray();
         $this->assertEquals($expected, $result);
@@ -37,23 +29,19 @@ class NestedSortTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test for single nested, no filter.
-     *
      */
-    public function testNoFilter()
+    public function testNoFilter(): void
     {
         $query = new NestedSort('somePath');
-        $expected = [
-            'path'   => 'somePath',
-        ];
+        $expected = ['path' => 'somePath'];
         $result = $query->toArray();
         $this->assertEquals($expected, $result);
     }
 
     /**
      * Test for single nested.
-     *
      */
-    public function testMultipleNesting()
+    public function testMultipleNesting(): void
     {
         $query = new NestedSort('somePath', new TermQuery('somePath.id', 10));
         $nestedFilter1 = new NestedSort('secondPath', new TermQuery('secondPath.foo', 'bar'));
@@ -63,28 +51,23 @@ class NestedSortTest extends \PHPUnit\Framework\TestCase
         $expected = [
             'path'   => 'somePath',
             'filter' => [
-                'term' => [
-                    'somePath.id' => 10,
-                ]
+                'term' => ['somePath.id' => 10],
             ],
             'nested' => [
                 'path'   => 'secondPath',
                 'filter' => [
-                    'term' => [
-                        'secondPath.foo' => 'bar',
-                    ]
+                    'term' => ['secondPath.foo' => 'bar'],
                 ],
                 'nested' => [
                     'path'   => 'thirdPath',
                     'filter' => [
-                        'term' => [
-                            'thirdPath.x' => 'y',
-                        ]
+                        'term' => ['thirdPath.x' => 'y'],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
         $result = $query->toArray();
         $this->assertEquals($expected, $result);
     }
+
 }

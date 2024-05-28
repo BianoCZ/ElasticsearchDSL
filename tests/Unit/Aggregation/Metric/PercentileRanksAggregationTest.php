@@ -1,27 +1,20 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\Metric\PercentileRanksAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Metric\PercentileRanksAggregation;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Percentile ranks aggregation unit tests.
  */
-class PercentileRanksAggregationTest extends \PHPUnit\Framework\TestCase
+class PercentileRanksAggregationTest extends TestCase
 {
-    /**
-     * @var PercentileRanksAggregation
-     */
-    public $agg;
+
+    public PercentileRanksAggregation $agg;
 
     /**
      * Phpunit setup.
@@ -34,18 +27,18 @@ class PercentileRanksAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if exception is thrown when required parameters not set.
      */
-    public function testIfPercentileRanksAggregationThrowsAnException()
+    public function testIfPercentileRanksAggregationThrowsAnException(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->agg->toArray();
     }
 
     /**
      * Tests exception when only field is set.
      */
-    public function testIfExceptionIsThrownWhenFieldSetAndValueNotSet()
+    public function testIfExceptionIsThrownWhenFieldSetAndValueNotSet(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->agg->setField('bar');
         $this->agg->toArray();
     }
@@ -53,9 +46,9 @@ class PercentileRanksAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests exception when only value is set.
      */
-    public function testIfExceptionIsThrownWhenScriptSetAndValueNotSet()
+    public function testIfExceptionIsThrownWhenScriptSetAndValueNotSet(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->agg->setScript('bar');
         $this->agg->toArray();
     }
@@ -63,7 +56,7 @@ class PercentileRanksAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test getType method.
      */
-    public function testGetType()
+    public function testGetType(): void
     {
         $this->assertEquals('percentile_ranks', $this->agg->getType());
     }
@@ -71,7 +64,7 @@ class PercentileRanksAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test toArray method.
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->agg->setField('bar');
         $this->agg->setValues(['bar']);
@@ -82,7 +75,8 @@ class PercentileRanksAggregationTest extends \PHPUnit\Framework\TestCase
                     'values' => ['bar'],
                 ],
             ],
-            $this->agg->toArray()
+            $this->agg->toArray(),
         );
     }
+
 }

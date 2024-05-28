@@ -1,39 +1,28 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\MissingAggregation;
-use ONGR\ElasticsearchDSL\SearchEndpoint\AggregationsEndpoint;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\MissingAggregation;
+use Biano\ElasticsearchDSL\SearchEndpoint\AggregationsEndpoint;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Class AggregationsEndpointTest.
- */
-class AggregationsEndpointTest extends \PHPUnit\Framework\TestCase
+class AggregationsEndpointTest extends TestCase
 {
-    /**
-     * Tests constructor.
-     */
-    public function testItCanBeInstantiated()
+
+    public function testItCanBeInstantiated(): void
     {
         $this->assertInstanceOf(
             AggregationsEndpoint::class,
-            new AggregationsEndpoint()
+            new AggregationsEndpoint(),
         );
     }
 
     /**
      * Tests if endpoint returns builders.
      */
-    public function testEndpointGetter()
+    public function testEndpointGetter(): void
     {
         $aggName = 'acme_agg';
         $agg = new MissingAggregation('acme');
@@ -44,4 +33,5 @@ class AggregationsEndpointTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $builders);
         $this->assertSame($agg, $builders[$aggName]);
     }
+
 }

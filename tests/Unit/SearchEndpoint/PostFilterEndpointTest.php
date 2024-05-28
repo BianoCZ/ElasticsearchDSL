@@ -1,30 +1,21 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\SearchEndpoint\PostFilterEndpoint;
+use Biano\ElasticsearchDSL\Query\MatchAllQuery;
+use Biano\ElasticsearchDSL\SearchEndpoint\PostFilterEndpoint;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
+use function assert;
+use function json_encode;
 
-/**
- * Class PostFilterEndpointTest.
- */
-class PostFilterEndpointTest extends \PHPUnit\Framework\TestCase
+class PostFilterEndpointTest extends TestCase
 {
-    /**
-     * Tests constructor.
-     */
-    public function testItCanBeInstantiated()
+
+    public function testItCanBeInstantiated(): void
     {
         $this->assertInstanceOf(PostFilterEndpoint::class, new PostFilterEndpoint());
     }
@@ -32,7 +23,7 @@ class PostFilterEndpointTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if correct order is returned. It's very important that filters must be executed second.
      */
-    public function testGetOrder()
+    public function testGetOrder(): void
     {
         $instance = new PostFilterEndpoint();
         $this->assertEquals(1, $instance->getOrder());
@@ -41,13 +32,13 @@ class PostFilterEndpointTest extends \PHPUnit\Framework\TestCase
     /**
      * Test normalization.
      */
-    public function testNormalization()
+    public function testNormalization(): void
     {
         $instance = new PostFilterEndpoint();
-        /** @var NormalizerInterface|MockObject $normalizerInterface */
         $normalizerInterface = $this->getMockForAbstractClass(
-            NormalizerInterface::class
+            NormalizerInterface::class,
         );
+        assert($normalizerInterface instanceof NormalizerInterface || $normalizerInterface instanceof MockObject);
         $this->assertFalse($instance->normalize($normalizerInterface));
 
         $matchAll = new MatchAllQuery();
@@ -55,14 +46,14 @@ class PostFilterEndpointTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             json_encode($matchAll->toArray()),
-            json_encode($instance->normalize($normalizerInterface))
+            json_encode($instance->normalize($normalizerInterface)),
         );
     }
 
     /**
      * Tests if endpoint returns builders.
      */
-    public function testEndpointGetter()
+    public function testEndpointGetter(): void
     {
         $filterName = 'acme_post_filter';
         $filter = new MatchAllQuery();
@@ -74,4 +65,5 @@ class PostFilterEndpointTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $builders);
         $this->assertSame($filter, $builders[$filterName]);
     }
+
 }

@@ -1,62 +1,43 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\TermLevel;
+namespace Biano\ElasticsearchDSL\Query\TermLevel;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "fuzzy" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html
  */
 class FuzzyQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var string
-     */
-    private $field;
+    private string $field;
+
+    private string $value;
 
     /**
-     * @var string
+     * @param array<string,mixed> $parameters
      */
-    private $value;
-
-    /**
-     * @param string $field
-     * @param string $value
-     * @param array  $parameters
-     */
-    public function __construct($field, $value, array $parameters = [])
+    public function __construct(string $field, string $value, array $parameters = [])
     {
         $this->field = $field;
         $this->value = $value;
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'fuzzy';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [
             'value' => $this->value,
@@ -68,4 +49,5 @@ class FuzzyQuery implements BuilderInterface
 
         return [$this->getType() => $output];
     }
+
 }

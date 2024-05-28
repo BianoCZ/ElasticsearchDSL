@@ -1,25 +1,20 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\NestedAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\TermsAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\NestedAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\TermsAggregation;
+use PHPUnit\Framework\TestCase;
 
-class NestedAggregationTest extends \PHPUnit\Framework\TestCase
+class NestedAggregationTest extends TestCase
 {
+
     /**
      * Test for nested aggregation toArray() method exception.
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $termAggregation = new TermsAggregation('acme');
 
@@ -36,4 +31,5 @@ class NestedAggregationTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($expectedResult, $aggregation->toArray());
     }
+
 }

@@ -1,79 +1,74 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL;
+namespace Biano\ElasticsearchDSL;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Highlight\Highlight;
-use ONGR\ElasticsearchDSL\InnerHit\NestedInnerHit;
-use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
-use ONGR\ElasticsearchDSL\SearchEndpoint\AbstractSearchEndpoint;
-use ONGR\ElasticsearchDSL\SearchEndpoint\AggregationsEndpoint;
-use ONGR\ElasticsearchDSL\SearchEndpoint\HighlightEndpoint;
-use ONGR\ElasticsearchDSL\SearchEndpoint\InnerHitsEndpoint;
-use ONGR\ElasticsearchDSL\SearchEndpoint\PostFilterEndpoint;
-use ONGR\ElasticsearchDSL\SearchEndpoint\QueryEndpoint;
-use ONGR\ElasticsearchDSL\SearchEndpoint\SearchEndpointFactory;
-use ONGR\ElasticsearchDSL\SearchEndpoint\SearchEndpointInterface;
-use ONGR\ElasticsearchDSL\SearchEndpoint\SortEndpoint;
-use ONGR\ElasticsearchDSL\Serializer\Normalizer\CustomReferencedNormalizer;
-use ONGR\ElasticsearchDSL\Serializer\OrderedSerializer;
+use Biano\ElasticsearchDSL\Aggregation\AbstractAggregation;
+use Biano\ElasticsearchDSL\Highlight\Highlight;
+use Biano\ElasticsearchDSL\InnerHit\NestedInnerHit;
+use Biano\ElasticsearchDSL\Query\Compound\BoolQuery;
+use Biano\ElasticsearchDSL\SearchEndpoint\AbstractSearchEndpoint;
+use Biano\ElasticsearchDSL\SearchEndpoint\AggregationsEndpoint;
+use Biano\ElasticsearchDSL\SearchEndpoint\HighlightEndpoint;
+use Biano\ElasticsearchDSL\SearchEndpoint\InnerHitsEndpoint;
+use Biano\ElasticsearchDSL\SearchEndpoint\PostFilterEndpoint;
+use Biano\ElasticsearchDSL\SearchEndpoint\QueryEndpoint;
+use Biano\ElasticsearchDSL\SearchEndpoint\SearchEndpointFactory;
+use Biano\ElasticsearchDSL\SearchEndpoint\SearchEndpointInterface;
+use Biano\ElasticsearchDSL\SearchEndpoint\SortEndpoint;
+use Biano\ElasticsearchDSL\SearchEndpoint\SuggestEndpoint;
+use Biano\ElasticsearchDSL\Serializer\Normalizer\CustomReferencedNormalizer;
+use Biano\ElasticsearchDSL\Serializer\OrderedSerializer;
+use InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
-use ONGR\ElasticsearchDSL\SearchEndpoint\SuggestEndpoint;
+use function array_filter;
+use function array_key_exists;
+use function assert;
+use function in_array;
+use function json_encode;
+use function sprintf;
 
 /**
  * Search object that can be executed by a manager.
  */
 class Search
 {
+
     /**
      * The total number of hits. Defaults to true (10000 hits).
      * You can improve query times by not tracking at all and setting this option to false
      * or defining a number of hits you want to track.
-     *
-     * @var bool|int
      */
-    private $trackTotalHits;
+    private bool|int|null $trackTotalHits = null;
 
     /**
      * To retrieve hits from a certain offset. Defaults to 0.
-     *
-     * @var int
      */
-    private $from;
+    private ?int $from = null;
 
     /**
      * The number of hits to return. Defaults to 10. If you do not care about getting some
      * hits back but only about the number of matches and/or aggregations, setting the value
      * to 0 will help performance.
-     *
-     * @var int
      */
-    private $size;
+    private ?int $size = null;
 
     /**
      * Allows to control how the _source field is returned with every hit. By default
      * operations return the contents of the _source field unless you have used the
      * stored_fields parameter or if the _source field is disabled.
      *
-     * @var array|bool|string
+     * @var array<mixed>|bool|string|null
      */
-    private $source;
+    private array|bool|string|null $source = null;
 
     /**
      * Allows to selectively load specific stored fields for each document represented by a search hit.
      *
-     * @var array
+     * @var list<string>|null
      */
-    private $storedFields;
+    private ?array $storedFields = null;
 
     /**
      * Allows to return a script evaluation (based on different fields) for each hit.
@@ -82,9 +77,9 @@ class Search
      * also access the actual _source document indexed and extract specific elements
      * to be returned from it (can be an "object" type).
      *
-     * @var array
+     * @var array<mixed>|null
      */
-    private $scriptFields;
+    private ?array $scriptFields = null;
 
     /**
      * Allows to return a script evaluation (based on different fields) at query time.
@@ -94,9 +89,9 @@ class Search
      * original _source and any mapped fields plus their values. The script runs only
      * against the top hits just like script fields do.
      *
-     * @var array
+     * @var array<mixed>|null
      */
-    private $runtimeFields;
+    private ?array $runtimeFields = null;
 
     /**
      * Allows to return the doc value representation of a field for each hit. Doc value
@@ -105,39 +100,33 @@ class Search
      * cache causing the terms for that field to be loaded to memory (cached), which will
      * result in more memory consumption.
      *
-     * @var array
+     * @var array<mixed>|null
      */
-    private $docValueFields;
+    private ?array $docValueFields = null;
 
     /**
      * Enables explanation for each hit on how its score was computed.
-     *
-     * @var bool
      */
-    private $explain;
+    private ?bool $explain = null;
 
     /**
      * Returns a version for each search hit.
-     *
-     * @var bool
      */
-    private $version;
+    private ?bool $version = null;
 
     /**
      * Allows to configure different boost level per index when searching across more
      * than one indices. This is very handy when hits coming from one index matter more
      * than hits coming from another index (think social graph where each user has an index).
      *
-     * @var array
+     * @var array<mixed>|null
      */
-    private $indicesBoost;
+    private ?array $indicesBoost = null;
 
     /**
      * Exclude documents which have a _score less than the minimum specified in min_score.
-     *
-     * @var float
      */
-    private $minScore;
+    private ?float $minScore = null;
 
     /**
      * Pagination of results can be done by using the from and size but the cost becomes
@@ -149,18 +138,18 @@ class Search
      * providing a live cursor. The idea is to use the results from the previous page to
      * help the retrieval of the next page.
      *
-     * @var array
+     * @var array<mixed>|null
      */
-    private $searchAfter;
+    private ?array $searchAfter = null;
 
     /**
      * URI parameters alongside Request body search.
      *
      * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-uri-request.html
      *
-     * @var array
+     * @var array<string,mixed>
      */
-    private $uriParams = [];
+    private array $uriParams = [];
 
     /**
      * While a search request returns a single “page” of results, the scroll API can be used to retrieve
@@ -168,24 +157,14 @@ class Search
      * as you would use a cursor on a traditional database. Scrolling is not intended for real time user
      * requests, but rather for processing large amounts of data, e.g. in order to reindex the contents
      * of one index into a new index with a different configuration.
-     *
-     * @var string
      */
-    private $scroll;
+    private ?string $scroll = null;
 
-    /**
-     * @var OrderedSerializer
-     */
-    private static $serializer;
+    private static ?OrderedSerializer $serializer = null;
 
-    /**
-     * @var SearchEndpointInterface[]
-     */
-    private $endpoints = [];
+    /** @var array<string,\Biano\ElasticsearchDSL\SearchEndpoint\SearchEndpointInterface> */
+    private array $endpoints = [];
 
-    /**
-     * Constructor to initialize static properties
-     */
     public function __construct()
     {
         $this->initializeSerializer();
@@ -194,7 +173,7 @@ class Search
     /**
      * Wakeup method to initialize static properties
      */
-    public function __wakeup()
+    public function __wakeup(): void
     {
         $this->initializeSerializer();
     }
@@ -202,38 +181,32 @@ class Search
     /**
      * Initializes the serializer
      */
-    private function initializeSerializer()
+    private function initializeSerializer(): void
     {
-        if (static::$serializer === null) {
-            static::$serializer = new OrderedSerializer(
-                [
-                    new CustomReferencedNormalizer(new CustomNormalizer()),
-                    new CustomNormalizer(),
-                ]
-            );
+        if (self::$serializer !== null) {
+            return;
         }
+
+        self::$serializer = new OrderedSerializer(
+            [
+                new CustomReferencedNormalizer(new CustomNormalizer()),
+                new CustomNormalizer(),
+            ],
+        );
     }
 
     /**
      * Destroys search endpoint.
-     *
-     * @param string $type Endpoint type.
      */
-    public function destroyEndpoint($type)
+    public function destroyEndpoint(string $type): void
     {
         unset($this->endpoints[$type]);
     }
 
     /**
      * Adds query to the search.
-     *
-     * @param BuilderInterface $query
-     * @param string           $boolType
-     * @param string           $key
-     *
-     * @return $this
      */
-    public function addQuery(BuilderInterface $query, $boolType = BoolQuery::MUST, $key = null)
+    public function addQuery(BuilderInterface $query, string $boolType = BoolQuery::MUST, ?string $key = null): self
     {
         $endpoint = $this->getEndpoint(QueryEndpoint::NAME);
         $endpoint->addToBool($query, $boolType, $key);
@@ -243,12 +216,8 @@ class Search
 
     /**
      * Returns endpoint instance.
-     *
-     * @param string $type Endpoint type.
-     *
-     * @return SearchEndpointInterface
      */
-    private function getEndpoint($type)
+    private function getEndpoint(string $type): SearchEndpointInterface
     {
         if (!array_key_exists($type, $this->endpoints)) {
             $this->endpoints[$type] = SearchEndpointFactory::get($type);
@@ -259,10 +228,8 @@ class Search
 
     /**
      * Returns queries inside BoolQuery instance.
-     *
-     * @return BoolQuery
      */
-    public function getQueries()
+    public function getQueries(): ?BoolQuery
     {
         $endpoint = $this->getEndpoint(QueryEndpoint::NAME);
 
@@ -272,11 +239,9 @@ class Search
     /**
      * Sets query endpoint parameters.
      *
-     * @param array $parameters
-     *
-     * @return $this
+     * @param array<string,mixed> $parameters
      */
-    public function setQueryParameters(array $parameters)
+    public function setQueryParameters(array $parameters): self
     {
         $this->setEndpointParameters(QueryEndpoint::NAME, $parameters);
 
@@ -286,15 +251,12 @@ class Search
     /**
      * Sets parameters to the endpoint.
      *
-     * @param string $endpointName
-     * @param array  $parameters
-     *
-     * @return $this
+     * @param array<string,mixed> $parameters
      */
-    public function setEndpointParameters($endpointName, array $parameters)
+    public function setEndpointParameters(string $endpointName, array $parameters): self
     {
-        /** @var AbstractSearchEndpoint $endpoint */
         $endpoint = $this->getEndpoint($endpointName);
+        assert($endpoint instanceof AbstractSearchEndpoint);
         $endpoint->setParameters($parameters);
 
         return $this;
@@ -302,31 +264,19 @@ class Search
 
     /**
      * Adds a post filter to search.
-     *
-     * @param BuilderInterface $filter   Filter.
-     * @param string           $boolType Example boolType values:
-     *                                   - must
-     *                                   - must_not
-     *                                   - should.
-     * @param string           $key
-     *
-     * @return $this.
      */
-    public function addPostFilter(BuilderInterface $filter, $boolType = BoolQuery::MUST, $key = null)
+    public function addPostFilter(BuilderInterface $filter, string $boolType = BoolQuery::MUST, ?string $key = null): self
     {
-        $this
-            ->getEndpoint(PostFilterEndpoint::NAME)
-            ->addToBool($filter, $boolType, $key);
+        $endpoint = $this->getEndpoint(PostFilterEndpoint::NAME);
+        $endpoint->addToBool($filter, $boolType, $key);
 
         return $this;
     }
 
     /**
      * Returns queries inside BoolFilter instance.
-     *
-     * @return BoolQuery
      */
-    public function getPostFilters()
+    public function getPostFilters(): ?BoolQuery
     {
         $endpoint = $this->getEndpoint(PostFilterEndpoint::NAME);
 
@@ -336,11 +286,9 @@ class Search
     /**
      * Sets post filter endpoint parameters.
      *
-     * @param array $parameters
-     *
-     * @return $this
+     * @param array<string,mixed> $parameters
      */
-    public function setPostFilterParameters(array $parameters)
+    public function setPostFilterParameters(array $parameters): self
     {
         $this->setEndpointParameters(PostFilterEndpoint::NAME, $parameters);
 
@@ -349,12 +297,8 @@ class Search
 
     /**
      * Adds aggregation into search.
-     *
-     * @param AbstractAggregation $aggregation
-     *
-     * @return $this
      */
-    public function addAggregation(AbstractAggregation $aggregation)
+    public function addAggregation(AbstractAggregation $aggregation): self
     {
         $this->getEndpoint(AggregationsEndpoint::NAME)->add($aggregation, $aggregation->getName());
 
@@ -364,21 +308,17 @@ class Search
     /**
      * Returns all aggregations.
      *
-     * @return BuilderInterface[]
+     * @return array<string,\Biano\ElasticsearchDSL\BuilderInterface>
      */
-    public function getAggregations()
+    public function getAggregations(): array
     {
         return $this->getEndpoint(AggregationsEndpoint::NAME)->getAll();
     }
 
     /**
      * Adds inner hit into search.
-     *
-     * @param NestedInnerHit $innerHit
-     *
-     * @return $this
      */
-    public function addInnerHit(NestedInnerHit $innerHit)
+    public function addInnerHit(NestedInnerHit $innerHit): self
     {
         $this->getEndpoint(InnerHitsEndpoint::NAME)->add($innerHit, $innerHit->getName());
 
@@ -388,21 +328,17 @@ class Search
     /**
      * Returns all inner hits.
      *
-     * @return BuilderInterface[]
+     * @return array<string,\Biano\ElasticsearchDSL\BuilderInterface>
      */
-    public function getInnerHits()
+    public function getInnerHits(): array
     {
         return $this->getEndpoint(InnerHitsEndpoint::NAME)->getAll();
     }
 
     /**
      * Adds sort to search.
-     *
-     * @param BuilderInterface $sort
-     *
-     * @return $this
      */
-    public function addSort(BuilderInterface $sort)
+    public function addSort(BuilderInterface $sort): self
     {
         $this->getEndpoint(SortEndpoint::NAME)->add($sort);
 
@@ -412,21 +348,17 @@ class Search
     /**
      * Returns all set sorts.
      *
-     * @return BuilderInterface[]
+     * @return array<string,\Biano\ElasticsearchDSL\BuilderInterface>
      */
-    public function getSorts()
+    public function getSorts(): array
     {
         return $this->getEndpoint(SortEndpoint::NAME)->getAll();
     }
 
     /**
      * Allows to highlight search results on one or more fields.
-     *
-     * @param Highlight $highlight
-     *
-     * @return $this.
      */
-    public function addHighlight($highlight)
+    public function addHighlight(Highlight $highlight): self
     {
         $this->getEndpoint(HighlightEndpoint::NAME)->add($highlight);
 
@@ -435,25 +367,19 @@ class Search
 
     /**
      * Returns highlight builder.
-     *
-     * @return BuilderInterface
      */
-    public function getHighlights()
+    public function getHighlights(): ?BuilderInterface
     {
-        /** @var HighlightEndpoint $highlightEndpoint */
         $highlightEndpoint = $this->getEndpoint(HighlightEndpoint::NAME);
+        assert($highlightEndpoint instanceof HighlightEndpoint);
 
         return $highlightEndpoint->getHighlight();
     }
 
     /**
-    * Adds suggest into search.
-    *
-    * @param BuilderInterface $suggest
-    *
-    * @return $this
-    */
-    public function addSuggest(NamedBuilderInterface $suggest)
+     * Adds suggest into search.
+     */
+    public function addSuggest(NamedBuilderInterface $suggest): self
     {
         $this->getEndpoint(SuggestEndpoint::NAME)->add($suggest, $suggest->getName());
 
@@ -461,69 +387,45 @@ class Search
     }
 
     /**
-    * Returns all suggests.
-    *
-    * @return BuilderInterface[]
-    */
-    public function getSuggests()
+     * Returns all suggests.
+     *
+     * @return array<string,\Biano\ElasticsearchDSL\BuilderInterface>
+     */
+    public function getSuggests(): array
     {
         return $this->getEndpoint(SuggestEndpoint::NAME)->getAll();
     }
 
-    /**
-     * @return null|int
-     */
-    public function getFrom()
+    public function getFrom(): ?int
     {
         return $this->from;
     }
 
-    /**
-     * @param null|int $from
-     *
-     * @return $this
-     */
-    public function setFrom($from)
+    public function setFrom(?int $from): self
     {
         $this->from = $from;
 
         return $this;
     }
 
-    /**
-     * @return bool|int
-     */
-    public function isTrackTotalHits()
+    public function isTrackTotalHits(): bool|int|null
     {
         return $this->trackTotalHits;
     }
 
-    /**
-     * @param bool|int $trackTotalHits
-     *
-     * @return $this
-     */
-    public function setTrackTotalHits(bool|int $trackTotalHits)
+    public function setTrackTotalHits(bool|int|null $trackTotalHits): self
     {
         $this->trackTotalHits = $trackTotalHits;
 
         return $this;
     }
 
-    /**
-     * @return null|int
-     */
-    public function getSize()
+    public function getSize(): ?int
     {
         return $this->size;
     }
 
-    /**
-     * @param null|int $size
-     *
-     * @return $this
-     */
-    public function setSize($size)
+    public function setSize(?int $size): self
     {
         $this->size = $size;
 
@@ -531,19 +433,17 @@ class Search
     }
 
     /**
-     * @return array|bool|string
+     * @return array<mixed>|bool|string|null
      */
-    public function isSource()
+    public function getSource(): array|bool|string|null
     {
         return $this->source;
     }
 
     /**
-     * @param array|bool|string $source
-     *
-     * @return $this
+     * @param  array<mixed>|bool|string $source
      */
-    public function setSource($source)
+    public function setSource(array|bool|string $source): self
     {
         $this->source = $source;
 
@@ -551,19 +451,17 @@ class Search
     }
 
     /**
-     * @return array
+     * @return list<string>|null
      */
-    public function getStoredFields()
+    public function getStoredFields(): ?array
     {
         return $this->storedFields;
     }
 
     /**
-     * @param array $storedFields
-     *
-     * @return $this
+     * @param list<string> $storedFields
      */
-    public function setStoredFields($storedFields)
+    public function setStoredFields(array $storedFields): self
     {
         $this->storedFields = $storedFields;
 
@@ -571,19 +469,17 @@ class Search
     }
 
     /**
-     * @return array
+     * @return array<mixed>|null
      */
-    public function getScriptFields()
+    public function getScriptFields(): ?array
     {
         return $this->scriptFields;
     }
 
     /**
-     * @param array $scriptFields
-     *
-     * @return $this
+     * @param array<mixed> $scriptFields
      */
-    public function setScriptFields($scriptFields)
+    public function setScriptFields(array $scriptFields): self
     {
         $this->scriptFields = $scriptFields;
 
@@ -591,19 +487,17 @@ class Search
     }
 
     /**
-     * @return array
+     * @return array<mixed>|null
      */
-    public function getRuntimeFields()
+    public function getRuntimeFields(): ?array
     {
         return $this->runtimeFields;
     }
 
     /**
-     * @param array $runtimeFields
-     *
-     * @return $this
+     * @param array<mixed> $runtimeFields
      */
-    public function setRuntimeFields($runtimeFields)
+    public function setRuntimeFields(array $runtimeFields): self
     {
         $this->runtimeFields = $runtimeFields;
 
@@ -611,59 +505,41 @@ class Search
     }
 
     /**
-     * @return array
+     * @return array<mixed>|null
      */
-    public function getDocValueFields()
+    public function getDocValueFields(): ?array
     {
         return $this->docValueFields;
     }
 
     /**
-     * @param array $docValueFields
-     *
-     * @return $this
+     * @param array<mixed> $docValueFields
      */
-    public function setDocValueFields($docValueFields)
+    public function setDocValueFields(array $docValueFields): self
     {
         $this->docValueFields = $docValueFields;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isExplain()
+    public function getExplain(): ?bool
     {
         return $this->explain;
     }
 
-    /**
-     * @param bool $explain
-     *
-     * @return $this
-     */
-    public function setExplain($explain)
+    public function setExplain(bool $explain): self
     {
         $this->explain = $explain;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isVersion()
+    public function getVersion(): ?bool
     {
         return $this->version;
     }
 
-    /**
-     * @param bool $version
-     *
-     * @return $this
-     */
-    public function setVersion($version)
+    public function setVersion(bool $version): self
     {
         $this->version = $version;
 
@@ -671,39 +547,29 @@ class Search
     }
 
     /**
-     * @return array
+     * @return  array<mixed>|null
      */
-    public function getIndicesBoost()
+    public function getIndicesBoost(): ?array
     {
         return $this->indicesBoost;
     }
 
     /**
-     * @param array $indicesBoost
-     *
-     * @return $this
+     * @param array<mixed> $indicesBoost
      */
-    public function setIndicesBoost($indicesBoost)
+    public function setIndicesBoost(array $indicesBoost): self
     {
         $this->indicesBoost = $indicesBoost;
 
         return $this;
     }
 
-    /**
-     * @return float
-     */
-    public function getMinScore()
+    public function getMinScore(): ?float
     {
         return $this->minScore;
     }
 
-    /**
-     * @param float $minScore
-     *
-     * @return $this
-     */
-    public function setMinScore($minScore)
+    public function setMinScore(float $minScore): self
     {
         $this->minScore = $minScore;
 
@@ -711,39 +577,29 @@ class Search
     }
 
     /**
-     * @return array
+     * @return array<mixed>|null
      */
-    public function getSearchAfter()
+    public function getSearchAfter(): ?array
     {
         return $this->searchAfter;
     }
 
     /**
-     * @param array $searchAfter
-     *
-     * @return $this
+     * @param array<mixed>|null $searchAfter
      */
-    public function setSearchAfter($searchAfter)
+    public function setSearchAfter(?array $searchAfter): self
     {
         $this->searchAfter = $searchAfter;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getScroll()
+    public function getScroll(): ?string
     {
         return $this->scroll;
     }
 
-    /**
-     * @param string $scroll
-     *
-     * @return $this
-     */
-    public function setScroll($scroll = '5m')
+    public function setScroll(string $scroll = '5m'): self
     {
         $this->scroll = $scroll;
 
@@ -753,44 +609,43 @@ class Search
     }
 
     /**
-     * @param string $name
-     * @param string|array|bool $value
-     *
-     * @return $this
+     * @param string|array<mixed>|bool $value
      */
-    public function addUriParam($name, $value)
+    public function addUriParam(string $name, string|array|bool $value): self
     {
-        if (in_array($name, [
-            'q',
-            'df',
-            'analyzer',
-            'analyze_wildcard',
-            'default_operator',
-            'lenient',
-            'explain',
-            '_source',
-            '_source_exclude',
-            '_source_include',
-            'stored_fields',
-            'sort',
-            'track_scores',
-            'timeout',
-            'terminate_after',
-            'from',
-            'size',
-            'search_type',
-            'scroll',
-            'allow_no_indices',
-            'ignore_unavailable',
-            'typed_keys',
-            'pre_filter_shard_size',
-            'ignore_unavailable',
-            'rest_total_hits_as_int',
-        ])) {
-            $this->uriParams[$name] = $value;
-        } else {
-            throw new \InvalidArgumentException(sprintf('Parameter %s is not supported.', $value));
+        if (
+            !in_array($name, [
+                'q',
+                'df',
+                'analyzer',
+                'analyze_wildcard',
+                'default_operator',
+                'lenient',
+                'explain',
+                '_source',
+                '_source_exclude',
+                '_source_include',
+                'stored_fields',
+                'sort',
+                'track_scores',
+                'timeout',
+                'terminate_after',
+                'from',
+                'size',
+                'search_type',
+                'scroll',
+                'allow_no_indices',
+                'ignore_unavailable',
+                'typed_keys',
+                'pre_filter_shard_size',
+                'ignore_unavailable',
+                'rest_total_hits_as_int',
+            ], true)
+        ) {
+            throw new InvalidArgumentException(sprintf('Parameter %s is not supported.', json_encode($value)));
         }
+
+        $this->uriParams[$name] = $value;
 
         return $this;
     }
@@ -798,19 +653,19 @@ class Search
     /**
      * Returns query url parameters.
      *
-     * @return array
+     * @return array<string,mixed>
      */
-    public function getUriParams()
+    public function getUriParams(): array
     {
         return $this->uriParams;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<string,mixed>
      */
-    public function toArray()
+    public function toArray(): array
     {
-        $output = array_filter(static::$serializer->normalize($this->endpoints));
+        $result = array_filter(self::$serializer->normalize($this->endpoints));
 
         $params = [
             'from' => 'from',
@@ -829,11 +684,14 @@ class Search
         ];
 
         foreach ($params as $field => $param) {
-            if ($this->$field !== null) {
-                $output[$param] = $this->$field;
+            if ($this->$field === null) {
+                continue;
             }
+
+            $result[$param] = $this->$field;
         }
 
-        return $output;
+        return $result;
     }
+
 }

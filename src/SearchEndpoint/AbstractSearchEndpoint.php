@@ -1,42 +1,37 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
-use ONGR\ElasticsearchDSL\Serializer\Normalizer\AbstractNormalizable;
+use BadFunctionCallException;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\Query\Compound\BoolQuery;
+use Biano\ElasticsearchDSL\Serializer\Normalizer\AbstractNormalizable;
+use OverflowException;
+use function array_key_exists;
+use function bin2hex;
+use function random_bytes;
+use function sprintf;
 
-/**
- * Abstract class used to define search endpoint with references.
- */
 abstract class AbstractSearchEndpoint extends AbstractNormalizable implements SearchEndpointInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var BuilderInterface[]
-     */
-    private $container = [];
+    /** @var array<string,\Biano\ElasticsearchDSL\BuilderInterface> */
+    private array $container = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function add(BuilderInterface $builder, $key = null)
+    abstract protected function getName(): string;
+
+    public function add(BuilderInterface $builder, ?string $key = null): string
     {
-        if (array_key_exists($key, $this->container)) {
-            throw new \OverflowException(sprintf('Builder with %s name for endpoint has already been added!', $key));
+        if (array_key_exists((string) $key, $this->container)) {
+            throw new OverflowException(sprintf('Builder with %s name for endpoint has already been added!', $key));
         }
 
-        if (!$key) {
+        if ($key === null) {
             $key = bin2hex(random_bytes(30));
         }
 
@@ -45,42 +40,24 @@ abstract class AbstractSearchEndpoint extends AbstractNormalizable implements Se
         return $key;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addToBool(BuilderInterface $builder, $boolType = null, $key = null)
+    public function addToBool(BuilderInterface $builder, ?string $boolType = null, ?string $key = null): string
     {
-        throw new \BadFunctionCallException(sprintf("Endpoint %s doesn't support bool statements", static::NAME));
+        throw new BadFunctionCallException(sprintf("Endpoint %s doesn't support bool statements", static::getName()));
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($key)
+    public function remove(string $key): void
     {
         if ($this->has($key)) {
             unset($this->container[$key]);
         }
-
-        return $this;
     }
 
-    /**
-     * Checks if builder with specific key exists.
-     *
-     * @param string $key Key to check if it exists in container.
-     *
-     * @return bool
-     */
-    public function has($key)
+    public function has(string $key): bool
     {
         return array_key_exists($key, $this->container);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function get($key)
+    public function get(string $key): ?BuilderInterface
     {
         if ($this->has($key)) {
             return $this->container[$key];
@@ -90,18 +67,16 @@ abstract class AbstractSearchEndpoint extends AbstractNormalizable implements Se
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getAll($boolType = null)
+    public function getAll(?string $boolType = null): array
     {
         return $this->container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBool()
+    public function getBool(): ?BoolQuery
     {
-        throw new \BadFunctionCallException(sprintf("Endpoint %s doesn't support bool statements", static::NAME));
+        throw new BadFunctionCallException(sprintf("Endpoint %s doesn't support bool statements", static::getName()));
     }
+
 }

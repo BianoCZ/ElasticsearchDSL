@@ -1,62 +1,43 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Joining;
+namespace Biano\ElasticsearchDSL\Query\Joining;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "has_parent" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-has-parent-query.html
  */
 class HasParentQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var string
-     */
-    private $parentType;
+    private string $parentType;
+
+    private BuilderInterface $query;
 
     /**
-     * @var BuilderInterface
+     * @param array<string,mixed> $parameters
      */
-    private $query;
-
-    /**
-     * @param string           $parentType
-     * @param BuilderInterface $query
-     * @param array            $parameters
-     */
-    public function __construct($parentType, BuilderInterface $query, array $parameters = [])
+    public function __construct(string $parentType, BuilderInterface $query, array $parameters = [])
     {
         $this->parentType = $parentType;
         $this->query = $query;
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'has_parent';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [
             'parent_type' => $this->parentType,
@@ -67,4 +48,5 @@ class HasParentQuery implements BuilderInterface
 
         return [$this->getType() => $output];
     }
+
 }

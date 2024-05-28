@@ -1,90 +1,60 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\MetricTrait;
+use LogicException;
 
 /**
- * Class representing geo bounds aggregation.
- *
- * @link http://goo.gl/aGqw7Y
+ * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-geobounds-aggregation.html
  */
-class GeoBoundsAggregation extends AbstractAggregation
+class GeoBoundsAggregation extends AbstractMetricAggregation
 {
-    use MetricTrait;
 
-    /**
-     * @var bool
-     */
-    private $wrapLongitude = true;
+    private bool $wrapLongitude = true;
 
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $field
-     * @param bool   $wrapLongitude
-     */
-    public function __construct($name, $field = null, $wrapLongitude = true)
+    public function __construct(string $name, ?string $field = null, bool $wrapLongitude = true)
     {
         parent::__construct($name);
 
-        $this->setField($field);
+        if ($field !== null) {
+            $this->setField($field);
+        }
+
         $this->setWrapLongitude($wrapLongitude);
     }
 
-    /**
-     * @return bool
-     */
-    public function isWrapLongitude()
+    public function isWrapLongitude(): bool
     {
         return $this->wrapLongitude;
     }
 
-    /**
-     * @param bool $wrapLongitude
-     *
-     * @return $this
-     */
-    public function setWrapLongitude($wrapLongitude)
+    public function setWrapLongitude(bool $wrapLongitude): self
     {
         $this->wrapLongitude = $wrapLongitude;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
-    {
-        $data = [];
-        if ($this->getField()) {
-            $data['field'] = $this->getField();
-        } else {
-            throw new \LogicException('Geo bounds aggregation must have a field set.');
-        }
-
-        $data['wrap_longitude'] = $this->isWrapLongitude();
-
-        return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'geo_bounds';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArray(): array
+    {
+        if ($this->getField() === null) {
+            throw new LogicException('Geo bounds aggregation must have a field set.');
+        }
+
+        return [
+            'field' => $this->getField(),
+            'wrap_longitude' => $this->isWrapLongitude(),
+        ];
+    }
+
 }

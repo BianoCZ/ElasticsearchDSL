@@ -1,50 +1,30 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Geo;
+namespace Biano\ElasticsearchDSL\Query\Geo;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "geo_distance" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-geo-distance-query.html
  */
 class GeoDistanceQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var string
-     */
-    private $field;
+    private string $field;
+
+    private string $distance;
+
+    private mixed $location;
 
     /**
-     * @var string
+     * @param array<string,mixed> $parameters
      */
-    private $distance;
-
-    /**
-     * @var mixed
-     */
-    private $location;
-
-    /**
-     * @param string $field
-     * @param string $distance
-     * @param mixed  $location
-     * @param array  $parameters
-     */
-    public function __construct($field, $distance, $location, array $parameters = [])
+    public function __construct(string $field, string $distance, mixed $location, array $parameters = [])
     {
         $this->field = $field;
         $this->distance = $distance;
@@ -53,18 +33,15 @@ class GeoDistanceQuery implements BuilderInterface
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'geo_distance';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [
             'distance' => $this->distance,
@@ -74,4 +51,5 @@ class GeoDistanceQuery implements BuilderInterface
 
         return [$this->getType() => $output];
     }
+
 }

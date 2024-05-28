@@ -1,42 +1,27 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\AdjacencyMatrixAggregation;
-use ONGR\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\AdjacencyMatrixAggregation;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use function assert;
 
 /**
  * Unit test for adjacency matrix aggregation.
  */
-class AdjacencyMatrixAggregationTest extends \PHPUnit\Framework\TestCase
+class AdjacencyMatrixAggregationTest extends TestCase
 {
-//    /**
-//     * Test if exception is thrown when not anonymous filter is without name.
-//     */
-//    public function testIfExceptionIsThrown()
-//    {
-//        $this->expectException(\LogicException::class);
-//        $this->expectExceptionMessage('In not anonymous filters filter name must be set.');
-//        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\BuilderInterface::class)->getMock();
-//        $aggregation = new FiltersAggregation('test_agg');
-//        $aggregation->addFilter($mock);
-//    }
 
     /**
      * Test GetArray method.
      */
-    public function testFiltersAggregationGetArray()
+    public function testFiltersAggregationGetArray(): void
     {
-        $mock = $this->getMockBuilder(\ONGR\ElasticsearchDSL\BuilderInterface::class)->getMock();
+        $mock = $this->createMock(BuilderInterface::class);
         $aggregation = new AdjacencyMatrixAggregation('test_agg');
         $aggregation->addFilter('name', $mock);
         $result = $aggregation->getArray();
@@ -46,7 +31,7 @@ class AdjacencyMatrixAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getType method.
      */
-    public function testFiltersAggregationGetType()
+    public function testFiltersAggregationGetType(): void
     {
         $aggregation = new AdjacencyMatrixAggregation('foo');
         $result = $aggregation->getType();
@@ -56,14 +41,11 @@ class AdjacencyMatrixAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for filter aggregation toArray() method.
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $aggregation = new AdjacencyMatrixAggregation('test_agg');
-        $filter = $this->getMockBuilder(\ONGR\ElasticsearchDSL\BuilderInterface::class)
-            ->setMethods(['toArray', 'getType'])
-            ->getMockForAbstractClass();
-        $filter->expects($this->any())
-            ->method('toArray')
+        $filter = $this->createMock(BuilderInterface::class);
+        $filter->expects(self::any())->method('toArray')
             ->willReturn(['test_field' => ['test_value' => 'test']]);
 
         $aggregation->addFilter('first', $filter);
@@ -74,14 +56,10 @@ class AdjacencyMatrixAggregationTest extends \PHPUnit\Framework\TestCase
             'adjacency_matrix' => [
                 'filters' => [
                     'first' => [
-                        'test_field' => [
-                            'test_value' => 'test',
-                        ],
+                        'test_field' => ['test_value' => 'test'],
                     ],
                     'second' => [
-                        'test_field' => [
-                            'test_value' => 'test',
-                        ],
+                        'test_field' => ['test_value' => 'test'],
                     ],
                 ],
             ],
@@ -92,31 +70,31 @@ class AdjacencyMatrixAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if filters can be passed to the constructor.
      */
-    public function testFilterConstructor()
+    public function testFilterConstructor(): void
     {
-        /** @var BuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builderInterface1 */
-        $builderInterface1 = $this->getMockForAbstractClass(\ONGR\ElasticsearchDSL\BuilderInterface::class);
-        /** @var BuilderInterface|\PHPUnit_Framework_MockObject_MockObject $builderInterface2 */
-        $builderInterface2 = $this->getMockForAbstractClass(\ONGR\ElasticsearchDSL\BuilderInterface::class);
+        $builderInterface1 = $this->getMockForAbstractClass(BuilderInterface::class);
+        assert($builderInterface1 instanceof BuilderInterface || $builderInterface1 instanceof MockObject);
+        $builderInterface2 = $this->getMockForAbstractClass(BuilderInterface::class);
+        assert($builderInterface2 instanceof BuilderInterface || $builderInterface2 instanceof MockObject);
 
         $aggregation = new AdjacencyMatrixAggregation(
             'test',
             [
                 'filter1' => $builderInterface1,
                 'filter2' => $builderInterface2,
-            ]
+            ],
         );
 
         $this->assertSame(
             [
                 'adjacency_matrix' => [
                     'filters' => [
-                        'filter1' => null,
-                        'filter2' => null,
+                        'filter1' => [],
+                        'filter2' => [],
                     ],
                 ],
             ],
-            $aggregation->toArray()
+            $aggregation->toArray(),
         );
 
         $aggregation = new AdjacencyMatrixAggregation('test');
@@ -127,7 +105,8 @@ class AdjacencyMatrixAggregationTest extends \PHPUnit\Framework\TestCase
                     'filters' => [],
                 ],
             ],
-            $aggregation->toArray()
+            $aggregation->toArray(),
         );
     }
+
 }

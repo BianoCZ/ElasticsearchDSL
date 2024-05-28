@@ -1,43 +1,36 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Highlight;
+namespace Biano\ElasticsearchDSL\Highlight;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
+use stdClass;
+use function count;
 
 /**
  * Data holder for highlight api.
  */
 class Highlight implements BuilderInterface
 {
+
     use ParametersTrait;
 
     /**
-     * @var array Holds fields for highlight.
-     */
-    private $fields = [];
-
-    /**
-     * @var array
-     */
-    private $tags;
-
-    /**
-     * @param string $name   Field name to highlight.
-     * @param array  $params
+     * Holds fields for highlight
      *
-     * @return $this
+     * @var array<string,array<mixed>>
      */
-    public function addField($name, array $params = [])
+    private array $fields = [];
+
+    /** @var array<string,array<mixed>>|null */
+    private ?array $tags = null;
+
+    /**
+     * @param array<mixed> $params
+     */
+    public function addField(string $name, array $params = []): self
     {
         $this->fields[$name] = $params;
 
@@ -47,12 +40,10 @@ class Highlight implements BuilderInterface
     /**
      * Sets html tag and its class used in highlighting.
      *
-     * @param array $preTags
-     * @param array $postTags
-     *
-     * @return $this
+     * @param array<mixed> $preTags
+     * @param array<mixed> $postTags
      */
-    public function setTags(array $preTags, array $postTags)
+    public function setTags(array $preTags, array $postTags): self
     {
         $this->tags['pre_tags'] = $preTags;
         $this->tags['post_tags'] = $postTags;
@@ -60,31 +51,29 @@ class Highlight implements BuilderInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'highlight';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
-        $output = [];
+        $data = [];
 
-        if (is_array($this->tags)) {
-            $output = $this->tags;
+        if ($this->tags !== null) {
+            $data = $this->tags;
         }
 
-        $output = $this->processArray($output);
+        $data = $this->processArray($data);
 
         foreach ($this->fields as $field => $params) {
-            $output['fields'][$field] = count($params) ? $params : new \stdClass();
+            $data['fields'][$field] = count($params) ? $params : new stdClass();
         }
 
-        return $output;
+        return $data;
     }
+
 }

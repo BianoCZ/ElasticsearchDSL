@@ -1,36 +1,26 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Functional;
+namespace Biano\ElasticsearchDSL\Tests\Functional;
 
+use Biano\ElasticsearchDSL\Search;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\ClientBuilder;
-use ONGR\ElasticsearchDSL\Search;
 use PHPUnit\Framework\TestCase;
+use Throwable;
+use function array_filter;
 
 abstract class AbstractElasticsearchTestCase extends TestCase
 {
+
     /**
      * Test index name in the elasticsearch.
      */
-    const INDEX_NAME = 'elasticsaerch-dsl-test';
+    public const INDEX_NAME = 'elasticsaerch-dsl-test';
 
-    /**
-     * @var Client
-     */
-    private $client;
+    private Client $client;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -42,9 +32,9 @@ abstract class AbstractElasticsearchTestCase extends TestCase
             array_filter(
                 [
                     'index' => self::INDEX_NAME,
-                    'mapping' => $this->getMapping()
-                ]
-            )
+                    'mapping' => $this->getMapping(),
+                ],
+            ),
         );
 
         $bulkBody = [];
@@ -52,19 +42,17 @@ abstract class AbstractElasticsearchTestCase extends TestCase
         foreach ($this->getDataArray() as $type => $documents) {
             foreach ($documents as $id => $document) {
                 $bulkBody[] = [
-                   'index' => [
+                    'index' => [
                         '_index' => self::INDEX_NAME,
                         '_id' => $id,
-                    ]
+                    ],
                 ];
                 $bulkBody[] = $document;
             }
         }
 
         $this->client->bulk(
-            [
-                'body' => $bulkBody
-            ]
+            ['body' => $bulkBody],
         );
         $this->client->indices()->refresh();
     }
@@ -76,7 +64,7 @@ abstract class AbstractElasticsearchTestCase extends TestCase
      *
      * @return array Mapping body
      */
-    protected function getMapping()
+    protected function getMapping(): array
     {
         return [];
     }
@@ -97,29 +85,25 @@ abstract class AbstractElasticsearchTestCase extends TestCase
      *          ]
      *      ]
      * Document _id can be set as it's id.
-     *
-     * @return array
      */
-    protected function getDataArray()
+    protected function getDataArray(): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function tearDown(): void
     {
         parent::tearDown();
+
         $this->deleteIndex();
     }
 
     /**
      * Execute search to the elasticsearch and handle results.
      *
-     * @param Search $search Search object.
+     * @param \Biano\ElasticsearchDSL\Search $search    Search object.
      * @param bool $returnRaw Return raw response from the client.
-     * @return array
+     *
      * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
      * @throws \Elastic\Elasticsearch\Exception\MissingParameterException
      * @throws \Elastic\Elasticsearch\Exception\ServerResponseException
@@ -130,7 +114,7 @@ abstract class AbstractElasticsearchTestCase extends TestCase
             array_filter([
                 'index' => self::INDEX_NAME,
                 'body' => $search->toArray(),
-            ])
+            ]),
         );
 
         if ($returnRaw) {
@@ -143,7 +127,7 @@ abstract class AbstractElasticsearchTestCase extends TestCase
             foreach ($response['hits']['hits'] as $document) {
                 $documents[$document['_id']] = $document['_source'];
             }
-        } catch (\Exception $e) {
+        } catch (Throwable) {
             return $documents;
         }
 
@@ -153,12 +137,13 @@ abstract class AbstractElasticsearchTestCase extends TestCase
     /**
      * Deletes index from elasticsearch.
      */
-    private function deleteIndex()
+    private function deleteIndex(): void
     {
         try {
             $this->client->indices()->delete(['index' => self::INDEX_NAME]);
-        } catch (\Exception $e) {
+        } catch (Throwable) {
             // Do nothing.
         }
     }
+
 }

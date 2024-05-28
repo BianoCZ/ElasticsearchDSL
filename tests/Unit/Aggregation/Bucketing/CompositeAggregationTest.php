@@ -1,25 +1,20 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\CompositeAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\TermsAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\CompositeAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\TermsAggregation;
+use PHPUnit\Framework\TestCase;
 
-class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
+class CompositeAggregationTest extends TestCase
 {
+
     /**
      * Test for composite aggregation toArray() method exception.
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $compositeAgg = new CompositeAggregation('composite_test_agg');
         $termsAgg = new TermsAggregation('test_term_agg', 'test_field');
@@ -30,8 +25,8 @@ class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
                 'sources' =>  [
                     [
                         'test_term_agg' => [ 'terms' => ['field' => 'test_field'] ],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 
@@ -41,7 +36,7 @@ class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for composite aggregation toArray() method with size and after part.
      */
-    public function testToArrayWithSizeAndAfter()
+    public function testToArrayWithSizeAndAfter(): void
     {
         $compositeAgg = new CompositeAggregation('composite_test_agg');
         $termsAgg = new TermsAggregation('test_term_agg', 'test_field');
@@ -54,10 +49,10 @@ class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
                 'sources' =>  [
                     [
                         'test_term_agg' => [ 'terms' => ['field' => 'test_field'] ],
-                    ]
+                    ],
                 ],
                 'size' => 5,
-                'after' => ['test_term_agg' => 'test']
+                'after' => ['test_term_agg' => 'test'],
             ],
         ];
 
@@ -67,7 +62,7 @@ class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for composite aggregation getSize() method.
      */
-    public function testGetSize()
+    public function testGetSize(): void
     {
         $compositeAgg = new CompositeAggregation('composite_test_agg');
         $compositeAgg->setSize(5);
@@ -78,7 +73,7 @@ class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for composite aggregation getAfter() method.
      */
-    public function testGetAfter()
+    public function testGetAfter(): void
     {
         $compositeAgg = new CompositeAggregation('composite_test_agg');
         $compositeAgg->setAfter(['test_term_agg' => 'test']);
@@ -89,14 +84,14 @@ class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getType method.
      */
-    public function testGetType()
+    public function testGetType(): void
     {
         $aggregation = new CompositeAggregation('foo');
         $result = $aggregation->getType();
         $this->assertEquals('composite', $result);
     }
 
-    public function testTermsSourceWithOrderParameter()
+    public function testTermsSourceWithOrderParameter(): void
     {
         $compositeAgg = new CompositeAggregation('composite_with_order');
         $termsAgg = new TermsAggregation('test_term_agg', 'test_field');
@@ -108,16 +103,15 @@ class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
                 'sources' =>  [
                     [
                         'test_term_agg' => [ 'terms' => ['field' => 'test_field', 'order' => 'asc'] ],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 
         $this->assertEquals($expectedResult, $compositeAgg->toArray());
     }
 
-
-    public function testTermsSourceWithDescOrderParameter()
+    public function testTermsSourceWithDescOrderParameter(): void
     {
         $compositeAgg = new CompositeAggregation('composite_with_order');
         $termsAgg = new TermsAggregation('test_term_agg', 'test_field');
@@ -129,16 +123,15 @@ class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
                 'sources' =>  [
                     [
                         'test_term_agg' => [ 'terms' => ['field' => 'test_field', 'order' => 'desc'] ],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 
         $this->assertEquals($expectedResult, $compositeAgg->toArray());
     }
 
-
-    public function testMultipleSourcesWithDifferentOrders()
+    public function testMultipleSourcesWithDifferentOrders(): void
     {
         $compositeAgg = new CompositeAggregation('composite_with_order');
 
@@ -158,11 +151,12 @@ class CompositeAggregationTest extends \PHPUnit\Framework\TestCase
                     ],
                     [
                         'test_term_agg_2' => [ 'terms' => ['field' => 'test_field', 'order' => 'asc'] ],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 
         $this->assertEquals($expectedResult, $compositeAgg->toArray());
     }
+
 }

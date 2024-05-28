@@ -1,41 +1,22 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
-use ONGR\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use LogicException;
+use function sprintf;
 
 /**
- * Class representing FilterAggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-filter-aggregation.html
  */
-class FilterAggregation extends AbstractAggregation
+class FilterAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
 
-    /**
-     * @var BuilderInterface
-     */
-    protected $filter;
+    private ?BuilderInterface $filter = null;
 
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string           $name
-     * @param BuilderInterface $filter
-     */
-    public function __construct($name, BuilderInterface $filter = null)
+    public function __construct(string $name, ?BuilderInterface $filter = null)
     {
         parent::__construct($name);
 
@@ -44,53 +25,38 @@ class FilterAggregation extends AbstractAggregation
         }
     }
 
-    /**
-     * @param BuilderInterface $filter
-     *
-     * @return $this
-     */
-    public function setFilter(BuilderInterface $filter)
+    public function setField(string $field): self
+    {
+        throw new LogicException("Filter aggregation doesn't support `field` parameter");
+    }
+
+    public function getFilter(): ?BuilderInterface
+    {
+        return $this->filter;
+    }
+
+    public function setFilter(BuilderInterface $filter): self
     {
         $this->filter = $filter;
 
         return $this;
     }
 
-    /**
-     * Returns a filter.
-     *
-     * @return BuilderInterface
-     */
-    public function getFilter()
+    public function getType(): string
     {
-        return $this->filter;
+        return 'filter';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function setField($field)
+    public function getArray(): array
     {
-        throw new \LogicException("Filter aggregation, doesn't support `field` parameter");
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
-    {
-        if (!$this->filter) {
-            throw new \LogicException("Filter aggregation `{$this->getName()}` has no filter added");
+        if ($this->getFilter() === null) {
+            throw new LogicException(sprintf('Filter aggregation `%s` has no filter added', $this->getName()));
         }
 
         return $this->getFilter()->toArray();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'filter';
-    }
 }

@@ -1,36 +1,33 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query;
 
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
+use Biano\ElasticsearchDSL\Query\MatchAllQuery;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
-class MatchAllQueryTest extends \PHPUnit\Framework\TestCase
+class MatchAllQueryTest extends TestCase
 {
+
     /**
      * Tests toArray().
      */
-    public function testToArrayWhenThereAreNoParams()
+    public function testToArrayWhenThereAreNoParams(): void
     {
         $query = new MatchAllQuery();
-        $this->assertEquals(['match_all' => new \stdClass()], $query->toArray());
+        $this->assertEquals(['match_all' => new stdClass()], $query->toArray());
     }
 
     /**
      * Tests toArray().
      */
-    public function testToArrayWithParams()
+    public function testToArrayWithParams(): void
     {
         $params = ['boost' => 5];
         $query = new MatchAllQuery($params);
         $this->assertEquals(['match_all' => $params], $query->toArray());
     }
+
 }

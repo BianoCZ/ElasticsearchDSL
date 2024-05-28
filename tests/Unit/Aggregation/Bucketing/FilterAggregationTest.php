@@ -1,31 +1,25 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\FilterAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\HistogramAggregation;
-use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\ExistsQuery;
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\FilterAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\HistogramAggregation;
+use Biano\ElasticsearchDSL\Query\Compound\BoolQuery;
+use Biano\ElasticsearchDSL\Query\MatchAllQuery;
+use Biano\ElasticsearchDSL\Query\TermLevel\ExistsQuery;
+use Biano\ElasticsearchDSL\Query\TermLevel\TermQuery;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
-class FilterAggregationTest extends \PHPUnit\Framework\TestCase
+class FilterAggregationTest extends TestCase
 {
+
     /**
      * Data provider for testToArray.
-     *
-     * @return array
      */
-    public function getToArrayData()
+    public function getToArrayData(): array
     {
         $out = [];
 
@@ -77,7 +71,6 @@ class FilterAggregationTest extends \PHPUnit\Framework\TestCase
             'filter' => $boolFilter->toArray(),
         ];
 
-
         $out[] = [
             $aggregation,
             $result,
@@ -89,12 +82,9 @@ class FilterAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for filter aggregation toArray() method.
      *
-     * @param FilterAggregation $aggregation
-     * @param array             $expectedResult
-     *
      * @dataProvider getToArrayData
      */
-    public function testToArray($aggregation, $expectedResult)
+    public function testToArray(FilterAggregation $aggregation, array $expectedResult): void
     {
         $this->assertEquals($expectedResult, $aggregation->toArray());
     }
@@ -102,9 +92,9 @@ class FilterAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for setField().
      */
-    public function testSetField()
+    public function testSetField(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('doesn\'t support `field` parameter');
         $aggregation = new FilterAggregation('test_agg');
         $aggregation->setField('test_field');
@@ -113,9 +103,9 @@ class FilterAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for toArray() without setting a filter.
      */
-    public function testToArrayNoFilter()
+    public function testToArrayNoFilter(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('has no filter added');
         $aggregation = new FilterAggregation('test_agg');
         $result = $aggregation->toArray();
@@ -124,18 +114,18 @@ class FilterAggregationTest extends \PHPUnit\Framework\TestCase
             [
                 'aggregation' => [
                     'test_agg' => [
-                        'filter' => []
-                    ]
-                ]
+                        'filter' => [],
+                    ],
+                ],
             ],
-            $result
+            $result,
         );
     }
 
     /**
      * Test for toArray() with setting a filter.
      */
-    public function testToArrayWithFilter()
+    public function testToArrayWithFilter(): void
     {
         $aggregation = new FilterAggregation('test_agg');
         $aggregation->setFilter(new ExistsQuery('test'));
@@ -144,19 +134,17 @@ class FilterAggregationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 'filter' => [
-                    'exists' => [
-                        'field' => 'test'
-                    ]
-                ]
+                    'exists' => ['field' => 'test'],
+                ],
             ],
-            $result
+            $result,
         );
     }
 
     /**
      * Tests if filter can be passed to constructor.
      */
-    public function testConstructorFilter()
+    public function testConstructorFilter(): void
     {
         $matchAllFilter = new MatchAllQuery();
         $aggregation = new FilterAggregation('test', $matchAllFilter);
@@ -164,7 +152,8 @@ class FilterAggregationTest extends \PHPUnit\Framework\TestCase
             [
                 'filter' => $matchAllFilter->toArray(),
             ],
-            $aggregation->toArray()
+            $aggregation->toArray(),
         );
     }
+
 }

@@ -1,45 +1,59 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL;
+namespace Biano\ElasticsearchDSL;
+
+use function array_merge;
 
 /**
  * A trait which handles the behavior of parameters in queries, filters, etc.
  */
 trait ParametersTrait
 {
-    /**
-     * @var array
-     */
-    private $parameters = [];
+
+    /** @var array<string,mixed> */
+    private array $parameters = [];
 
     /**
-     * Checks if parameter exists.
-     *
-     * @param string $name
-     *
-     * @return bool
+     * Returns one parameter by its name.
      */
-    public function hasParameter($name)
+    public function getParameter(string $name): mixed
+    {
+        return $this->parameters[$name];
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
+    public function hasParameter(string $name): bool
     {
         return isset($this->parameters[$name]);
     }
 
     /**
-     * Removes parameter.
-     *
-     * @param string $name
-     * @return $this
+     * @param array<string,mixed> $parameters
      */
-    public function removeParameter($name)
+    public function setParameters(array $parameters): self
+    {
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+
+    public function addParameter(string $name, mixed $value): self
+    {
+        $this->parameters[$name] = $value;
+
+        return $this;
+    }
+
+    public function removeParameter(string $name): self
     {
         if ($this->hasParameter($name)) {
             unset($this->parameters[$name]);
@@ -49,60 +63,15 @@ trait ParametersTrait
     }
 
     /**
-     * Returns one parameter by it's name.
-     *
-     * @param string $name
-     *
-     * @return array|string|int|float|bool|\stdClass
-     */
-    public function getParameter($name)
-    {
-        return $this->parameters[$name];
-    }
-
-    /**
-     * Returns an array of all parameters.
-     *
-     * @return array
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
-    /**
-     * @param string                 $name
-     * @param array|string|int|float|bool|\stdClass $value
-     * @return $this
-     */
-    public function addParameter($name, $value)
-    {
-        $this->parameters[$name] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @param array $parameters
-     *
-     * @return $this
-     */
-    public function setParameters(array $parameters)
-    {
-        $this->parameters = $parameters;
-
-        return $this;
-    }
-
-    /**
      * Returns given array merged with parameters.
      *
-     * @param array $array
+     * @param array<mixed> $data
      *
-     * @return array
+     * @return array<mixed>
      */
-    protected function processArray(array $array = [])
+    protected function processArray(array $data = []): array
     {
-        return array_merge($array, $this->parameters);
+        return array_merge($data, $this->parameters);
     }
+
 }

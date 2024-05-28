@@ -1,62 +1,34 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Pipeline;
+namespace Biano\ElasticsearchDSL\Aggregation\Pipeline;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\Sort\FieldSort;
+use Biano\ElasticsearchDSL\Sort\FieldSort;
+use function array_filter;
 
 /**
- * Class representing Bucket Script Pipeline Aggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-bucket-sort-aggregation.html
  */
 class BucketSortAggregation extends AbstractPipelineAggregation
 {
-    /**
-     * @var array
-     */
-    private $sort = [];
+
+    /** @var list<array<mixed>> */
+    private array $sort = [];
+
+    private ?int $size = null;
+
+    private ?int $from = null;
 
     /**
-     * @var int
+     * @return list<array<mixed>>
      */
-    private $size;
-
-    /**
-     * @var int
-     */
-    private $from;
-
-    /**
-     * @param string $name
-     * @param string  $bucketsPath
-     */
-    public function __construct($name, $bucketsPath = null)
-    {
-        parent::__construct($name, $bucketsPath);
-    }
-
-    /**
-     * @return array
-     */
-    public function getSort()
+    public function getSort(): array
     {
         return $this->sort;
     }
 
-    /**
-     * @return $this
-     */
-    public function addSort(FieldSort $sort)
+    public function addSort(FieldSort $sort): self
     {
         $this->sort[] = $sort->toArray();
 
@@ -64,77 +36,62 @@ class BucketSortAggregation extends AbstractPipelineAggregation
     }
 
     /**
-     * @param string $sort
-     *
-     * @return $this
+     * @param list<\Biano\ElasticsearchDSL\Sort\FieldSort> $sorts
      */
-    public function setSort($sort)
+    public function setSort(array $sorts): self
     {
-        $this->sort = $sort;
+        foreach ($sorts as $sort) {
+            $this->addSort($sort);
+        }
 
         return $this;
     }
 
-    public function setSize($size)
+    public function setSize(int $size): self
     {
         $this->size = $size;
 
         return $this;
     }
 
-    /**
-     *
-     * @return int
-     */
-    public function getSize(): int
+    public function getSize(): ?int
     {
-        return (int) $this->size;
+        return $this->size;
     }
 
     /**
      * Return from.
-     *
-     * @return int
      */
-    public function getFrom()
+    public function getFrom(): ?int
     {
         return $this->from;
     }
 
-    /**
-     * @param int $from
-     *
-     * @return $this
-     */
-    public function setFrom($from)
+    public function setFrom(int $from): self
     {
         $this->from = $from;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'bucket_sort';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
-        $out = array_filter(
+        return array_filter(
             [
-            'buckets_path' => $this->getBucketsPath(),
-            'sort' => $this->getSort(),
-            'size' => $this->getSize(),
-            'from' => $this->getFrom(),
-            ]
+                'buckets_path' => $this->getBucketsPath(),
+                'sort' => $this->getSort(),
+                'size' => $this->getSize(),
+                'from' => $this->getFrom(),
+            ],
         );
-
-        return $out;
     }
+
 }

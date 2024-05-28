@@ -1,40 +1,32 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit;
+namespace Biano\ElasticsearchDSL\Tests\Unit;
 
-use ONGR\ElasticsearchDSL\Query\TermLevel\ExistsQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
-use ONGR\ElasticsearchDSL\Search;
-use ONGR\ElasticsearchDSL\Sort\FieldSort;
-use ONGR\ElasticsearchDSL\Suggest\Suggest;
+use Biano\ElasticsearchDSL\Search;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Test for Search.
  */
-class SearchTest extends \PHPUnit\Framework\TestCase
+class SearchTest extends TestCase
 {
+
     /**
      * Tests Search constructor.
      */
-    public function testItCanBeInstantiated()
+    public function testItCanBeInstantiated(): void
     {
         $this->assertInstanceOf(Search::class, new Search());
     }
 
-    public function testScrollUriParameter()
+    public function testScrollUriParameter(): void
     {
         $search = new Search();
         $search->setScroll('5m');
 
         $this->assertArrayHasKey('scroll', $search->getUriParams());
     }
+
 }

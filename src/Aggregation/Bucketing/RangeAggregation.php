@@ -1,68 +1,54 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use function array_diff_assoc;
+use function array_filter;
+use function array_key_exists;
+use function array_values;
 
 /**
- * Class representing RangeAggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-range-aggregation.html
  */
-class RangeAggregation extends AbstractAggregation
+class RangeAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
+
+    /** @var list<array<string,mixed>> */
+    private array $ranges = [];
+
+    private bool $keyed = false;
 
     /**
-     * @var array
+     * @param list<array<string,string>> $ranges
      */
-    private $ranges = [];
-
-    /**
-     * @var bool
-     */
-    private $keyed = false;
-
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $field
-     * @param array  $ranges
-     * @param bool   $keyed
-     */
-    public function __construct($name, $field = null, $ranges = [], $keyed = false)
+    public function __construct(string $name, ?string $field = null, array $ranges = [], bool $keyed = false)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setKeyed($keyed);
-        foreach ($ranges as $range) {
-            $from = isset($range['from']) ? $range['from'] : null;
-            $to = isset($range['to']) ? $range['to'] : null;
-            $key = isset($range['key']) ? $range['key'] : null;
-            $this->addRange($from, $to, $key);
+        if ($field !== null) {
+            $this->setField($field);
         }
+
+        if ($keyed !== null) {
+            $this->setKeyed($keyed);
+        }
+
+        foreach ($ranges as $range) {
+            $this->addRange($range['from'] ?? null, $range['to'] ?? null, $range['key'] ?? null);
+        }
+    }
+
+    public function isKeyed(): bool
+    {
+        return $this->keyed;
     }
 
     /**
      * Sets if result buckets should be keyed.
-     *
-     * @param bool $keyed
-     *
-     * @return $this
      */
-    public function setKeyed($keyed)
+    public function setKeyed(bool $keyed): self
     {
         $this->keyed = $keyed;
 
@@ -70,29 +56,26 @@ class RangeAggregation extends AbstractAggregation
     }
 
     /**
-     * Add range to aggregation.
-     *
-     * @param int|float|null $from
-     * @param int|float|null $to
-     * @param string         $key
-     *
-     * @return RangeAggregation
+     * @return list<array<string,mixed>>
      */
-    public function addRange($from = null, $to = null, $key = '')
+    public function getRanges(): array
+    {
+        return $this->ranges;
+    }
+
+    /**
+     * Add range to aggregation.
+     */
+    public function addRange(int|float|string|null $from = null, int|float|string|null $to = null, ?string $key = null): self
     {
         $range = array_filter(
             [
                 'from' => $from,
                 'to' => $to,
+                'key' => $key,
             ],
-            function ($v) {
-                return !is_null($v);
-            }
+            static fn ($v): bool => $v !== null,
         );
-
-        if (!empty($key)) {
-            $range['key'] = $key;
-        }
 
         $this->ranges[] = $range;
 
@@ -101,13 +84,8 @@ class RangeAggregation extends AbstractAggregation
 
     /**
      * Remove range from aggregation. Returns true on success.
-     *
-     * @param int|float|null $from
-     * @param int|float|null $to
-     *
-     * @return bool
      */
-    public function removeRange($from, $to)
+    public function removeRange(int|float|null $from, int|float|null $to): bool
     {
         foreach ($this->ranges as $key => $range) {
             if (array_diff_assoc(array_filter(['from' => $from, 'to' => $to]), $range) === []) {
@@ -122,12 +100,8 @@ class RangeAggregation extends AbstractAggregation
 
     /**
      * Removes range by key.
-     *
-     * @param string $key Range key.
-     *
-     * @return bool
      */
-    public function removeRangeByKey($key)
+    public function removeRangeByKey(string $key): bool
     {
         if ($this->keyed) {
             foreach ($this->ranges as $rangeKey => $range) {
@@ -142,28 +116,24 @@ class RangeAggregation extends AbstractAggregation
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
-    {
-        $data = [
-            'keyed' => $this->keyed,
-            'ranges' => array_values($this->ranges),
-        ];
-
-        if ($this->getField()) {
-            $data['field'] = $this->getField();
-        }
-
-        return $data;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'range';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArray(): array
+    {
+        return array_filter(
+            [
+                'keyed' => $this->isKeyed(),
+                'ranges' => array_values($this->getRanges()),
+                'field' =>  $this->getField(),
+            ],
+            static fn ($v): bool => $v !== null,
+        );
+    }
+
 }

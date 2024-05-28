@@ -1,43 +1,33 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Functional\Query;
+namespace Biano\ElasticsearchDSL\Tests\Functional\Query;
 
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\Search;
-use ONGR\ElasticsearchDSL\Tests\Functional\AbstractElasticsearchTestCase;
+use Biano\ElasticsearchDSL\Query\MatchAllQuery;
+use Biano\ElasticsearchDSL\Search;
+use Biano\ElasticsearchDSL\Tests\Functional\AbstractElasticsearchTestCase;
 
 class MatchAllQueryTest extends AbstractElasticsearchTestCase
 {
+
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    protected function getDataArray()
+    protected function getDataArray(): array
     {
         return [
             'product' => [
-                [
-                    'title' => 'acme',
-                ],
-                [
-                    'title' => 'foo',
-                ],
-            ]
+                ['title' => 'acme'],
+                ['title' => 'foo'],
+            ],
         ];
     }
 
     /**
      * Match all test
      */
-    public function testMatchAll()
+    public function testMatchAll(): void
     {
         $search = new Search();
         $matchAll = new MatchAllQuery();
@@ -48,4 +38,5 @@ class MatchAllQueryTest extends AbstractElasticsearchTestCase
 
         $this->assertEquals($this->getDataArray()['product'], $results);
     }
+
 }

@@ -1,45 +1,36 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\InnerHit\NestedInnerHit;
+use Biano\ElasticsearchDSL\InnerHit\NestedInnerHit;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use function assert;
 
-/**
- * Search inner hits dsl endpoint.
- */
 class InnerHitsEndpoint extends AbstractSearchEndpoint
 {
-    /**
-     * Endpoint name
-     */
-    const NAME = 'inner_hits';
+
+    public const NAME = 'inner_hits';
+
+    protected function getName(): string
+    {
+        return self::NAME;
+    }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function normalize(
-        NormalizerInterface $normalizer,
-        $format = null,
-        array $context = []
-    ): array|string|int|float|bool {
-        $output = [];
-        if (count($this->getAll()) > 0) {
-            /** @var NestedInnerHit $innerHit */
-            foreach ($this->getAll() as $innerHit) {
-                $output[$innerHit->getName()] = $innerHit->toArray();
-            }
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = []): array|string|int|float|bool
+    {
+        $result = [];
+
+        foreach ($this->getAll() as $innerHit) {
+            assert($innerHit instanceof NestedInnerHit);
+            $result[$innerHit->getName()] = $innerHit->toArray();
         }
 
-        return $output;
+        return $result;
     }
+
 }

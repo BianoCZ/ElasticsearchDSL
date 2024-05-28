@@ -1,14 +1,15 @@
 <?php
 
-namespace ONGR\ElasticsearchDSL\InnerHit;
+declare(strict_types = 1);
+
+namespace Biano\ElasticsearchDSL\InnerHit;
 
 class ParentInnerHit extends NestedInnerHit
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+
+    public function getType(): string
     {
         return 'parent';
     }
+
 }

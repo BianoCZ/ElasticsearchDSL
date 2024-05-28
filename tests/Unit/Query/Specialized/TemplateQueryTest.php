@@ -1,27 +1,23 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\Specialized;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Specialized;
 
-use ONGR\ElasticsearchDSL\Query\Specialized\TemplateQuery;
+use Biano\ElasticsearchDSL\Query\Specialized\TemplateQuery;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for Template.
  */
-class TemplateQueryTest extends \PHPUnit\Framework\TestCase
+class TemplateQueryTest extends TestCase
 {
+
     /**
      * Tests toArray() method with inline.
      */
-    public function testToArrayInline()
+    public function testToArrayInline(): void
     {
         $inline = '"term": {"field": "{{query_string}}"}';
         $params = ['query_string' => 'all about search'];
@@ -29,7 +25,7 @@ class TemplateQueryTest extends \PHPUnit\Framework\TestCase
         $expected = [
             'template' => [
                 'inline' => $inline,
-                'params' => $params
+                'params' => $params,
             ],
         ];
         $this->assertEquals($expected, $query->toArray());
@@ -38,7 +34,7 @@ class TemplateQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests toArray() method with file
      */
-    public function testToArrayFile()
+    public function testToArrayFile(): void
     {
         $file = 'my_template';
         $params = ['query_string' => 'all about search'];
@@ -57,10 +53,11 @@ class TemplateQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests toArray() exception
      */
-    public function testToArrayException()
+    public function testToArrayException(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $query = new TemplateQuery();
         $query->toArray();
     }
+
 }

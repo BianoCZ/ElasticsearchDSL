@@ -1,143 +1,121 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\MetricTrait;
-use ONGR\ElasticsearchDSL\ScriptAwareTrait;
+use Biano\ElasticsearchDSL\ScriptAwareTrait;
+use LogicException;
+use function array_filter;
+use function array_key_exists;
 
 /**
- * Class representing PercentilesAggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-percentile-aggregation.html
  */
-class PercentilesAggregation extends AbstractAggregation
+class PercentilesAggregation extends AbstractMetricAggregation
 {
-    use MetricTrait;
+
     use ScriptAwareTrait;
 
-    /**
-     * @var array
-     */
-    private $percents;
+    /** @var list<int|float>|null */
+    private ?array $percents = null;
+
+    private ?int $compression = null;
 
     /**
-     * @var int
-     */
-    private $compression;
-
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string|null $field
-     * @param array|null $percents
-     * @param string|null $script
-     * @param int|null $compression
+     * @param list<int|float>|null $percents
      */
     public function __construct(
         string $name,
-        string $field = null,
-        array $percents = null,
-        string $script = null,
-        int $compression = null
+        ?string $field = null,
+        ?array $percents = null,
+        ?string $script = null,
+        ?int $compression = null,
     ) {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setPercents($percents);
-        $this->setScript($script);
-        $this->setCompression($compression);
+        if ($field !== null) {
+            $this->setField($field);
+        }
+
+        if ($percents !== null) {
+            $this->setPercents($percents);
+        }
+
+        if ($script !== null) {
+            $this->setScript($script);
+        }
+
+        if ($compression !== null) {
+            $this->setCompression($compression);
+        }
     }
 
     /**
-     * @return array
+     * @return list<int|float>|null
      */
-    public function getPercents()
+    public function getPercents(): ?array
     {
         return $this->percents;
     }
 
     /**
-     * @param array $percents
-     *
-     * @return $this
+     * @param list<int|float> $percents
      */
-    public function setPercents($percents)
+    public function setPercents(array $percents): self
     {
         $this->percents = $percents;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getCompression()
+    public function getCompression(): ?int
     {
         return $this->compression;
     }
 
-    /**
-     * @param int $compression
-     *
-     * @return $this
-     */
-    public function setCompression($compression)
+    public function setCompression(int $compression): self
     {
         $this->compression = $compression;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'percentiles';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
-        $out = array_filter(
+        $data = array_filter(
             [
                 'compression' => $this->getCompression(),
                 'percents' => $this->getPercents(),
                 'field' => $this->getField(),
                 'script' => $this->getScript(),
             ],
-            function ($val) {
-                return ($val || is_numeric($val));
-            }
+            static fn ($val): bool => $val !== null,
         );
 
-        $this->isRequiredParametersSet($out);
+        $this->isRequiredParametersSet($data);
 
-        return $out;
+        return $data;
     }
 
     /**
-     * @param array $a
+     * @param array<mixed> $data
      *
      * @throws \LogicException
      */
-    private function isRequiredParametersSet($a)
+    private function isRequiredParametersSet(array $data): void
     {
-        if (!array_key_exists('field', $a) && !array_key_exists('script', $a)) {
-            throw new \LogicException('Percentiles aggregation must have field or script set.');
+        if (!array_key_exists('field', $data) && !array_key_exists('script', $data)) {
+            throw new LogicException('Percentiles aggregation must have field or script set.');
         }
     }
+
 }

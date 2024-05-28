@@ -1,91 +1,62 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Span;
+namespace Biano\ElasticsearchDSL\Query\Span;
 
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Elasticsearch span within query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-span-field-masking-query.html
  */
 class FieldMaskingSpanQuery implements SpanQueryInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var SpanQueryInterface
-     */
-    private $query;
+    private SpanQueryInterface $query;
 
-    /**
-     * @var string
-     */
-    private $field;
+    private string $field;
 
-    /**
-     * @param string             $field
-     * @param SpanQueryInterface $query
-     */
-    public function __construct($field, SpanQueryInterface $query)
+    public function __construct(string $field, SpanQueryInterface $query)
     {
         $this->setQuery($query);
         $this->setField($field);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getQuery()
+    public function getQuery(): SpanQueryInterface
     {
         return $this->query;
     }
 
-    /**
-     * @param mixed $query
-     *
-     * @return $this
-     */
-    public function setQuery($query)
+    public function setQuery(SpanQueryInterface $query): self
     {
         $this->query = $query;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getField()
+    public function getField(): string
     {
         return $this->field;
     }
 
-    /**
-     * @param string $field
-     *
-     * @return $this
-     */
-    public function setField($field)
+    public function setField(string $field): self
     {
         $this->field = $field;
 
         return $this;
     }
 
+    public function getType(): string
+    {
+        return 'field_masking_span';
+    }
+
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $output = [
             'query' => $this->getQuery()->toArray(),
@@ -97,11 +68,4 @@ class FieldMaskingSpanQuery implements SpanQueryInterface
         return [$this->getType() => $output];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'field_masking_span';
-    }
 }

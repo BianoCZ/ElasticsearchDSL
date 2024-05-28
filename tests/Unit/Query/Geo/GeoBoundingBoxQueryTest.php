@@ -1,36 +1,30 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\Geo;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Geo;
 
-use ONGR\ElasticsearchDSL\Query\Geo\GeoBoundingBoxQuery;
+use Biano\ElasticsearchDSL\Query\Geo\GeoBoundingBoxQuery;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
-class GeoBoundingBoxQueryTest extends \PHPUnit\Framework\TestCase
+class GeoBoundingBoxQueryTest extends TestCase
 {
+
     /**
      * Test if exception is thrown when geo points are not set.
      */
-    public function testGeoBoundBoxQueryException()
+    public function testGeoBoundBoxQueryException(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $query = new GeoBoundingBoxQuery('location', []);
         $query->toArray();
     }
 
     /**
      * Data provider for testToArray().
-     *
-     * @return array
      */
-    public function getArrayDataProvider()
+    public function getArrayDataProvider(): array
     {
         return [
             // Case #1 (2 values).
@@ -88,7 +82,7 @@ class GeoBoundingBoxQueryTest extends \PHPUnit\Framework\TestCase
                     'right' => -71.12,
                     'bottom' => 40.01,
                     'top' => 40.73,
-                    'left' => -74.1
+                    'left' => -74.1,
                 ],
                 ['parameter' => 'value'],
                 [
@@ -114,10 +108,11 @@ class GeoBoundingBoxQueryTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider getArrayDataProvider
      */
-    public function testToArray($field, $values, $parameters, $expected)
+    public function testToArray(string $field, array $values, array $parameters, array $expected): void
     {
         $query = new GeoBoundingBoxQuery($field, $values, $parameters);
         $result = $query->toArray();
         $this->assertEquals(['geo_bounding_box' => $expected], $result);
     }
+
 }

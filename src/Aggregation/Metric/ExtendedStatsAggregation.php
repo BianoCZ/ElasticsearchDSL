@@ -1,96 +1,72 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\MetricTrait;
-use ONGR\ElasticsearchDSL\ScriptAwareTrait;
+use Biano\ElasticsearchDSL\ScriptAwareTrait;
+use function array_filter;
+use function is_numeric;
 
 /**
- * Class representing Extended stats aggregation.
- *
- * @link http://goo.gl/E0PpDv
+ * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-extendedstats-aggregation.html
  */
-class ExtendedStatsAggregation extends AbstractAggregation
+class ExtendedStatsAggregation extends AbstractMetricAggregation
 {
-    use MetricTrait;
+
     use ScriptAwareTrait;
 
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $field
-     * @param int    $sigma
-     * @param string $script
-     */
-    public function __construct($name, $field = null, $sigma = null, $script = null)
+    private ?int $sigma = null;
+
+    public function __construct(string $name, ?string $field = null, ?int $sigma = null, ?string $script = null)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setSigma($sigma);
-        $this->setScript($script);
+        if ($field !== null) {
+            $this->setField($field);
+        }
+
+        if ($sigma !== null) {
+            $this->setSigma($sigma);
+        }
+
+        if ($script !== null) {
+            $this->setScript($script);
+        }
     }
 
-    /**
-     * @var int
-     */
-    private $sigma;
-
-    /**
-     * @return int
-     */
-    public function getSigma()
+    public function getSigma(): ?int
     {
         return $this->sigma;
     }
 
-    /**
-     * @param int $sigma
-     *
-     * @return $this
-     */
-    public function setSigma($sigma)
+    public function setSigma(int $sigma): self
     {
         $this->sigma = $sigma;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'extended_stats';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
-        $out = array_filter(
+        return array_filter(
             [
                 'field' => $this->getField(),
                 'script' => $this->getScript(),
                 'sigma' => $this->getSigma(),
             ],
-            function ($val) {
-                return ($val || is_numeric($val));
-            }
+            static function ($val) {
+                return $val || is_numeric($val);
+            },
         );
-
-        return $out;
     }
+
 }

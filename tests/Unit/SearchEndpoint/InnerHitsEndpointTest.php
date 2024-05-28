@@ -1,40 +1,30 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\SearchEndpoint\InnerHitsEndpoint;
-use ONGR\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\InnerHit\NestedInnerHit;
+use Biano\ElasticsearchDSL\SearchEndpoint\InnerHitsEndpoint;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-/**
- * Class AggregationsEndpointTest.
- */
-class InnerHitsEndpointTest extends \PHPUnit\Framework\TestCase
+class InnerHitsEndpointTest extends TestCase
 {
-    /**
-     * Tests constructor.
-     */
-    public function testItCanBeInstantiated()
+
+    public function testItCanBeInstantiated(): void
     {
         $this->assertInstanceOf(
             InnerHitsEndpoint::class,
-            new InnerHitsEndpoint()
+            new InnerHitsEndpoint(),
         );
     }
 
     /**
      * Tests if endpoint returns builders.
      */
-    public function testEndpointGetter()
+    public function testEndpointGetter(): void
     {
         $hitName = 'foo';
         $innerHit = $this->getMockBuilder(BuilderInterface::class)->getMock();
@@ -49,29 +39,23 @@ class InnerHitsEndpointTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests normalize method
      */
-    public function testNormalization()
+    public function testNormalization(): void
     {
-        $normalizer = $this
-            ->getMockBuilder(NormalizerInterface::class)
-            ->getMock();
-        $innerHit = $this
-            ->getMockBuilder(BuilderInterface::class)
-            ->setMethods(['getName', 'toArray', 'getType'])
-            ->getMock();
-        $innerHit->expects($this->any())->method('getName')->willReturn('foo');
-        $innerHit->expects($this->any())->method('toArray')->willReturn(['foo' => 'bar']);
+        $normalizer = $this->createMock(NormalizerInterface::class);
+        $innerHit = $this->createMock(NestedInnerHit::class);
+        $innerHit->expects(self::any())->method('getName')->willReturn('foo');
+        $innerHit->expects(self::any())->method('toArray')->willReturn(['foo' => 'bar']);
 
         $endpoint = new InnerHitsEndpoint();
         $endpoint->add($innerHit, 'foo');
         $expected = [
-            'foo' => [
-                'foo' => 'bar'
-            ]
+            'foo' => ['foo' => 'bar'],
         ];
 
         $this->assertEquals(
             $expected,
-            $endpoint->normalize($normalizer)
+            $endpoint->normalize($normalizer),
         );
     }
+
 }

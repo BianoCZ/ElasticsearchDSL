@@ -1,19 +1,19 @@
 <?php
-/**
- * @since     Feb 2022
- * @author    Haydar KULEKCI <haydarkulekci@gmail.com>
- */
 
-namespace ONGR\ElasticsearchDSL\Tests\Functional\Aggregation;
+declare(strict_types = 1);
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\DateHistogramAggregation;
-use ONGR\ElasticsearchDSL\Search;
-use ONGR\ElasticsearchDSL\Tests\Functional\AbstractElasticsearchTestCase;
+namespace Biano\ElasticsearchDSL\Tests\Functional\Aggregation;
+
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\DateHistogramAggregation;
+use Biano\ElasticsearchDSL\Search;
+use Biano\ElasticsearchDSL\Tests\Functional\AbstractElasticsearchTestCase;
+use function count;
 
 class DateHistogramAggregationTest extends AbstractElasticsearchTestCase
 {
+
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     protected function getDataArray(): array
     {
@@ -34,7 +34,7 @@ class DateHistogramAggregationTest extends AbstractElasticsearchTestCase
                     'price' => 10,
                     'created_at' => '2022-01-01T00:03:00Z',
                 ],
-            ]
+            ],
         ];
     }
 
@@ -79,4 +79,5 @@ class DateHistogramAggregationTest extends AbstractElasticsearchTestCase
         $results = $this->executeSearch($search, true);
         $this->assertCount(2, $results['aggregations']['dates']['buckets']);
     }
+
 }

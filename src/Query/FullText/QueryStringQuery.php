@@ -1,62 +1,53 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\FullText;
+namespace Biano\ElasticsearchDSL\Query\FullText;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "query_string" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
  */
 class QueryStringQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var string The actual query to be parsed.
-     */
-    private $query;
+    private string $query;
 
     /**
-     * @param string $query
-     * @param array  $parameters
+     * @param array<string,mixed> $parameters
      */
-    public function __construct($query, array $parameters = [])
+    public function __construct(string $query, array $parameters = [])
     {
         $this->query = $query;
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getQuery(): string
+    {
+        return $this->query;
+    }
+
+    public function getType(): string
     {
         return 'query_string';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [
-            'query' => $this->query,
+            'query' => $this->getQuery(),
         ];
 
         $output = $this->processArray($query);
 
         return [$this->getType() => $output];
     }
+
 }

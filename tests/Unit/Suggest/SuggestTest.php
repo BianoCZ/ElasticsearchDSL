@@ -1,35 +1,30 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Suggest;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Suggest;
 
-use ONGR\ElasticsearchDSL\Suggest\Suggest;
+use Biano\ElasticsearchDSL\Suggest\Suggest;
+use PHPUnit\Framework\TestCase;
 
-class SuggestTest extends \PHPUnit\Framework\TestCase
+class SuggestTest extends TestCase
 {
+
     /**
      * Tests getType method.
      */
-    public function testSuggestGetType()
+    public function testSuggestGetType(): void
     {
         $suggest = new Suggest('foo', 'term', 'acme', 'bar');
         $this->assertEquals('term', $suggest->getType());
     }
 
     /**
-     * Data provider for testToArray()
+     * Data provider for testtoArray():array
      *
      * @return array[]
      */
-    public function getTestToArrayData()
+    public function getTestToArrayData(): array
     {
         return [
             [
@@ -38,17 +33,17 @@ class SuggestTest extends \PHPUnit\Framework\TestCase
                     'term',
                     'bar',
                     'acme',
-                    ['size' => 5]
+                    ['size' => 5],
                 ),
                 'expected' => [
                     'foo' => [
                         'text' => 'bar',
                         'term' => [
                             'field' => 'acme',
-                            'size' => 5
-                        ]
-                    ]
-                ]
+                            'size' => 5,
+                        ],
+                    ],
+                ],
             ],
             [
                 'suggest' => new Suggest(
@@ -56,7 +51,7 @@ class SuggestTest extends \PHPUnit\Framework\TestCase
                     'phrase',
                     'bar',
                     'acme',
-                    ['max_errors' => 0.5]
+                    ['max_errors' => 0.5],
                 ),
                 'expected' => [
                     'foo' => [
@@ -65,8 +60,8 @@ class SuggestTest extends \PHPUnit\Framework\TestCase
                             'field' => 'acme',
                             'max_errors' => 0.5,
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'suggest' => new Suggest(
@@ -74,17 +69,17 @@ class SuggestTest extends \PHPUnit\Framework\TestCase
                     'completion',
                     'bar',
                     'acme',
-                    ['fuzziness' => 2]
+                    ['fuzziness' => 2],
                 ),
                 'expected' => [
                     'foo' => [
                         'text' => 'bar',
                         'completion' => [
                             'field' => 'acme',
-                            'fuzziness' => 2
-                        ]
-                    ]
-                ]
+                            'fuzziness' => 2,
+                        ],
+                    ],
+                ],
             ],
             [
                 'suggest' => new Suggest(
@@ -92,7 +87,7 @@ class SuggestTest extends \PHPUnit\Framework\TestCase
                     'completion',
                     'bar',
                     'acme',
-                    ['context' => ['color' => 'red'], 'size' => 3]
+                    ['context' => ['color' => 'red'], 'size' => 3],
                 ),
                 'expected' => [
                     'foo' => [
@@ -100,24 +95,20 @@ class SuggestTest extends \PHPUnit\Framework\TestCase
                         'completion' => [
                             'field' => 'acme',
                             'size' => 3,
-                            'context' => [
-                                'color' => 'red'
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                            'context' => ['color' => 'red'],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
     /**
-     * @param Suggest $suggest
-     * @param array $expected
-     *
      * @dataProvider getTestToArrayData()
      */
-    public function testToArray(Suggest $suggest, array $expected)
+    public function testToArray(Suggest $suggest, array $expected): void
     {
         $this->assertEquals($expected, $suggest->toArray());
     }
+
 }

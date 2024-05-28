@@ -1,24 +1,19 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\Metric\StatsAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Metric\StatsAggregation;
+use PHPUnit\Framework\TestCase;
 
-class StatsAggregationTest extends \PHPUnit\Framework\TestCase
+class StatsAggregationTest extends TestCase
 {
+
     /**
      * Test for stats aggregation toArray() method.
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $aggregation = new StatsAggregation('test_agg');
         $aggregation->setField('test_field');
@@ -33,7 +28,7 @@ class StatsAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if parameter can be passed to constructor.
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $aggregation = new StatsAggregation('foo', 'fieldValue', 'scriptValue');
         $this->assertSame(
@@ -43,7 +38,8 @@ class StatsAggregationTest extends \PHPUnit\Framework\TestCase
                     'script' => 'scriptValue',
                 ],
             ],
-            $aggregation->toArray()
+            $aggregation->toArray(),
         );
     }
+
 }

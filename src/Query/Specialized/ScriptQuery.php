@@ -1,59 +1,45 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Specialized;
+namespace Biano\ElasticsearchDSL\Query\Specialized;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "script" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-script-query.html
  */
 class ScriptQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var string
-     */
-    private $script;
+    private string $script;
 
     /**
-     * @param string $script     Script
-     * @param array  $parameters Optional parameters
+     * @param array<mixed> $parameters
      */
-    public function __construct($script, array $parameters = [])
+    public function __construct(string $script, array $parameters = [])
     {
         $this->script = $script;
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'script';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = ['inline' => $this->script];
         $output = $this->processArray($query);
 
         return [$this->getType() => ['script' => $output]];
     }
+
 }

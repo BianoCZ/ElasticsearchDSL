@@ -1,51 +1,32 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
-use ONGR\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\Aggregation\AbstractAggregation;
+use function array_filter;
+use function array_merge;
+use function is_array;
 
 /**
- * Class representing composite aggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-composite-aggregation.html
  */
-class CompositeAggregation extends AbstractAggregation
+class CompositeAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
+
+    /** @var list<array<mixed>> */
+    private array $sources = [];
+
+    private ?int $size = null;
+
+    /** @var array<mixed>|null */
+    private ?array $after = null;
 
     /**
-     * @var BuilderInterface[]
+     * @param list<\Biano\ElasticsearchDSL\Aggregation\AbstractAggregation> $sources
      */
-    private $sources = [];
-
-    /**
-     * @var int
-     */
-    private $size;
-
-    /**
-     * @var array
-     */
-    private $after;
-
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string             $name
-     * @param AbstractAggregation[] $sources
-     */
-    public function __construct($name, $sources = [])
+    public function __construct(string $name, array $sources = [])
     {
         parent::__construct($name);
 
@@ -55,61 +36,32 @@ class CompositeAggregation extends AbstractAggregation
     }
 
     /**
-     * @param AbstractAggregation $agg
-     *
-     * @throws \LogicException
-     *
-     * @return self
+     * @return  list<array<mixed>>
      */
-    public function addSource(AbstractAggregation $agg)
+    public function getSources(): array
+    {
+        return $this->sources;
+    }
+
+    public function addSource(AbstractAggregation $agg): self
     {
         $array = $agg->getArray();
 
         $array = is_array($array) ? array_merge($array, $agg->getParameters()) : $array;
 
         $this->sources[] = [
-            $agg->getName() => [ $agg->getType() => $array ]
+            $agg->getName() => [ $agg->getType() => $array ],
         ];
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
+    public function getSize(): ?int
     {
-        $array = [
-            'sources' => $this->sources,
-        ];
-
-        if ($this->size !== null) {
-            $array['size'] = $this->size;
-        }
-
-        if (!empty($this->after)) {
-            $array['after'] = $this->after;
-        }
-
-        return $array;
+        return $this->size;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
-    {
-        return 'composite';
-    }
-
-    /**
-     * Sets size
-     *
-     * @param int $size Size
-     *
-     * @return $this
-     */
-    public function setSize($size)
+    public function setSize(int $size): self
     {
         $this->size = $size;
 
@@ -117,36 +69,38 @@ class CompositeAggregation extends AbstractAggregation
     }
 
     /**
-     * Returns size
-     *
-     * @return int
+     * @return array<mixed>|null
      */
-    public function getSize()
+    public function getAfter(): ?array
     {
-        return $this->size;
+        return $this->after;
     }
 
     /**
-     * Sets after
-     *
-     * @param array $after After
-     *
-     * @return $this
+     * @param array<mixed> $after
      */
-    public function setAfter(array $after)
+    public function setAfter(array $after): self
     {
         $this->after = $after;
 
         return $this;
     }
 
-    /**
-     * Returns after
-     *
-     * @return array
-     */
-    public function getAfter()
+    public function getType(): string
     {
-        return $this->after;
+        return 'composite';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArray(): array
+    {
+        return array_filter([
+            'sources' => $this->getSources(),
+            'size' => $this->getSize(),
+            'after' => $this->getAfter(),
+        ]);
+    }
+
 }

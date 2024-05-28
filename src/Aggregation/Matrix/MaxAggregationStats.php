@@ -1,69 +1,81 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Matrix;
+namespace Biano\ElasticsearchDSL\Aggregation\Matrix;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\MetricTrait;
+use LogicException;
+use function array_filter;
 
 /**
- * Class representing Max Aggregation.
- *
- * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-max-aggregation.html
+ * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-matrix-stats-aggregation.html
  */
-class MaxAggregationStats extends AbstractAggregation
+class MaxAggregationStats extends AbstractMatrixAggregation
 {
-    use MetricTrait;
+
+    /** @var list<string> */
+    private array $fields;
 
     /**
-     * @var string Used for multi value aggregation fields to pick a value.
+     * Used for multi value aggregation fields to pick a value.
      */
-    private $mode;
+    private ?string $mode = null;
 
     /**
-     * @var array Defines how documents that are missing a value should be treated.
-     */
-    private $missing;
-
-    /**
-     * Inner aggregations container init.
+     * Defines how documents that are missing a value should be treated.
      *
-     * @param string $name
-     * @param string|array $field Fields list to aggregate.
-     * @param array $missing
-     * @param string $mode
+     * @var array<mixed>
      */
-    public function __construct($name, $field, $missing = null, $mode = null)
+    private ?array $missing = null;
+
+    /**
+     * @param list<string> $fields
+     * @param array<mixed>|null $missing
+     */
+    public function __construct(string $name, array $fields, ?array $missing = null, ?string $mode = null)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setMode($mode);
-        $this->missing = $missing;
+        $this->setFields($fields);
+
+        if ($missing !== null) {
+            $this->setMissing($missing);
+        }
+
+        if ($mode !== null) {
+            $this->setMode($mode);
+        }
+    }
+
+    public function setField(string $field): self
+    {
+        throw new LogicException('Max aggregation stats doesn\'t support `field` parameter');
     }
 
     /**
-     * @return string
+     * @return list<string>
      */
-    public function getMode()
+    public function getFields(): array
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param list<string> $fields
+     */
+    public function setFields(array $fields): self
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
+    public function getMode(): ?string
     {
         return $this->mode;
     }
 
-    /**
-     * @param string $mode
-     *
-     * @return $this
-     */
-    public function setMode($mode)
+    public function setMode(string $mode): self
     {
         $this->mode = $mode;
 
@@ -71,49 +83,38 @@ class MaxAggregationStats extends AbstractAggregation
     }
 
     /**
-     * @return array
+     * @return array<mixed>|null
      */
-    public function getMissing()
+    public function getMissing(): ?array
     {
         return $this->missing;
     }
 
     /**
-     * @param array $missing
-     *
-     * @return $this
+     * @param array<mixed> $missing
      */
-    public function setMissing($missing)
+    public function setMissing(array $missing): self
     {
         $this->missing = $missing;
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'matrix_stats';
     }
 
-    protected function getArray()
+    /**
+     * @inheritDoc
+     */
+    protected function getArray(): array
     {
-        $out = [];
-        if ($this->getField()) {
-            $out['fields'] = $this->getField();
-        }
-
-        if ($this->getMode()) {
-            $out['mode'] = $this->getMode();
-        }
-
-
-        if ($this->getMissing()) {
-            $out['missing'] = $this->getMissing();
-        }
-
-        return $out;
+        return array_filter([
+            'fields' => $this->getField(),
+            'mode' => $this->getMode(),
+            'missing' => $this->getMissing(),
+        ]);
     }
+
 }

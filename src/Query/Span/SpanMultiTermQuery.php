@@ -1,38 +1,26 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Span;
+namespace Biano\ElasticsearchDSL\Query\Span;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Elasticsearch span multi term query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-span-multi-term-query.html
  */
 class SpanMultiTermQuery implements SpanQueryInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var BuilderInterface
-     */
-    private $query;
+    private BuilderInterface $query;
 
     /**
      * Accepts one of fuzzy, prefix, term range, wildcard, regexp query.
      *
-     * @param BuilderInterface $query
-     * @param array            $parameters
+     * @param array<string,mixed> $parameters
      */
     public function __construct(BuilderInterface $query, array $parameters = [])
     {
@@ -40,20 +28,15 @@ class SpanMultiTermQuery implements SpanQueryInterface
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'span_multi';
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @throws \InvalidArgumentException
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [];
         $query['match'] = $this->query->toArray();
@@ -61,4 +44,5 @@ class SpanMultiTermQuery implements SpanQueryInterface
 
         return [$this->getType() => $output];
     }
+
 }

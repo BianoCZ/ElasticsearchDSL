@@ -1,39 +1,33 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\GeoHashGridAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\GeoHashGridAggregation;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for geohash grid aggregation.
  */
-class GeoHashGridAggregationTest extends \PHPUnit\Framework\TestCase
+class GeoHashGridAggregationTest extends TestCase
 {
+
     /**
      * Test if exception is thrown.
      */
-    public function testGeoHashGridAggregationException()
+    public function testGeoHashGridAggregationException(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $agg = new GeoHashGridAggregation('test_agg');
         $agg->getArray();
     }
 
     /**
      * Data provider for testGeoHashGridAggregationGetArray().
-     *
-     * @return array
      */
-    public function getArrayDataProvider()
+    public function getArrayDataProvider(): array
     {
         $out = [];
 
@@ -59,12 +53,9 @@ class GeoHashGridAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getArray method.
      *
-     * @param array $filterData
-     * @param array $expected
-     *
      * @dataProvider getArrayDataProvider
      */
-    public function testGeoHashGridAggregationGetArray(array $filterData, array $expected)
+    public function testGeoHashGridAggregationGetArray(array $filterData, array $expected): void
     {
         $aggregation = new GeoHashGridAggregation('foo');
         $aggregation->setPrecision($filterData['precision']);
@@ -79,10 +70,11 @@ class GeoHashGridAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getType method.
      */
-    public function testGeoHashGridAggregationGetType()
+    public function testGeoHashGridAggregationGetType(): void
     {
         $aggregation = new GeoHashGridAggregation('foo');
         $result = $aggregation->getType();
         $this->assertEquals('geohash_grid', $result);
     }
+
 }

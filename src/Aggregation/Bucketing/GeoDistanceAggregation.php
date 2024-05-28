@@ -1,127 +1,85 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use LogicException;
+use function array_filter;
 
 /**
- * Class representing geo distance aggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-geodistance-aggregation.html
  */
-class GeoDistanceAggregation extends AbstractAggregation
+class GeoDistanceAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
+
+    private mixed $origin = null;
+
+    private ?string $distanceType = null;
+
+    private ?string $unit = null;
+
+    /** @var list<array<string,mixed>> */
+    private array $ranges = [];
 
     /**
-     * @var mixed
+     * @param list<array<string,mixed>> $ranges
      */
-    private $origin;
-
-    /**
-     * @var string
-     */
-    private $distanceType;
-
-    /**
-     * @var string
-     */
-    private $unit;
-
-    /**
-     * @var array
-     */
-    private $ranges = [];
-
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $field
-     * @param mixed  $origin
-     * @param array  $ranges
-     * @param string $unit
-     * @param string $distanceType
-     */
-    public function __construct($name, $field = null, $origin = null, $ranges = [], $unit = null, $distanceType = null)
+    public function __construct(string $name, ?string $field = null, mixed $origin = null, array $ranges = [], ?string $unit = null, ?string $distanceType = null)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setOrigin($origin);
-        foreach ($ranges as $range) {
-            $from = isset($range['from']) ? $range['from'] : null;
-            $to = isset($range['to']) ? $range['to'] : null;
-            $this->addRange($from, $to);
+        if ($field !== null) {
+            $this->setField($field);
         }
-        $this->setUnit($unit);
-        $this->setDistanceType($distanceType);
+
+        if ($origin !== null) {
+            $this->setOrigin($origin);
+        }
+
+        foreach ($ranges as $range) {
+            $this->addRange($range['from'] ?? null, $range['to'] ?? null);
+        }
+
+        if ($unit !== null) {
+            $this->setUnit($unit);
+        }
+
+        if ($distanceType !== null) {
+            $this->setDistanceType($distanceType);
+        }
     }
 
-    /**
-     * @return string
-     */
-    public function getOrigin()
+    public function getOrigin(): ?string
     {
         return $this->origin;
     }
 
-    /**
-     * @param mixed $origin
-     *
-     * @return $this
-     */
-    public function setOrigin($origin)
+    public function setOrigin(mixed $origin): self
     {
         $this->origin = $origin;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDistanceType()
+    public function getDistanceType(): ?string
     {
         return $this->distanceType;
     }
 
-    /**
-     * @param string $distanceType
-     *
-     * @return $this
-     */
-    public function setDistanceType($distanceType)
+    public function setDistanceType(string $distanceType): self
     {
         $this->distanceType = $distanceType;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getUnit()
+    public function getUnit(): ?string
     {
         return $this->unit;
     }
 
-    /**
-     * @param string $unit
-     *
-     * @return $this
-     */
-    public function setUnit($unit)
+    public function setUnit(string $unit): self
     {
         $this->unit = $unit;
 
@@ -131,27 +89,20 @@ class GeoDistanceAggregation extends AbstractAggregation
     /**
      * Add range to aggregation.
      *
-     * @param int|float|null $from
-     * @param int|float|null $to
-     *
      * @throws \LogicException
-     *
-     * @return GeoDistanceAggregation
      */
-    public function addRange($from = null, $to = null)
+    public function addRange(int|float|string|null $from = null, int|float|string|null $to = null): GeoDistanceAggregation
     {
         $range = array_filter(
             [
                 'from' => $from,
                 'to' => $to,
             ],
-            function ($v) {
-                return !is_null($v);
-            }
+            static fn ($v): bool => $v !== null,
         );
 
         if (empty($range)) {
-            throw new \LogicException('Either from or to must be set. Both cannot be null.');
+            throw new LogicException('Either from or to must be set. Both cannot be null.');
         }
 
         $this->ranges[] = $range;
@@ -160,23 +111,23 @@ class GeoDistanceAggregation extends AbstractAggregation
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
         $data = [];
 
-        if ($this->getField()) {
-            $data['field'] = $this->getField();
-        } else {
-            throw new \LogicException('Geo distance aggregation must have a field set.');
+        if (!$this->getField()) {
+            throw new LogicException('Geo distance aggregation must have a field set.');
         }
 
-        if ($this->getOrigin()) {
-            $data['origin'] = $this->getOrigin();
-        } else {
-            throw new \LogicException('Geo distance aggregation must have an origin set.');
+        $data['field'] = $this->getField();
+
+        if (!$this->getOrigin()) {
+            throw new LogicException('Geo distance aggregation must have an origin set.');
         }
+
+        $data['origin'] = $this->getOrigin();
 
         if ($this->getUnit()) {
             $data['unit'] = $this->getUnit();
@@ -191,11 +142,9 @@ class GeoDistanceAggregation extends AbstractAggregation
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'geo_distance';
     }
+
 }

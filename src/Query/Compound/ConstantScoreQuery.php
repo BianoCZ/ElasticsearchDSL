@@ -1,36 +1,24 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Compound;
+namespace Biano\ElasticsearchDSL\Query\Compound;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "constant_score" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html
  */
 class ConstantScoreQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var BuilderInterface
-     */
-    private $query;
+    private BuilderInterface $query;
 
     /**
-     * @param BuilderInterface $query
-     * @param array            $parameters
+     * @param array<mixed> $parameters
      */
     public function __construct(BuilderInterface $query, array $parameters = [])
     {
@@ -38,25 +26,28 @@ class ConstantScoreQuery implements BuilderInterface
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getQuery(): BuilderInterface
+    {
+        return $this->query;
+    }
+
+    public function getType(): string
     {
         return 'constant_score';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [
-            'filter' => $this->query->toArray(),
+            'filter' => $this->getQuery()->toArray(),
         ];
 
         $output = $this->processArray($query);
 
         return [$this->getType() => $output];
     }
+
 }

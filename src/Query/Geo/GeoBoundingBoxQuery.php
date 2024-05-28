@@ -1,81 +1,66 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Geo;
+namespace Biano\ElasticsearchDSL\Query\Geo;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
+use LogicException;
+use function count;
 
 /**
- * Represents Elasticsearch "geo_bounding_box" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-geo-bounding-box-query.html
  */
 class GeoBoundingBoxQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var array
-     */
-    private $values;
+    private string $field;
+
+    /** @var array<mixed> */
+    private array $values;
 
     /**
-     * @var string
+     * @param array<mixed> $values
+     * @param array<string,mixed> $parameters
      */
-    private $field;
-
-    /**
-     * @param string $field
-     * @param array  $values
-     * @param array  $parameters
-     */
-    public function __construct($field, $values, array $parameters = [])
+    public function __construct(string $field, array $values, array $parameters = [])
     {
         $this->field = $field;
         $this->values = $values;
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'geo_bounding_box';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
-            $this->getType() => $this->processArray([$this->field => $this->points()])
+            $this->getType() => $this->processArray([$this->field => $this->points()]),
         ];
     }
 
     /**
-     * @return array
-     *
-     * @throws \LogicException
+     * @return array<string,mixed>
      */
-    private function points()
+    private function points(): array
     {
         if (count($this->values) === 2) {
             return [
                 'top_left' => $this->values[0] ?? $this->values['top_left'],
                 'bottom_right' => $this->values[1] ?? $this->values['bottom_right'],
             ];
-        } elseif (count($this->values) === 4) {
+        }
+
+        if (count($this->values) === 4) {
             return [
                 'top' => $this->values[0] ?? $this->values['top'],
                 'left' => $this->values[1] ?? $this->values['left'],
@@ -84,6 +69,7 @@ class GeoBoundingBoxQuery implements BuilderInterface
             ];
         }
 
-        throw new \LogicException('Geo Bounding Box filter must have 2 or 4 geo points set.');
+        throw new LogicException('Geo Bounding Box filter must have 2 or 4 geo points set.');
     }
+
 }

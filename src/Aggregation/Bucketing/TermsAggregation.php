@@ -1,65 +1,49 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
-use ONGR\ElasticsearchDSL\ScriptAwareTrait;
+use Biano\ElasticsearchDSL\ScriptAwareTrait;
+use function array_filter;
 
 /**
- * Class representing TermsAggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html
  */
-class TermsAggregation extends AbstractAggregation
+class TermsAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
+
     use ScriptAwareTrait;
 
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $field
-     * @param string $script
-     */
-    public function __construct($name, $field = null, $script = null)
+    public function __construct(string $name, ?string $field = null, ?string $script = null)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setScript($script);
+        if ($field !== null) {
+            $this->setField($field);
+        }
+
+        if ($script !== null) {
+            $this->setScript($script);
+        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'terms';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
-        $data = array_filter(
+        return array_filter(
             [
                 'field' => $this->getField(),
                 'script' => $this->getScript(),
-            ]
+            ],
         );
-
-        return $data;
     }
+
 }

@@ -1,27 +1,22 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Functional\Query;
+namespace Biano\ElasticsearchDSL\Tests\Functional\Query;
 
-use ONGR\ElasticsearchDSL\Query\Compound\FunctionScoreQuery;
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\Search;
-use ONGR\ElasticsearchDSL\Tests\Functional\AbstractElasticsearchTestCase;
+use Biano\ElasticsearchDSL\Query\Compound\FunctionScoreQuery;
+use Biano\ElasticsearchDSL\Query\MatchAllQuery;
+use Biano\ElasticsearchDSL\Search;
+use Biano\ElasticsearchDSL\Tests\Functional\AbstractElasticsearchTestCase;
+use function count;
 
 class FunctionScoreQueryTest extends AbstractElasticsearchTestCase
 {
+
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    protected function getDataArray()
+    protected function getDataArray(): array
     {
         return [
             'product' => [
@@ -37,14 +32,14 @@ class FunctionScoreQueryTest extends AbstractElasticsearchTestCase
                     'title' => 'bar',
                     'price' => 10,
                 ],
-            ]
+            ],
         ];
     }
 
     /**
      * Match all test
      */
-    public function testRandomScore()
+    public function testRandomScore(): void
     {
         $fquery = new FunctionScoreQuery(new MatchAllQuery());
         $fquery->addRandomFunction();
@@ -57,7 +52,7 @@ class FunctionScoreQueryTest extends AbstractElasticsearchTestCase
         $this->assertEquals(count($this->getDataArray()['product']), count($results));
     }
 
-    public function testScriptScore()
+    public function testScriptScore(): void
     {
         $fquery = new FunctionScoreQuery(new MatchAllQuery());
         $fquery->addScriptScoreFunction(
@@ -71,7 +66,7 @@ class FunctionScoreQueryTest extends AbstractElasticsearchTestCase
             [
                 'target' => 10,
                 'charge' => 0.9,
-            ]
+            ],
         );
 
         $search = new Search();
@@ -82,4 +77,5 @@ class FunctionScoreQueryTest extends AbstractElasticsearchTestCase
             $this->assertLessThanOrEqual(20, $document['price']);
         }
     }
+
 }

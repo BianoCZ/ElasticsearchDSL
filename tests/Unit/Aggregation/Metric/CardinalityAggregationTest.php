@@ -1,27 +1,23 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\Metric\CardinalityAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Metric\CardinalityAggregation;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for cardinality aggregation.
  */
-class CardinalityAggregationTest extends \PHPUnit\Framework\TestCase
+class CardinalityAggregationTest extends TestCase
 {
+
     /**
      * Tests getArray method.
      */
-    public function testGetArray()
+    public function testGetArray(): void
     {
         $aggregation = new CardinalityAggregation('bar');
 
@@ -53,9 +49,9 @@ class CardinalityAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests if CardinalityAggregation#getArray throws exception when expected.
      */
-    public function testGetArrayException()
+    public function testGetArrayException(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cardinality aggregation must have field or script set.');
         $aggregation = new CardinalityAggregation('bar');
         $aggregation->getArray();
@@ -64,10 +60,11 @@ class CardinalityAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getType method.
      */
-    public function testCardinallyAggregationGetType()
+    public function testCardinallyAggregationGetType(): void
     {
         $aggregation = new CardinalityAggregation('foo');
         $result = $aggregation->getType();
         $this->assertEquals('cardinality', $result);
     }
+
 }

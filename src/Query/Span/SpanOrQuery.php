@@ -1,34 +1,24 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Span;
+namespace Biano\ElasticsearchDSL\Query\Span;
 
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Elasticsearch span or query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-span-or-query.html
  */
 class SpanOrQuery implements SpanQueryInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var SpanQueryInterface[]
-     */
-    private $queries = [];
+    /** @var list<\Biano\ElasticsearchDSL\Query\Span\SpanQueryInterface> */
+    private array $queries = [];
 
     /**
-     * @param array $parameters
+     * @param array<string,mixed> $parameters
      */
     public function __construct(array $parameters = [])
     {
@@ -37,12 +27,8 @@ class SpanOrQuery implements SpanQueryInterface
 
     /**
      * Add span query.
-     *
-     * @param SpanQueryInterface $query
-     *
-     * @return $this
      */
-    public function addQuery(SpanQueryInterface $query)
+    public function addQuery(SpanQueryInterface $query): self
     {
         $this->queries[] = $query;
 
@@ -50,32 +36,31 @@ class SpanOrQuery implements SpanQueryInterface
     }
 
     /**
-     * @return SpanQueryInterface[]
+     * @return list<\Biano\ElasticsearchDSL\Query\Span\SpanQueryInterface>
      */
-    public function getQueries()
+    public function getQueries(): array
     {
         return $this->queries;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'span_or';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [];
         foreach ($this->queries as $type) {
             $query['clauses'][] = $type->toArray();
         }
+
         $output = $this->processArray($query);
 
         return [$this->getType() => $output];
     }
+
 }

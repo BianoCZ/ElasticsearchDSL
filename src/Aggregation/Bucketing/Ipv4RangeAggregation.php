@@ -1,50 +1,38 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use LogicException;
+use function array_filter;
+use function array_values;
+use function count;
+use function is_array;
 
 /**
- * Class representing ip range aggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-iprange-aggregation.html
  */
-class Ipv4RangeAggregation extends AbstractAggregation
+class Ipv4RangeAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
+
+    /** @var list<array<string,string>> */
+    private array $ranges = [];
 
     /**
-     * @var array
+     * @param list<array<string,string>> $ranges
      */
-    private $ranges = [];
-
-    /**
-     * Inner aggregations container init.
-     *
-     * @param string $name
-     * @param string $field
-     * @param array  $ranges
-     */
-    public function __construct($name, $field = null, $ranges = [])
+    public function __construct(string $name, ?string $field = null, array $ranges = [])
     {
         parent::__construct($name);
 
-        $this->setField($field);
+        if ($field !== null) {
+            $this->setField($field);
+        }
+
         foreach ($ranges as $range) {
             if (is_array($range)) {
-                $from = isset($range['from']) ? $range['from'] : null;
-                $to = isset($range['to']) ? $range['to'] : null;
-                $this->addRange($from, $to);
+                $this->addRange($range['from'] ?? null, $range['to'] ?? null);
             } else {
                 $this->addMask($range);
             }
@@ -52,23 +40,24 @@ class Ipv4RangeAggregation extends AbstractAggregation
     }
 
     /**
-     * Add range to aggregation.
-     *
-     * @param string|null $from
-     * @param string|null $to
-     *
-     * @return Ipv4RangeAggregation
+     * @return list<array<string,string>>
      */
-    public function addRange($from = null, $to = null)
+    public function getRanges(): array
+    {
+        return $this->ranges;
+    }
+
+    /**
+     * Add range to aggregation.
+     */
+    public function addRange(?string $from = null, ?string $to = null): self
     {
         $range = array_filter(
             [
                 'from' => $from,
                 'to' => $to,
             ],
-            function ($v) {
-                return !is_null($v);
-            }
+            static fn ($v): bool => $v !== null,
         );
 
         $this->ranges[] = $range;
@@ -78,37 +67,32 @@ class Ipv4RangeAggregation extends AbstractAggregation
 
     /**
      * Add ip mask to aggregation.
-     *
-     * @param string $mask
-     *
-     * @return Ipv4RangeAggregation
      */
-    public function addMask($mask)
+    public function addMask(string $mask): self
     {
         $this->ranges[] = ['mask' => $mask];
 
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'ip_range';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
-        if ($this->getField() && !empty($this->ranges)) {
-            return [
-                'field' => $this->getField(),
-                'ranges' => array_values($this->ranges),
-            ];
+        if ($this->getField() === null || count($this->getRanges()) === 0) {
+            throw new LogicException('Ip range aggregation must have field set and range added.');
         }
-        throw new \LogicException('Ip range aggregation must have field set and range added.');
+
+        return [
+            'field' => $this->getField(),
+            'ranges' => array_values($this->ranges),
+        ];
     }
+
 }

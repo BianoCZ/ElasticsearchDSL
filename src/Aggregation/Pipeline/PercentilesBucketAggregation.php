@@ -1,50 +1,37 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Pipeline;
+namespace Biano\ElasticsearchDSL\Aggregation\Pipeline;
+
+use function array_filter;
 
 /**
- * Class representing Percentiles Bucket Pipeline Aggregation.
- *
- * @link https://goo.gl/bqi7m5
+ * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-pipeline-percentiles-bucket-aggregation.html
  */
 class PercentilesBucketAggregation extends AbstractPipelineAggregation
 {
-    /**
-     * @var array
-     */
-    private $percents;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    /** @var list<int|float>|null */
+    private ?array $percents = null;
+
+    public function getType(): string
     {
         return 'percentiles_bucket';
     }
 
     /**
-     * @return array
+     * @return list<int|float>|null
      */
-    public function getPercents()
+    public function getPercents(): ?array
     {
         return $this->percents;
     }
 
     /**
-     * @param array $percents
-     *
-     * @return $this
+     * @param list<int|float> $percents
      */
-    public function setPercents(array $percents)
+    public function setPercents(array $percents): self
     {
         $this->percents = $percents;
 
@@ -52,16 +39,14 @@ class PercentilesBucketAggregation extends AbstractPipelineAggregation
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
-        $data = ['buckets_path' => $this->getBucketsPath()];
-
-        if ($this->getPercents()) {
-            $data['percents'] = $this->getPercents();
-        }
-
-        return $data;
+        return array_filter([
+            'buckets_path' => $this->getBucketsPath(),
+            'percents' => $this->getPercents(),
+        ]);
     }
+
 }

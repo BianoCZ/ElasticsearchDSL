@@ -1,26 +1,22 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\Bucketing\GlobalAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Bucketing\GlobalAggregation;
+use LogicException;
+use PHPUnit\Framework\TestCase;
+use stdClass;
+use function json_encode;
 
-class GlobalAggregationTest extends \PHPUnit\Framework\TestCase
+class GlobalAggregationTest extends TestCase
 {
+
     /**
      * Data provider for testToArray().
-     *
-     * @return array
      */
-    public function getToArrayData()
+    public function getToArrayData(): array
     {
         $out = [];
 
@@ -28,7 +24,7 @@ class GlobalAggregationTest extends \PHPUnit\Framework\TestCase
         $aggregation = new GlobalAggregation('test_agg');
 
         $result = [
-            'global' => new \stdClass(),
+            'global' => new stdClass(),
         ];
 
         $out[] = [
@@ -42,7 +38,7 @@ class GlobalAggregationTest extends \PHPUnit\Framework\TestCase
         $aggregation->addAggregation($aggregation2);
 
         $result = [
-            'global' => new \stdClass(),
+            'global' => new stdClass(),
             'aggregations' => [
                 $aggregation2->getName() => $aggregation2->toArray(),
             ],
@@ -59,26 +55,24 @@ class GlobalAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test for global aggregation toArray() method.
      *
-     * @param GlobalAggregation $aggregation
-     * @param array             $expectedResult
-     *
      * @dataProvider getToArrayData
      */
-    public function testToArray($aggregation, $expectedResult)
+    public function testToArray(GlobalAggregation $aggregation, array $expectedResult): void
     {
         $this->assertEquals(
             json_encode($expectedResult),
-            json_encode($aggregation->toArray())
+            json_encode($aggregation->toArray()),
         );
     }
 
     /**
      * Test for setField method on global aggregation.
      */
-    public function testSetField()
+    public function testSetField(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $aggregation = new GlobalAggregation('test_agg');
         $aggregation->setField('test_field');
     }
+
 }

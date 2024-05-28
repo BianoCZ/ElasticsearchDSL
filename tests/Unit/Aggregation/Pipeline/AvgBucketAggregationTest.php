@@ -1,27 +1,22 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Pipeline;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Pipeline;
 
-use ONGR\ElasticsearchDSL\Aggregation\Pipeline\AvgBucketAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Pipeline\AvgBucketAggregation;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for avg_bucket aggregation.
  */
-class AvgBucketAggregationTest extends \PHPUnit\Framework\TestCase
+class AvgBucketAggregationTest extends TestCase
 {
+
     /**
      * Tests getArray method.
      */
-    public function testGetArray()
+    public function testGetArray(): void
     {
         $aggregation = new AvgBucketAggregation('foo', 'foo>bar');
 
@@ -31,9 +26,10 @@ class AvgBucketAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests getType method.
      */
-    public function testAvgBucketAggregationGetType()
+    public function testAvgBucketAggregationGetType(): void
     {
         $aggregation = new AvgBucketAggregation('foo', 'foo>bar');
         $this->assertEquals('avg_bucket', $aggregation->getType());
     }
+
 }

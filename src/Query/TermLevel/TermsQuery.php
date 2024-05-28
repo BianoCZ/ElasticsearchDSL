@@ -1,64 +1,45 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\TermLevel;
+namespace Biano\ElasticsearchDSL\Query\TermLevel;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "terms" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html
  */
 class TermsQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
-    /**
-     * @var string
-     */
-    private $field;
+    private string $field;
+
+    /** @var list<string>|string */
+    private string|array $terms;
 
     /**
-     * @var array
+     * @param list<string>|string $terms
+     * @param array<string,mixed> $parameters
      */
-    private $terms;
-
-    /**
-     * Constructor.
-     *
-     * @param string $field      Field name
-     * @param array  $terms      An array of terms
-     * @param array  $parameters Optional parameters
-     */
-    public function __construct($field, $terms, array $parameters = [])
+    public function __construct(string $field, string|array $terms, array $parameters = [])
     {
         $this->field = $field;
         $this->terms = $terms;
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'terms';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [
             $this->field => $this->terms,
@@ -68,4 +49,5 @@ class TermsQuery implements BuilderInterface
 
         return [$this->getType() => $output];
     }
+
 }

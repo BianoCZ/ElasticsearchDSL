@@ -1,29 +1,24 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\Span;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Span;
 
-use ONGR\ElasticsearchDSL\Query\Span\FieldMaskingSpanQuery;
-use ONGR\ElasticsearchDSL\Query\Span\SpanNearQuery;
-use ONGR\ElasticsearchDSL\Query\Span\SpanTermQuery;
+use Biano\ElasticsearchDSL\Query\Span\FieldMaskingSpanQuery;
+use Biano\ElasticsearchDSL\Query\Span\SpanNearQuery;
+use Biano\ElasticsearchDSL\Query\Span\SpanTermQuery;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for FieldMaskingSpanQuery.
  */
-class FieldMaskingSpanQueryTest extends \PHPUnit\Framework\TestCase
+class FieldMaskingSpanQueryTest extends TestCase
 {
+
     /**
      * Tests for toArray().
      */
-    public function testToArray()
+    public function testToArray(): void
     {
         $spanTermQuery = new SpanTermQuery('text', 'quick brown');
 
@@ -40,14 +35,14 @@ class FieldMaskingSpanQueryTest extends \PHPUnit\Framework\TestCase
             'span_near' => [
                 'clauses' => [
                     [
-                        'span_term' => [ 'text' => 'quick brown']
+                        'span_term' => [ 'text' => 'quick brown'],
                     ],
                     [
                         'field_masking_span' => [
                             'query' => [ 'span_term' => [ 'text.stems' => 'fox' ] ],
                             'field' => 'text',
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 'slop' => 5,
                 'in_order' => false,
@@ -56,4 +51,5 @@ class FieldMaskingSpanQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($result, $spanNearQuery->toArray());
     }
+
 }

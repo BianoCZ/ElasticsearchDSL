@@ -1,33 +1,30 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Serializer;
+namespace Biano\ElasticsearchDSL\Serializer;
 
-use ONGR\ElasticsearchDSL\Serializer\Normalizer\OrderedNormalizerInterface;
+use ArrayObject;
+use Biano\ElasticsearchDSL\Serializer\Normalizer\OrderedNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
+use function array_diff_key;
+use function array_filter;
+use function array_merge;
+use function is_array;
+use function uasort;
 
 /**
  * Custom serializer which orders data before normalization.
  */
 class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
 {
-    /**
-     * @var Serializer
-     */
-    private $serializer;
+
+    private Serializer $serializer;
 
     /**
-     * @param array<NormalizerInterface|DenormalizerInterface> $normalizers
+     * @param list<\Symfony\Component\Serializer\Normalizer\NormalizerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface> $normalizers
      */
     public function __construct(array $normalizers = [])
     {
@@ -35,22 +32,19 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function normalize(
-        mixed $data,
-        ?string $format = null,
-        array $context = []
-    ): array|string|int|float|bool|\ArrayObject|null {
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|ArrayObject|null
+    {
         return $this->serializer->normalize(
             is_array($data) ? $this->order($data) : $data,
             $format,
-            $context
+            $context,
         );
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
@@ -58,27 +52,27 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
             is_array($data) ? $this->order($data) : $data,
             $type,
             $format,
-            $context
+            $context,
         );
     }
 
     /**
-     * Orders objects if can be done.
+     * Orders objects if it can be done.
      *
-     * @param array $data Data to order.
+     * @param array<mixed> $data
      *
-     * @return array
+     * @return array<mixed>
      */
-    private function order(array $data)
+    private function order(array $data): array
     {
         $filteredData = $this->filterOrderable($data);
 
         if (!empty($filteredData)) {
             uasort(
                 $filteredData,
-                function (OrderedNormalizerInterface $a, OrderedNormalizerInterface $b) {
+                static function (OrderedNormalizerInterface $a, OrderedNormalizerInterface $b) {
                     return $a->getOrder() > $b->getOrder() ? 1 : -1;
-                }
+                },
             );
 
             return array_merge($filteredData, array_diff_key($data, $filteredData));
@@ -90,42 +84,37 @@ class OrderedSerializer implements NormalizerInterface, DenormalizerInterface
     /**
      * Filters out data which can be ordered.
      *
-     * @param array $array Data to filter out.
+     * @param array<mixed> $array
      *
-     * @return array
+     * @return array<mixed>
      */
-    private function filterOrderable($array)
+    private function filterOrderable(array $array): array
     {
         return array_filter(
             $array,
-            function ($value) {
-                return $value instanceof OrderedNormalizerInterface;
-            }
+            static fn ($value): bool => $value instanceof OrderedNormalizerInterface,
         );
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function supportsDenormalization(
-        mixed $data,
-        string $type,
-        ?string $format = null,
-        array $context = []
-    ): bool {
-        return $this->serializer->supportsDenormalization($data, $format);
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
+    {
+        return $this->serializer->supportsDenormalization($data, $type, $format, $context);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        return $this->serializer->supportsNormalization($data, $format);
+        return $this->serializer->supportsNormalization($data, $format, $context);
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return $this->serializer->getSupportedTypes($format);
     }
+
 }

@@ -1,27 +1,23 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Metric;
 
-use ONGR\ElasticsearchDSL\Aggregation\Metric\PercentilesAggregation;
+use Biano\ElasticsearchDSL\Aggregation\Metric\PercentilesAggregation;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
-class PercentilesAggregationTest extends \PHPUnit\Framework\TestCase
+class PercentilesAggregationTest extends TestCase
 {
+
     /**
      * Tests if PercentilesAggregation#getArray throws exception when expected.
      */
-    public function testPercentilesAggregationGetArrayException()
+    public function testPercentilesAggregationGetArrayException(): void
     {
-        $this->expectExceptionMessage("Percentiles aggregation must have field or script set.");
-        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Percentiles aggregation must have field or script set.');
+        $this->expectException(LogicException::class);
         $aggregation = new PercentilesAggregation('bar');
         $aggregation->getArray();
     }
@@ -29,7 +25,7 @@ class PercentilesAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test getType method.
      */
-    public function testGetType()
+    public function testGetType(): void
     {
         $aggregation = new PercentilesAggregation('bar');
         $this->assertEquals('percentiles', $aggregation->getType());
@@ -38,7 +34,7 @@ class PercentilesAggregationTest extends \PHPUnit\Framework\TestCase
     /**
      * Test getArray method.
      */
-    public function testGetArray()
+    public function testGetArray(): void
     {
         $aggregation = new PercentilesAggregation('bar', 'fieldValue', ['percentsValue']);
         $this->assertSame(
@@ -46,7 +42,8 @@ class PercentilesAggregationTest extends \PHPUnit\Framework\TestCase
                 'percents' => ['percentsValue'],
                 'field' => 'fieldValue',
             ],
-            $aggregation->getArray()
+            $aggregation->getArray(),
         );
     }
+
 }

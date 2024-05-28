@@ -1,52 +1,33 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\TermLevel;
+namespace Biano\ElasticsearchDSL\Query\TermLevel;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\BuilderInterface;
 
 /**
- * Represents Elasticsearch "type" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-type-query.html
  */
 class TypeQuery implements BuilderInterface
 {
-    /**
-     * @var string
-     */
-    private $type;
 
-    /**
-     * Constructor.
-     *
-     * @param string $type Type name
-     */
-    public function __construct($type)
+    private string $type;
+
+    public function __construct(string $type)
     {
         $this->type = $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'type';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             $this->getType() => [
@@ -54,4 +35,5 @@ class TypeQuery implements BuilderInterface
             ],
         ];
     }
+
 }

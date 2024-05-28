@@ -1,45 +1,36 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
+use Biano\ElasticsearchDSL\Aggregation\AbstractAggregation;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use function assert;
 
-/**
- * Search aggregations dsl endpoint.
- */
 class AggregationsEndpoint extends AbstractSearchEndpoint
 {
-    /**
-     * Endpoint name
-     */
-    const NAME = 'aggregations';
+
+    public const NAME = 'aggregations';
+
+    protected function getName(): string
+    {
+        return self::NAME;
+    }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function normalize(
-        NormalizerInterface $normalizer,
-        $format = null,
-        array $context = []
-    ): array|string|int|float|bool {
-        $output = [];
-        if (count($this->getAll()) > 0) {
-            /** @var AbstractAggregation $aggregation */
-            foreach ($this->getAll() as $aggregation) {
-                $output[$aggregation->getName()] = $aggregation->toArray();
-            }
+    public function normalize(NormalizerInterface $normalizer, $format = null, array $context = []): array|string|int|float|bool
+    {
+        $result = [];
+
+        foreach ($this->getAll() as $aggregation) {
+            assert($aggregation instanceof AbstractAggregation);
+            $result[$aggregation->getName()] = $aggregation->toArray();
         }
 
-        return $output;
+        return $result;
     }
+
 }

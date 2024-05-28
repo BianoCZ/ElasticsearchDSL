@@ -1,41 +1,38 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
+namespace Biano\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
 
-use ONGR\ElasticsearchDSL\SearchEndpoint\AggregationsEndpoint;
-use ONGR\ElasticsearchDSL\SearchEndpoint\SearchEndpointFactory;
-use ONGR\ElasticsearchDSL\SearchEndpoint\SearchEndpointInterface;
+use Biano\ElasticsearchDSL\SearchEndpoint\AggregationsEndpoint;
+use Biano\ElasticsearchDSL\SearchEndpoint\SearchEndpointFactory;
+use Biano\ElasticsearchDSL\SearchEndpoint\SearchEndpointInterface;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * Unit test class for search endpoint factory.
  */
-class SearchEndpointFactoryTest extends \PHPUnit\Framework\TestCase
+class SearchEndpointFactoryTest extends TestCase
 {
+
     /**
      * Tests get method exception.
      */
-    public function testGet()
+    public function testGet(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         SearchEndpointFactory::get('foo');
     }
 
     /**
      * Tests if factory can create endpoint.
      */
-    public function testFactory()
+    public function testFactory(): void
     {
         $endpoinnt = SearchEndpointFactory::get(AggregationsEndpoint::NAME);
 
         $this->assertInstanceOf(SearchEndpointInterface::class, $endpoinnt);
     }
+
 }

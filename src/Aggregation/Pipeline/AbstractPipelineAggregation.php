@@ -1,43 +1,50 @@
 <?php
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Pipeline;
+declare(strict_types = 1);
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\MetricTrait;
+namespace Biano\ElasticsearchDSL\Aggregation\Pipeline;
+
+use Biano\ElasticsearchDSL\Aggregation\AbstractAggregation;
+use function array_filter;
 
 abstract class AbstractPipelineAggregation extends AbstractAggregation
 {
-    use MetricTrait;
+
+    /** @var array<string,string>|string|null */
+    private string|array|null $bucketsPath = null;
 
     /**
-     * @var string
+     * @param array<string,string>|string|null $bucketsPath
      */
-    private $bucketsPath;
-
-    /**
-     * @param string $name
-     * @param $bucketsPath
-     */
-    public function __construct($name, $bucketsPath = null)
+    public function __construct(string $name, string|array|null $bucketsPath = null)
     {
         parent::__construct($name);
-        $this->setBucketsPath($bucketsPath);
+
+        if ($bucketsPath !== null) {
+            $this->setBucketsPath($bucketsPath);
+        }
     }
 
     /**
-     * @return string
+     * Pipeline aggregations does not support nesting.
      */
-    public function getBucketsPath()
+    protected function supportsNesting(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @return  array<string,string>|string|null
+     */
+    public function getBucketsPath(): string|array|null
     {
         return $this->bucketsPath;
     }
 
     /**
-     * @param string $bucketsPath
-     *
-     * @return $this
+     * @param array<string,string>|string $bucketsPath
      */
-    public function setBucketsPath($bucketsPath)
+    public function setBucketsPath(string|array $bucketsPath): self
     {
         $this->bucketsPath = $bucketsPath;
 
@@ -45,10 +52,13 @@ abstract class AbstractPipelineAggregation extends AbstractAggregation
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function getArray()
+    public function getArray(): array
     {
-        return ['buckets_path' => $this->getBucketsPath()];
+        return array_filter([
+            'buckets_path' => $this->getBucketsPath(),
+        ]);
     }
+
 }

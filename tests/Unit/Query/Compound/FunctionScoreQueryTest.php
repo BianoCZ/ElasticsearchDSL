@@ -1,42 +1,37 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Tests\Unit\Query\Compound;
+namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Compound;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\Query\Compound\FunctionScoreQuery;
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\Query\Compound\FunctionScoreQuery;
+use Biano\ElasticsearchDSL\Query\MatchAllQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use stdClass;
+use function assert;
 
 /**
  * Tests for FunctionScoreQuery.
  */
-class FunctionScoreQueryTest extends \PHPUnit\Framework\TestCase
+class FunctionScoreQueryTest extends TestCase
 {
+
     /**
      * Data provider for testAddRandomFunction.
-     *
-     * @return array
      */
-    public function addRandomFunctionProvider()
+    public function addRandomFunctionProvider(): array
     {
         return [
             // Case #0. No seed.
             [
                 'seed' => null,
                 'expectedArray' => [
-                    'query' => null,
+                    'query' => [],
                     'functions' => [
                         [
-                            'random_score' => new \stdClass(),
+                            'random_score' => new stdClass(),
                         ],
                     ],
                 ],
@@ -45,7 +40,7 @@ class FunctionScoreQueryTest extends \PHPUnit\Framework\TestCase
             [
                 'seed' => 'someSeed',
                 'expectedArray' => [
-                    'query' => null,
+                    'query' => [],
                     'functions' => [
                         [
                             'random_score' => [ 'seed' => 'someSeed'],
@@ -59,36 +54,33 @@ class FunctionScoreQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * Tests addRandomFunction method.
      *
-     * @param mixed $seed
-     * @param array $expectedArray
-     *
      * @dataProvider addRandomFunctionProvider
      */
-    public function testAddRandomFunction($seed, $expectedArray)
+    public function testAddRandomFunction(mixed $seed, array $expectedArray): void
     {
-        /** @var MatchAllQuery|MockObject $matchAllQuery */
         $matchAllQuery = $this->getMockBuilder(MatchAllQuery::class)->getMock();
+        assert($matchAllQuery instanceof MatchAllQuery || $matchAllQuery instanceof MockObject);
 
         $functionScoreQuery = new FunctionScoreQuery($matchAllQuery);
         $functionScoreQuery->addRandomFunction($seed);
 
         $this->assertEquals(['function_score' => $expectedArray], $functionScoreQuery->toArray());
     }
-    
+
     /**
      * Tests default argument values.
      */
-    public function testAddFieldValueFactorFunction()
+    public function testAddFieldValueFactorFunction(): void
     {
-        /** @var BuilderInterface|MockObject $builderInterface */
-        $builderInterface = $this->getMockForAbstractClass(\ONGR\ElasticsearchDSL\BuilderInterface::class);
+        $builderInterface = $this->getMockForAbstractClass(BuilderInterface::class);
+        assert($builderInterface instanceof BuilderInterface || $builderInterface instanceof MockObject);
         $functionScoreQuery = new FunctionScoreQuery($builderInterface);
         $functionScoreQuery->addFieldValueFactorFunction('field1', 2);
         $functionScoreQuery->addFieldValueFactorFunction('field2', 1.5, 'ln');
 
         $this->assertEquals(
             [
-                'query' => null,
+                'query' => [],
                 'functions' => [
                     [
                         'field_value_factor' => [
@@ -106,7 +98,8 @@ class FunctionScoreQueryTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            $functionScoreQuery->toArray()['function_score']
+            $functionScoreQuery->toArray()['function_score'],
         );
     }
+
 }

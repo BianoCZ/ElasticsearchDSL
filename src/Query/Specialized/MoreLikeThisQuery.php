@@ -1,55 +1,43 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Query\Specialized;
+namespace Biano\ElasticsearchDSL\Query\Specialized;
 
-use ONGR\ElasticsearchDSL\BuilderInterface;
-use ONGR\ElasticsearchDSL\ParametersTrait;
+use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\ParametersTrait;
 
 /**
- * Represents Elasticsearch "more_like_this" query.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-mlt-query.html
  */
 class MoreLikeThisQuery implements BuilderInterface
 {
+
     use ParametersTrait;
 
     /**
-     * @var string The text to find documents like it, required if ids or docs are not specified.
+     * The text to find documents like it, required if ids or docs are not specified.
      */
-    private $like;
+    private string $like;
 
     /**
-     * @param string $like
-     * @param array  $parameters
+     * @param array<string,mixed> $parameters
      */
-    public function __construct($like, array $parameters = [])
+    public function __construct(string $like, array $parameters = [])
     {
         $this->like = $like;
         $this->setParameters($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'more_like_this';
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         $query = [];
 
@@ -61,4 +49,5 @@ class MoreLikeThisQuery implements BuilderInterface
 
         return [$this->getType() => $output];
     }
+
 }

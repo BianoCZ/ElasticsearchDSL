@@ -1,107 +1,86 @@
 <?php
 
-/*
- * This file is part of the ONGR package.
- *
- * (c) NFQ Technologies UAB <info@nfq.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+declare(strict_types = 1);
 
-namespace ONGR\ElasticsearchDSL\Aggregation\Bucketing;
+namespace Biano\ElasticsearchDSL\Aggregation\Bucketing;
 
-use ONGR\ElasticsearchDSL\Aggregation\AbstractAggregation;
-use ONGR\ElasticsearchDSL\Aggregation\Type\BucketingTrait;
+use LogicException;
+use function array_filter;
+use function count;
 
 /**
- * Class representing date range aggregation.
- *
  * @link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-daterange-aggregation.html
  */
-class DateRangeAggregation extends AbstractAggregation
+class DateRangeAggregation extends AbstractBucketingAggregation
 {
-    use BucketingTrait;
+
+    private ?string $format = null;
+
+    /** @var list<array<string,mixed>> */
+    private array $ranges = [];
+
+    private bool $keyed = false;
 
     /**
-     * @var string
+     * @param list<array<string,mixed>>$ranges
      */
-    private $format;
-
-    /**
-     * @var array
-     */
-    private $ranges = [];
-
-    /**
-     * @var bool
-     */
-    private $keyed = false;
-
-    /**
-     * @param string $name
-     * @param string $field
-     * @param string $format
-     * @param array  $ranges
-     * @param bool   $keyed
-     */
-    public function __construct($name, $field = null, $format = null, array $ranges = [], $keyed = false)
+    public function __construct(string $name, ?string $field = null, ?string $format = null, array $ranges = [], bool $keyed = false)
     {
         parent::__construct($name);
 
-        $this->setField($field);
-        $this->setFormat($format);
-        $this->setKeyed($keyed);
-        foreach ($ranges as $range) {
-            $from = isset($range['from']) ? $range['from'] : null;
-            $to = isset($range['to']) ? $range['to'] : null;
-            $key = isset($range['key']) ? $range['key'] : null;
-            $this->addRange($from, $to, $key);
+        if ($field !== null) {
+            $this->setField($field);
         }
+
+        if ($format !== null) {
+            $this->setFormat($format);
+        }
+
+        if ($keyed !== null) {
+            $this->setKeyed($keyed);
+        }
+
+        foreach ($ranges as $range) {
+            $this->addRange($range['from'] ?? null, $range['to'] ?? null, $range['key'] ?? null);
+        }
+    }
+
+    public function isKeyed(): bool
+    {
+        return $this->keyed;
     }
 
     /**
      * Sets if result buckets should be keyed.
-     *
-     * @param bool $keyed
-     *
-     * @return DateRangeAggregation
      */
-    public function setKeyed($keyed)
+    public function setKeyed(bool $keyed): self
     {
         $this->keyed = $keyed;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getFormat()
+    public function getFormat(): ?string
     {
         return $this->format;
     }
 
-    /**
-     * @param string $format
-     */
-    public function setFormat($format)
+    public function setFormat(?string $format): self
     {
         $this->format = $format;
+
+        return $this;
     }
 
     /**
-     * Add range to aggregation.
-     *
-     * @param string|null $from
-     * @param string|null $to
-     * @param string|null $key
-     *
-     * @return $this
-     *
-     * @throws \LogicException
+     * @return list<array<string,mixed>>
      */
-    public function addRange($from = null, $to = null, $key = null)
+    public function getRanges(): array
+    {
+        return $this->ranges;
+    }
+
+    public function addRange(int|float|string|null $from = null, int|float|string|null $to = null, ?string $key = null): self
     {
         $range = array_filter(
             [
@@ -109,13 +88,11 @@ class DateRangeAggregation extends AbstractAggregation
                 'to' => $to,
                 'key' => $key,
             ],
-            function ($v) {
-                return !is_null($v);
-            }
+            static fn ($v) => $v !== null,
         );
 
         if (empty($range)) {
-            throw new \LogicException('Either from or to must be set. Both cannot be null.');
+            throw new LogicException('Either from or to must be set. Both cannot be null.');
         }
 
         $this->ranges[] = $range;
@@ -123,29 +100,26 @@ class DateRangeAggregation extends AbstractAggregation
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getArray()
-    {
-        if ($this->getField() && $this->getFormat() && !empty($this->ranges)) {
-            $data = [
-                'format' => $this->getFormat(),
-                'field' => $this->getField(),
-                'ranges' => $this->ranges,
-                'keyed' => $this->keyed,
-            ];
-
-            return $data;
-        }
-        throw new \LogicException('Date range aggregation must have field, format set and range added.');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType()
+    public function getType(): string
     {
         return 'date_range';
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getArray(): array
+    {
+        if ($this->getField() === null || $this->getFormat()  === null || count($this->getRanges()) === 0) {
+            throw new LogicException('Date range aggregation must have field, format set and range added.');
+        }
+
+        return [
+            'format' => $this->getFormat(),
+            'field' => $this->getField(),
+            'ranges' => $this->getRanges(),
+            'keyed' => $this->isKeyed(),
+        ];
+    }
+
 }
