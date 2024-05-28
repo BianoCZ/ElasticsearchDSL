@@ -24,7 +24,7 @@
         "symfony/serializer": "^4.0 || ^5.0 || ^6.0 || ^7.0"
     },
     "require-dev": {
-        "biano/coding-standard": "^4.0",
+        "biano/coding-standard": "^4.1",
         "phpstan/phpstan": "^1.11",
         "phpunit/phpunit": "^9.6",
         "shipmonk/composer-dependency-analyser": "^1.5",
