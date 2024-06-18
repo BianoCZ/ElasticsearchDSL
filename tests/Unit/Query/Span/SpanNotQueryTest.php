@@ -8,25 +8,21 @@ use Biano\ElasticsearchDSL\Query\Span\SpanNotQuery;
 use Biano\ElasticsearchDSL\Query\Span\SpanQueryInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for SpanNotQuery.
- */
 class SpanNotQueryTest extends TestCase
 {
 
-    /**
-     * Tests for toArray().
-     */
     public function testSpanNotQueryToArray(): void
     {
-        $mock = $this->getMockBuilder(SpanQueryInterface::class)->getMock();
+        $mock = $this->createMock(SpanQueryInterface::class);
         $mock
             ->expects($this->exactly(2))
             ->method('toArray')
             ->willReturn(['span_term' => ['key' => 'value']]);
 
         $query = new SpanNotQuery($mock, $mock);
-        $result = [
+
+        $result = $query->toArray();
+        $expected = [
             'span_not' => [
                 'include' => [
                     'span_term' => ['key' => 'value'],
@@ -36,7 +32,8 @@ class SpanNotQueryTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($result, $query->toArray());
+
+        self::assertEquals($expected, $result);
     }
 
 }

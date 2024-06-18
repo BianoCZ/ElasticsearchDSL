@@ -11,14 +11,12 @@ use PHPUnit\Framework\TestCase;
 class HasChildQueryTest extends TestCase
 {
 
-    /**
-     * Tests whether __constructor calls setParameters method.
-     */
     public function testConstructor(): void
     {
-        $parentQuery = $this->getMockBuilder(BuilderInterface::class)->getMock();
-        $query = new HasChildQuery('test_type', $parentQuery, ['test_parameter1']);
-        $this->assertEquals(['test_parameter1'], $query->getParameters());
+        $parentQuery = $this->createMock(BuilderInterface::class);
+        $query = new HasChildQuery('test_type', $parentQuery, ['test' => 'test_parameter1']);
+
+        self::assertEquals(['test' => 'test_parameter1'], $query->getParameters());
     }
 
 }

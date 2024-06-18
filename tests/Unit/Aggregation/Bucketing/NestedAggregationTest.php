@@ -11,9 +11,6 @@ use PHPUnit\Framework\TestCase;
 class NestedAggregationTest extends TestCase
 {
 
-    /**
-     * Test for nested aggregation toArray() method exception.
-     */
     public function testToArray(): void
     {
         $termAggregation = new TermsAggregation('acme');
@@ -22,14 +19,14 @@ class NestedAggregationTest extends TestCase
         $aggregation->setPath('test_path');
         $aggregation->addAggregation($termAggregation);
 
-        $expectedResult = [
+        $expected = [
             'nested' => ['path' => 'test_path'],
             'aggregations' => [
                 $termAggregation->getName() => $termAggregation->toArray(),
             ],
         ];
 
-        $this->assertEquals($expectedResult, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
 }

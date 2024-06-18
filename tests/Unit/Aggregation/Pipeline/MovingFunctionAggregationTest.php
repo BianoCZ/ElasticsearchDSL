@@ -7,15 +7,9 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Pipeline;
 use Biano\ElasticsearchDSL\Aggregation\Pipeline\MovingFunctionAggregation;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for sum bucket aggregation.
- */
 class MovingFunctionAggregationTest extends TestCase
 {
 
-    /**
-     * Tests toArray method.
-     */
     public function testToArray(): void
     {
         $aggregation = new MovingFunctionAggregation('acme', 'test');
@@ -24,7 +18,7 @@ class MovingFunctionAggregationTest extends TestCase
             'moving_fn' => ['buckets_path' => 'test'],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
 }

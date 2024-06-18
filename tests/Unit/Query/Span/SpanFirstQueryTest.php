@@ -8,25 +8,21 @@ use Biano\ElasticsearchDSL\Query\Span\SpanFirstQuery;
 use Biano\ElasticsearchDSL\Query\Span\SpanQueryInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for SpanFirstQuery.
- */
 class SpanFirstQueryTest extends TestCase
 {
 
-    /**
-     * Tests for toArray().
-     */
     public function testToArray(): void
     {
-        $mock = $this->getMockBuilder(SpanQueryInterface::class)->getMock();
+        $mock = $this->createMock(SpanQueryInterface::class);
         $mock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('toArray')
             ->willReturn(['span_term' => ['user' => 'bob']]);
 
         $query = new SpanFirstQuery($mock, 5);
-        $result = [
+
+        $result = $query->toArray();
+        $expected = [
             'span_first' => [
                 'match' => [
                     'span_term' => ['user' => 'bob'],
@@ -34,7 +30,8 @@ class SpanFirstQueryTest extends TestCase
                 'end' => 5,
             ],
         ];
-        $this->assertEquals($result, $query->toArray());
+
+        self::assertEquals($expected, $result);
     }
 
 }

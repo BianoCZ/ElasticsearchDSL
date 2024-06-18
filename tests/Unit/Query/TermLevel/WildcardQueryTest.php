@@ -10,19 +10,17 @@ use PHPUnit\Framework\TestCase;
 class WildcardQueryTest extends TestCase
 {
 
-    /**
-     * Test for query toArray() method.
-     */
     public function testToArray(): void
     {
         $query = new WildcardQuery('user', 'ki*y');
-        $expectedResult = [
+
+        $expected = [
             'wildcard' => [
                 'user' => ['value' => 'ki*y'],
             ],
         ];
 
-        $this->assertEquals($expectedResult, $query->toArray());
+        self::assertEquals($expected, $query->toArray());
     }
 
 }

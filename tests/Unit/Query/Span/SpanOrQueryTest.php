@@ -8,26 +8,22 @@ use Biano\ElasticsearchDSL\Query\Span\SpanOrQuery;
 use Biano\ElasticsearchDSL\Query\Span\SpanQueryInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for SpanOrQuery.
- */
 class SpanOrQueryTest extends TestCase
 {
 
-    /**
-     * Tests for toArray().
-     */
     public function testToArray(): void
     {
-        $mock = $this->getMockBuilder(SpanQueryInterface::class)->getMock();
+        $mock = $this->createMock(SpanQueryInterface::class);
         $mock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('toArray')
             ->willReturn(['span_term' => ['key' => 'value']]);
 
         $query = new SpanOrQuery();
         $query->addQuery($mock);
-        $result = [
+
+        $result = $query->toArray();
+        $expected = [
             'span_or' => [
                 'clauses' => [
                     0 => [
@@ -36,11 +32,13 @@ class SpanOrQueryTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($result, $query->toArray());
+
+        self::assertEquals($expected, $result);
 
         $result = $query->getQueries();
-        $this->assertIsArray($result);
-        $this->assertCount(1, $result);
+
+        self::assertIsArray($result);
+        self::assertCount(1, $result);
     }
 
 }

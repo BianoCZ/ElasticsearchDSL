@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 class MatchQueryTest extends TestCase
 {
 
-    /**
-     * Tests toArray().
-     */
     public function testToArray(): void
     {
         $query = new MatchQuery('message', 'this is a test');
@@ -22,7 +19,7 @@ class MatchQueryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $query->toArray());
+        self::assertEquals($expected, $query->toArray());
     }
 
 }

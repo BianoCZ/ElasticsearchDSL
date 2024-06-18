@@ -6,26 +6,22 @@ namespace Biano\ElasticsearchDSL\Tests\Unit;
 
 use Biano\ElasticsearchDSL\BuilderBag;
 use Biano\ElasticsearchDSL\BuilderInterface;
+use Biano\ElasticsearchDSL\NamedBuilderInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class BuilderBagTest extends TestCase
 {
 
-    /**
-     * Tests if bag knows if he has a builder.
-     */
     public function testHas(): void
     {
         $bag = new BuilderBag();
         $fooBuilder = $this->getBuilder('foo');
         $builderName = $bag->add($fooBuilder);
-        $this->assertTrue($bag->has($builderName));
+
+        self::assertTrue($bag->has($builderName));
     }
 
-    /**
-     * Tests if bag can remove a builder.
-     */
     public function testRemove(): void
     {
         $bag = new BuilderBag();
@@ -36,14 +32,11 @@ class BuilderBagTest extends TestCase
 
         $bag->remove($fooBuilderName);
 
-        $this->assertFalse($bag->has($fooBuilderName), 'Foo builder should not exist anymore.');
-        $this->assertTrue($bag->has($acmeBuilderName), 'Acme builder should exist.');
-        $this->assertCount(1, $bag->all());
+        self::assertFalse($bag->has($fooBuilderName), 'Foo builder should not exist anymore.');
+        self::assertTrue($bag->has($acmeBuilderName), 'Acme builder should exist.');
+        self::assertCount(1, $bag->all());
     }
 
-    /**
-     * Tests if bag can clear it's builders.
-     */
     public function testClear(): void
     {
         $bag = new BuilderBag(
@@ -55,42 +48,26 @@ class BuilderBagTest extends TestCase
 
         $bag->clear();
 
-        $this->assertEmpty($bag->all());
+        self::assertEmpty($bag->all());
     }
 
-    /**
-     * Tests if bag can get a builder.
-     */
     public function testGet(): void
     {
         $bag = new BuilderBag();
         $bazBuilder = $this->getBuilder('baz');
         $builderName = $bag->add($bazBuilder);
 
-        $this->assertNotEmpty($bag->get($builderName));
+        self::assertNotEmpty($bag->get($builderName));
     }
 
-    /**
-     * Returns builder.
-     */
-    private function getBuilder(string $name): MockObject|BuilderInterface
+    private function getBuilder(string $name): BuilderInterface&MockObject
     {
-        $friendlyBuilderMock = $this->getMockBuilder(BuilderInterface::class)
-            ->setMethods(['getName', 'toArray', 'getType'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $builder = $this->createMock(NamedBuilderInterface::class);
 
-        $friendlyBuilderMock
-            ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($name));
+        $builder->expects(self::any())->method('getName')->willReturn($name);
+        $builder->expects(self::any())->method('toArray')->willReturn([]);
 
-        $friendlyBuilderMock
-            ->expects($this->any())
-            ->method('toArray')
-            ->will($this->returnValue([]));
-
-        return $friendlyBuilderMock;
+        return $builder;
     }
 
 }

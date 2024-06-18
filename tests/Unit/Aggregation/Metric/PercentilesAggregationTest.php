@@ -11,35 +11,29 @@ use PHPUnit\Framework\TestCase;
 class PercentilesAggregationTest extends TestCase
 {
 
-    /**
-     * Tests if PercentilesAggregation#getArray throws exception when expected.
-     */
     public function testPercentilesAggregationGetArrayException(): void
     {
         $this->expectExceptionMessage('Percentiles aggregation must have field or script set.');
         $this->expectException(LogicException::class);
+
         $aggregation = new PercentilesAggregation('bar');
         $aggregation->getArray();
     }
 
-    /**
-     * Test getType method.
-     */
     public function testGetType(): void
     {
         $aggregation = new PercentilesAggregation('bar');
-        $this->assertEquals('percentiles', $aggregation->getType());
+
+        self::assertEquals('percentiles', $aggregation->getType());
     }
 
-    /**
-     * Test getArray method.
-     */
     public function testGetArray(): void
     {
-        $aggregation = new PercentilesAggregation('bar', 'fieldValue', ['percentsValue']);
-        $this->assertSame(
+        $aggregation = new PercentilesAggregation('bar', 'fieldValue', [50, 70]);
+
+        self::assertSame(
             [
-                'percents' => ['percentsValue'],
+                'percents' => [50, 70],
                 'field' => 'fieldValue',
             ],
             $aggregation->getArray(),

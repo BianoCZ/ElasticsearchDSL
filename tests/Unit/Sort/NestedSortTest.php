@@ -11,36 +11,31 @@ use PHPUnit\Framework\TestCase;
 class NestedSortTest extends TestCase
 {
 
-    /**
-     * Test for single nested.
-     */
     public function testSingle(): void
     {
         $query = new NestedSort('somePath', new TermQuery('somePath.id', 10));
+
+        $result = $query->toArray();
         $expected = [
             'path'   => 'somePath',
             'filter' => [
                 'term' => ['somePath.id' => 10],
             ],
         ];
-        $result = $query->toArray();
-        $this->assertEquals($expected, $result);
+
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Test for single nested, no filter.
-     */
     public function testNoFilter(): void
     {
         $query = new NestedSort('somePath');
-        $expected = ['path' => 'somePath'];
+
         $result = $query->toArray();
-        $this->assertEquals($expected, $result);
+        $expected = ['path' => 'somePath'];
+
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Test for single nested.
-     */
     public function testMultipleNesting(): void
     {
         $query = new NestedSort('somePath', new TermQuery('somePath.id', 10));
@@ -48,6 +43,8 @@ class NestedSortTest extends TestCase
         $nestedFilter2 = new NestedSort('thirdPath', new TermQuery('thirdPath.x', 'y'));
         $nestedFilter1->setNestedFilter($nestedFilter2);
         $query->setNestedFilter($nestedFilter1);
+
+        $result = $query->toArray();
         $expected = [
             'path'   => 'somePath',
             'filter' => [
@@ -66,8 +63,8 @@ class NestedSortTest extends TestCase
                 ],
             ],
         ];
-        $result = $query->toArray();
-        $this->assertEquals($expected, $result);
+
+        self::assertEquals($expected, $result);
     }
 
 }

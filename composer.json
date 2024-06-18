@@ -18,19 +18,19 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-json": "*",
         "elasticsearch/elasticsearch": "^8.0",
         "symfony/serializer": "^5.0 || ^6.0 || ^7.0"
     },
     "require-dev": {
         "biano/coding-standard": "^4.1",
-        "ergebnis/composer-normalize": "^2.42",
+        "ergebnis/composer-normalize": "^2.43",
         "phpstan/phpstan": "^1.11",
-        "phpunit/phpunit": "^9.6",
+        "phpunit/phpunit": "^11.0",
         "roave/security-advisories": "dev-latest",
         "shipmonk/composer-dependency-analyser": "^1.5",
-        "squizlabs/php_codesniffer": "^3.9"
+        "squizlabs/php_codesniffer": "^3.10"
     },
     "autoload": {
         "psr-4": {

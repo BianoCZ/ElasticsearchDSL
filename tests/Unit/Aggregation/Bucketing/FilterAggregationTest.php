@@ -11,31 +11,41 @@ use Biano\ElasticsearchDSL\Query\MatchAllQuery;
 use Biano\ElasticsearchDSL\Query\TermLevel\ExistsQuery;
 use Biano\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class FilterAggregationTest extends TestCase
 {
 
     /**
-     * Data provider for testToArray.
+     * Test for filter aggregation toArray() method.
+     *
+     * @param array<string,mixed> $expected
      */
-    public function getToArrayData(): array
+    #[DataProvider('provideToArray')]
+    public function testToArray(FilterAggregation $aggregation, array $expected): void
     {
-        $out = [];
+        self::assertEquals($expected, $aggregation->toArray());
+    }
 
+    /**
+     * @return iterable<array<string,mixed>>
+     */
+    public static function provideToArray(): iterable
+    {
         // Case #0 filter aggregation.
         $aggregation = new FilterAggregation('test_agg');
         $filter = new MatchAllQuery();
 
         $aggregation->setFilter($filter);
 
-        $result = [
+        $expected = [
             'filter' => $filter->toArray(),
         ];
 
-        $out[] = [
-            $aggregation,
-            $result,
+        yield [
+            'aggregation' => $aggregation,
+            'expected' => $expected,
         ];
 
         // Case #1 nested filter aggregation.
@@ -45,16 +55,16 @@ class FilterAggregationTest extends TestCase
         $histogramAgg = new HistogramAggregation('acme', 'bar', 10);
         $aggregation->addAggregation($histogramAgg);
 
-        $result = [
+        $expected = [
             'filter' => $filter->toArray(),
             'aggregations' => [
                 $histogramAgg->getName() => $histogramAgg->toArray(),
             ],
         ];
 
-        $out[] = [
-            $aggregation,
-            $result,
+        yield [
+            'aggregation' => $aggregation,
+            'expected' => $expected,
         ];
 
         // Case #2 testing bool filter.
@@ -67,88 +77,65 @@ class FilterAggregationTest extends TestCase
 
         $aggregation->setFilter($boolFilter);
 
-        $result = [
+        $expected = [
             'filter' => $boolFilter->toArray(),
         ];
 
-        $out[] = [
-            $aggregation,
-            $result,
+        yield [
+            'aggregation' => $aggregation,
+            'expected' => $expected,
         ];
-
-        return $out;
     }
 
-    /**
-     * Test for filter aggregation toArray() method.
-     *
-     * @dataProvider getToArrayData
-     */
-    public function testToArray(FilterAggregation $aggregation, array $expectedResult): void
-    {
-        $this->assertEquals($expectedResult, $aggregation->toArray());
-    }
-
-    /**
-     * Test for setField().
-     */
     public function testSetField(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('doesn\'t support `field` parameter');
+
         $aggregation = new FilterAggregation('test_agg');
         $aggregation->setField('test_field');
     }
 
-    /**
-     * Test for toArray() without setting a filter.
-     */
     public function testToArrayNoFilter(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('has no filter added');
-        $aggregation = new FilterAggregation('test_agg');
-        $result = $aggregation->toArray();
 
-        $this->assertEquals(
-            [
-                'aggregation' => [
-                    'test_agg' => [
-                        'filter' => [],
-                    ],
+        $aggregation = new FilterAggregation('test_agg');
+
+        $result = $aggregation->toArray();
+        $expected = [
+            'aggregation' => [
+                'test_agg' => [
+                    'filter' => [],
                 ],
             ],
-            $result,
-        );
+        ];
+
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Test for toArray() with setting a filter.
-     */
     public function testToArrayWithFilter(): void
     {
         $aggregation = new FilterAggregation('test_agg');
         $aggregation->setFilter(new ExistsQuery('test'));
-        $result = $aggregation->toArray();
 
-        $this->assertEquals(
-            [
-                'filter' => [
-                    'exists' => ['field' => 'test'],
-                ],
+        $result = $aggregation->toArray();
+        $expected = [
+            'filter' => [
+                'exists' => ['field' => 'test'],
             ],
-            $result,
-        );
+        ];
+
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests if filter can be passed to constructor.
-     */
     public function testConstructorFilter(): void
     {
         $matchAllFilter = new MatchAllQuery();
         $aggregation = new FilterAggregation('test', $matchAllFilter);
-        $this->assertEquals(
+
+        self::assertEquals(
             [
                 'filter' => $matchAllFilter->toArray(),
             ],

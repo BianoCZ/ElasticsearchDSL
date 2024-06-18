@@ -10,25 +10,20 @@ use PHPUnit\Framework\TestCase;
 class TermsAggregationTest extends TestCase
 {
 
-    /**
-     * Tests setField method.
-     */
     public function testTermsAggregationSetField(): void
     {
         // Case #0 terms aggregation.
         $aggregation = new TermsAggregation('test_agg');
         $aggregation->setField('test_field');
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'terms' => ['field' => 'test_field'],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests setSize method.
-     */
     public function testTermsAggregationSetSize(): void
     {
         // Case #1 terms aggregation with size.
@@ -36,7 +31,8 @@ class TermsAggregationTest extends TestCase
         $aggregation->setField('test_field');
         $aggregation->addParameter('size', 1);
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'terms' => [
                 'field' => 'test_field',
                 'size' => 1,
@@ -44,26 +40,24 @@ class TermsAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
 
         // Case #2 terms aggregation with zero size.
         $aggregation = new TermsAggregation('test_agg');
         $aggregation->setField('test_field');
         $aggregation->addParameter('size', 0);
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'terms' => [
                 'field' => 'test_field',
                 'size' => 0,
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests minDocumentCount method.
-     */
     public function testTermsAggregationMinDocumentCount(): void
     {
         // Case #3 terms aggregation with size and min document count.
@@ -72,7 +66,8 @@ class TermsAggregationTest extends TestCase
         $aggregation->addParameter('size', 1);
         $aggregation->addParameter('min_doc_count', 10);
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'terms' => [
                 'field' => 'test_field',
                 'size' => 1,
@@ -80,12 +75,9 @@ class TermsAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests include, exclude method.
-     */
     public function testTermsAggregationSimpleIncludeExclude(): void
     {
         // Case #4 terms aggregation with simple include, exclude.
@@ -94,6 +86,7 @@ class TermsAggregationTest extends TestCase
         $aggregation->addParameter('include', 'test_.*');
         $aggregation->addParameter('exclude', 'pizza_.*');
 
+        $expected = $aggregation->toArray();
         $result = [
             'terms' => [
                 'field' => 'test_field',
@@ -102,12 +95,9 @@ class TermsAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests include, exclude with flags method.
-     */
     public function testTermsAggregationIncludeExcludeFlags(): void
     {
         // Case #5 terms aggregation with include, exclude and flags.
@@ -128,7 +118,8 @@ class TermsAggregationTest extends TestCase
             ],
         );
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'terms' => [
                 'field' => 'test_field',
                 'include' => [
@@ -142,12 +133,9 @@ class TermsAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests setOrder method.
-     */
     public function testTermsAggregationSetOrder(): void
     {
         // Case #6 terms aggregation with order default direction.
@@ -155,19 +143,17 @@ class TermsAggregationTest extends TestCase
         $aggregation->setField('test_field');
         $aggregation->addParameter('order', ['_count' => 'asc']);
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'terms' => [
                 'field' => 'test_field',
                 'order' => ['_count' => 'asc'],
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests setOrder DESC method.
-     */
     public function testTermsAggregationSetOrderDESC(): void
     {
         // Case #7 terms aggregation with order term mode, desc direction.
@@ -175,24 +161,24 @@ class TermsAggregationTest extends TestCase
         $aggregation->setField('test_field');
         $aggregation->addParameter('order', ['_key' => 'desc']);
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'terms' => [
                 'field' => 'test_field',
                 'order' => ['_key' => 'desc'],
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests getType method.
-     */
     public function testTermsAggregationGetType(): void
     {
         $aggregation = new TermsAggregation('foo');
+
         $result = $aggregation->getType();
-        $this->assertEquals('terms', $result);
+
+        self::assertEquals('terms', $result);
     }
 
 }

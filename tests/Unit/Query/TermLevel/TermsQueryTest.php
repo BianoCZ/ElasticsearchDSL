@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 class TermsQueryTest extends TestCase
 {
 
-    /**
-     * Tests toArray().
-     */
     public function testToArray(): void
     {
         $query = new TermsQuery('user', ['bob', 'elasticsearch']);
@@ -22,7 +19,7 @@ class TermsQueryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $query->toArray());
+        self::assertEquals($expected, $query->toArray());
     }
 
 }

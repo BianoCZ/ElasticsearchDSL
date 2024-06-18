@@ -5,110 +5,109 @@ declare(strict_types = 1);
 namespace Biano\ElasticsearchDSL\Tests\Unit\Suggest;
 
 use Biano\ElasticsearchDSL\Suggest\Suggest;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SuggestTest extends TestCase
 {
 
-    /**
-     * Tests getType method.
-     */
     public function testSuggestGetType(): void
     {
         $suggest = new Suggest('foo', 'term', 'acme', 'bar');
-        $this->assertEquals('term', $suggest->getType());
+
+        self::assertEquals('term', $suggest->getType());
     }
 
     /**
-     * Data provider for testtoArray():array
-     *
-     * @return array[]
+     * @param array<string,mixed> $expected
      */
-    public function getTestToArrayData(): array
+    #[DataProvider('provideToArray')]
+    public function testToArray(Suggest $suggest, array $expected): void
     {
-        return [
-            [
-                'suggest' => new Suggest(
-                    'foo',
-                    'term',
-                    'bar',
-                    'acme',
-                    ['size' => 5],
-                ),
-                'expected' => [
-                    'foo' => [
-                        'text' => 'bar',
-                        'term' => [
-                            'field' => 'acme',
-                            'size' => 5,
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'suggest' => new Suggest(
-                    'foo',
-                    'phrase',
-                    'bar',
-                    'acme',
-                    ['max_errors' => 0.5],
-                ),
-                'expected' => [
-                    'foo' => [
-                        'text' => 'bar',
-                        'phrase' => [
-                            'field' => 'acme',
-                            'max_errors' => 0.5,
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'suggest' => new Suggest(
-                    'foo',
-                    'completion',
-                    'bar',
-                    'acme',
-                    ['fuzziness' => 2],
-                ),
-                'expected' => [
-                    'foo' => [
-                        'text' => 'bar',
-                        'completion' => [
-                            'field' => 'acme',
-                            'fuzziness' => 2,
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'suggest' => new Suggest(
-                    'foo',
-                    'completion',
-                    'bar',
-                    'acme',
-                    ['context' => ['color' => 'red'], 'size' => 3],
-                ),
-                'expected' => [
-                    'foo' => [
-                        'text' => 'bar',
-                        'completion' => [
-                            'field' => 'acme',
-                            'size' => 3,
-                            'context' => ['color' => 'red'],
-                        ],
+        self::assertEquals($expected, $suggest->toArray());
+    }
+
+    /**
+     * @return iterable<array<string,mixed>>
+     */
+    public static function provideToArray(): iterable
+    {
+        yield [
+            'suggest' => new Suggest(
+                'foo',
+                'term',
+                'bar',
+                'acme',
+                ['size' => 5],
+            ),
+            'expected' => [
+                'foo' => [
+                    'text' => 'bar',
+                    'term' => [
+                        'field' => 'acme',
+                        'size' => 5,
                     ],
                 ],
             ],
         ];
-    }
 
-    /**
-     * @dataProvider getTestToArrayData()
-     */
-    public function testToArray(Suggest $suggest, array $expected): void
-    {
-        $this->assertEquals($expected, $suggest->toArray());
+        yield [
+            'suggest' => new Suggest(
+                'foo',
+                'phrase',
+                'bar',
+                'acme',
+                ['max_errors' => 0.5],
+            ),
+            'expected' => [
+                'foo' => [
+                    'text' => 'bar',
+                    'phrase' => [
+                        'field' => 'acme',
+                        'max_errors' => 0.5,
+                    ],
+                ],
+            ],
+        ];
+
+        yield [
+            'suggest' => new Suggest(
+                'foo',
+                'completion',
+                'bar',
+                'acme',
+                ['fuzziness' => 2],
+            ),
+            'expected' => [
+                'foo' => [
+                    'text' => 'bar',
+                    'completion' => [
+                        'field' => 'acme',
+                        'fuzziness' => 2,
+                    ],
+                ],
+            ],
+        ];
+
+        yield [
+            'suggest' => new Suggest(
+                'foo',
+                'completion',
+                'bar',
+                'acme',
+                ['context' => ['color' => 'red'], 'size' => 3],
+            ),
+            'expected' => [
+                'foo' => [
+                    'text' => 'bar',
+                    'completion' => [
+                        'field' => 'acme',
+                        'size' => 3,
+                        'context' => ['color' => 'red'],
+                    ],
+                ],
+            ],
+        ];
     }
 
 }

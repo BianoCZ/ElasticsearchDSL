@@ -11,18 +11,15 @@ use PHPUnit\Framework\TestCase;
 class CompositeAggregationTest extends TestCase
 {
 
-    /**
-     * Test for composite aggregation toArray() method exception.
-     */
     public function testToArray(): void
     {
         $compositeAgg = new CompositeAggregation('composite_test_agg');
         $termsAgg = new TermsAggregation('test_term_agg', 'test_field');
         $compositeAgg->addSource($termsAgg);
 
-        $expectedResult = [
+        $expected = [
             'composite' => [
-                'sources' =>  [
+                'sources' => [
                     [
                         'test_term_agg' => [ 'terms' => ['field' => 'test_field'] ],
                     ],
@@ -30,12 +27,9 @@ class CompositeAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedResult, $compositeAgg->toArray());
+        self::assertEquals($expected, $compositeAgg->toArray());
     }
 
-    /**
-     * Test for composite aggregation toArray() method with size and after part.
-     */
     public function testToArrayWithSizeAndAfter(): void
     {
         $compositeAgg = new CompositeAggregation('composite_test_agg');
@@ -44,9 +38,9 @@ class CompositeAggregationTest extends TestCase
         $compositeAgg->setSize(5);
         $compositeAgg->setAfter(['test_term_agg' => 'test']);
 
-        $expectedResult = [
+        $expected = [
             'composite' => [
-                'sources' =>  [
+                'sources' => [
                     [
                         'test_term_agg' => [ 'terms' => ['field' => 'test_field'] ],
                     ],
@@ -56,39 +50,31 @@ class CompositeAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedResult, $compositeAgg->toArray());
+        self::assertEquals($expected, $compositeAgg->toArray());
     }
 
-    /**
-     * Test for composite aggregation getSize() method.
-     */
     public function testGetSize(): void
     {
         $compositeAgg = new CompositeAggregation('composite_test_agg');
         $compositeAgg->setSize(5);
 
-        $this->assertEquals(5, $compositeAgg->getSize());
+        self::assertEquals(5, $compositeAgg->getSize());
     }
 
-    /**
-     * Test for composite aggregation getAfter() method.
-     */
     public function testGetAfter(): void
     {
         $compositeAgg = new CompositeAggregation('composite_test_agg');
         $compositeAgg->setAfter(['test_term_agg' => 'test']);
 
-        $this->assertEquals(['test_term_agg' => 'test'], $compositeAgg->getAfter());
+        self::assertEquals(['test_term_agg' => 'test'], $compositeAgg->getAfter());
     }
 
-    /**
-     * Tests getType method.
-     */
     public function testGetType(): void
     {
         $aggregation = new CompositeAggregation('foo');
         $result = $aggregation->getType();
-        $this->assertEquals('composite', $result);
+
+        self::assertEquals('composite', $result);
     }
 
     public function testTermsSourceWithOrderParameter(): void
@@ -98,9 +84,9 @@ class CompositeAggregationTest extends TestCase
         $termsAgg->addParameter('order', 'asc');
         $compositeAgg->addSource($termsAgg);
 
-        $expectedResult = [
+        $expected = [
             'composite' => [
-                'sources' =>  [
+                'sources' => [
                     [
                         'test_term_agg' => [ 'terms' => ['field' => 'test_field', 'order' => 'asc'] ],
                     ],
@@ -108,7 +94,7 @@ class CompositeAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedResult, $compositeAgg->toArray());
+        self::assertEquals($expected, $compositeAgg->toArray());
     }
 
     public function testTermsSourceWithDescOrderParameter(): void
@@ -118,9 +104,9 @@ class CompositeAggregationTest extends TestCase
         $termsAgg->addParameter('order', 'desc');
         $compositeAgg->addSource($termsAgg);
 
-        $expectedResult = [
+        $expected = [
             'composite' => [
-                'sources' =>  [
+                'sources' => [
                     [
                         'test_term_agg' => [ 'terms' => ['field' => 'test_field', 'order' => 'desc'] ],
                     ],
@@ -128,7 +114,7 @@ class CompositeAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedResult, $compositeAgg->toArray());
+        self::assertEquals($expected, $compositeAgg->toArray());
     }
 
     public function testMultipleSourcesWithDifferentOrders(): void
@@ -143,9 +129,9 @@ class CompositeAggregationTest extends TestCase
         $termsAgg->addParameter('order', 'asc');
         $compositeAgg->addSource($termsAgg);
 
-        $expectedResult = [
+        $expected = [
             'composite' => [
-                'sources' =>  [
+                'sources' => [
                     [
                         'test_term_agg_1' => [ 'terms' => ['field' => 'test_field', 'order' => 'desc'] ],
                     ],
@@ -156,7 +142,7 @@ class CompositeAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedResult, $compositeAgg->toArray());
+        self::assertEquals($expected, $compositeAgg->toArray());
     }
 
 }

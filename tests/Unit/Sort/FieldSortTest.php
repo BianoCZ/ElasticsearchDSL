@@ -12,15 +12,13 @@ use PHPUnit\Framework\TestCase;
 class FieldSortTest extends TestCase
 {
 
-    /**
-     * Test for toArray() method.
-     */
     public function testToArray(): void
     {
         $nestedFilter = new NestedSort('somePath', new TermQuery('somePath.id', 10));
         $sort = new FieldSort('someField', 'asc');
         $sort->setNestedFilter($nestedFilter);
 
+        $result = $sort->toArray();
         $expected = [
             'someField' => [
                 'nested' => [
@@ -32,8 +30,8 @@ class FieldSortTest extends TestCase
                 'order'  => 'asc',
             ],
         ];
-        $result = $sort->toArray();
-        $this->assertEquals($expected, $result);
+
+        self::assertEquals($expected, $result);
     }
 
 }

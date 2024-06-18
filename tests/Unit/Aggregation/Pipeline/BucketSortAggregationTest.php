@@ -8,15 +8,9 @@ use Biano\ElasticsearchDSL\Aggregation\Pipeline\BucketSortAggregation;
 use Biano\ElasticsearchDSL\Sort\FieldSort;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for the bucket sort aggregation.
- */
 class BucketSortAggregationTest extends TestCase
 {
 
-    /**
-     * Tests toArray method.
-     */
     public function testToArray(): void
     {
         $aggregation = new BucketSortAggregation('acme', 'test');
@@ -25,7 +19,7 @@ class BucketSortAggregationTest extends TestCase
             'bucket_sort' => ['buckets_path' => 'test'],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
 
         $aggregation = new BucketSortAggregation('acme');
 
@@ -33,7 +27,7 @@ class BucketSortAggregationTest extends TestCase
             'bucket_sort' => [],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
 
         $aggregation = new BucketSortAggregation('acme');
         $sort = new FieldSort('test_field', FieldSort::ASC);
@@ -49,7 +43,7 @@ class BucketSortAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
 
         $aggregation = new BucketSortAggregation('acme');
         $sort = new FieldSort('test_field', FieldSort::ASC);
@@ -69,7 +63,7 @@ class BucketSortAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
 }

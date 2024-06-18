@@ -9,15 +9,9 @@ use Biano\ElasticsearchDSL\Query\Span\SpanNearQuery;
 use Biano\ElasticsearchDSL\Query\Span\SpanTermQuery;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for FieldMaskingSpanQuery.
- */
 class FieldMaskingSpanQueryTest extends TestCase
 {
 
-    /**
-     * Tests for toArray().
-     */
     public function testToArray(): void
     {
         $spanTermQuery = new SpanTermQuery('text', 'quick brown');
@@ -31,7 +25,8 @@ class FieldMaskingSpanQueryTest extends TestCase
         $spanNearQuery->setSlop(5);
         $spanNearQuery->addParameter('in_order', false);
 
-        $result = [
+        $result = $spanNearQuery->toArray();
+        $expected = [
             'span_near' => [
                 'clauses' => [
                     [
@@ -49,7 +44,7 @@ class FieldMaskingSpanQueryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($result, $spanNearQuery->toArray());
+        self::assertEquals($expected, $result);
     }
 
 }

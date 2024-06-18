@@ -6,78 +6,46 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
 use Biano\ElasticsearchDSL\Aggregation\Bucketing\GeoDistanceAggregation;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class GeoDistanceAggregationTest extends TestCase
 {
 
-    /**
-     * Test if exception is thrown when field is not set.
-     */
     public function testGeoDistanceAggregationExceptionWhenFieldIsNotSet(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Geo distance aggregation must have a field set.');
-        $agg = new GeoDistanceAggregation('test_agg');
-        $agg->setOrigin('50, 70');
-        $agg->getArray();
+
+        $aggregation = new GeoDistanceAggregation('test_agg');
+        $aggregation->setOrigin('50, 70');
+        $aggregation->getArray();
     }
 
-    /**
-     * Test if exception is thrown when origin is not set.
-     */
     public function testGeoDistanceAggregationExceptionWhenOriginIsNotSet(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Geo distance aggregation must have an origin set.');
-        $agg = new GeoDistanceAggregation('test_agg');
-        $agg->setField('location');
-        $agg->getArray();
+
+        $aggregation = new GeoDistanceAggregation('test_agg');
+        $aggregation->setField('location');
+        $aggregation->getArray();
     }
 
-    /**
-     * Test if exception is thrown when field is not set.
-     */
     public function testGeoDistanceAggregationAddRangeException(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Either from or to must be set. Both cannot be null.');
-        $agg = new GeoDistanceAggregation('test_agg');
-        $agg->addRange();
+
+        $aggregation = new GeoDistanceAggregation('test_agg');
+        $aggregation->addRange();
     }
 
     /**
-     * Data provider for testGeoDistanceAggregationGetArray().
+     * @param array<string,mixed> $filterData
+     * @param array<string,mixed> $expected
      */
-    public function getGeoDistanceAggregationGetArrayDataProvider(): array
-    {
-        $out = [];
-        $filterData = [
-            'field' => 'location',
-            'origin' => '52.3760, 4.894',
-            'unit' => 'mi',
-            'distance_type' => 'plane',
-            'ranges' => [100, 300],
-        ];
-
-        $expectedResults = [
-            'field' => 'location',
-            'origin' => '52.3760, 4.894',
-            'unit' => 'mi',
-            'distance_type' => 'plane',
-            'ranges' => [['from' => 100, 'to' => 300]],
-        ];
-
-        $out[] = [$filterData, $expectedResults];
-
-        return $out;
-    }
-
-    /**
-     * Tests getArray method.
-     *
-     * @dataProvider getGeoDistanceAggregationGetArrayDataProvider
-     */
+    #[DataProvider('provideGeoDistanceAggregationGetArray')]
     public function testGeoDistanceAggregationGetArray(array $filterData, array $expected): void
     {
         $aggregation = new GeoDistanceAggregation('foo');
@@ -88,22 +56,46 @@ class GeoDistanceAggregationTest extends TestCase
         $aggregation->addRange($filterData['ranges'][0], $filterData['ranges'][1]);
 
         $result = $aggregation->getArray();
-        $this->assertEquals($result, $expected);
+
+        self::assertEquals($expected, $result);
     }
 
     /**
-     * Tests getType method.
+     * @return iterable<array<string,mixed>>
      */
+    public static function provideGeoDistanceAggregationGetArray(): iterable
+    {
+        $filterData = [
+            'field' => 'location',
+            'origin' => '52.3760, 4.894',
+            'unit' => 'mi',
+            'distance_type' => 'plane',
+            'ranges' => [100, 300],
+        ];
+
+        $expected = [
+            'field' => 'location',
+            'origin' => '52.3760, 4.894',
+            'unit' => 'mi',
+            'distance_type' => 'plane',
+            'ranges' => [['from' => 100, 'to' => 300]],
+        ];
+
+        yield [
+            'filterData' => $filterData,
+            'expected' => $expected,
+        ];
+    }
+
     public function testGeoDistanceAggregationGetType(): void
     {
         $aggregation = new GeoDistanceAggregation('foo');
+
         $result = $aggregation->getType();
-        $this->assertEquals('geo_distance', $result);
+
+        self::assertEquals('geo_distance', $result);
     }
 
-    /**
-     * Tests if parameters can be passed to constructor.
-     */
     public function testConstructorFilter(): void
     {
         $aggregation = new GeoDistanceAggregation(
@@ -119,7 +111,7 @@ class GeoDistanceAggregationTest extends TestCase
             'distanceTypeValue',
         );
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'geo_distance' => [
                     'field' => 'fieldName',

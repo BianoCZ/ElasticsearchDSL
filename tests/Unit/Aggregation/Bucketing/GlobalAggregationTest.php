@@ -6,6 +6,7 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
 use Biano\ElasticsearchDSL\Aggregation\Bucketing\GlobalAggregation;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use function json_encode;
@@ -14,22 +15,32 @@ class GlobalAggregationTest extends TestCase
 {
 
     /**
-     * Data provider for testToArray().
+     * @param array<string,mixed> $expected
      */
-    public function getToArrayData(): array
+    #[DataProvider('provideToArray')]
+    public function testToArray(GlobalAggregation $aggregation, array $expected): void
     {
-        $out = [];
+        self::assertEquals(
+            json_encode($expected),
+            json_encode($aggregation->toArray()),
+        );
+    }
 
+    /**
+     * @return iterable<array<string,mixed>>
+     */
+    public static function provideToArray(): iterable
+    {
         // Case #0 global aggregation.
         $aggregation = new GlobalAggregation('test_agg');
 
-        $result = [
+        $expected = [
             'global' => new stdClass(),
         ];
 
-        $out[] = [
-            $aggregation,
-            $result,
+        yield [
+            'aggregation' => $aggregation,
+            'expected' => $expected,
         ];
 
         // Case #1 nested global aggregation.
@@ -37,32 +48,17 @@ class GlobalAggregationTest extends TestCase
         $aggregation2 = new GlobalAggregation('test_agg_2');
         $aggregation->addAggregation($aggregation2);
 
-        $result = [
+        $expected = [
             'global' => new stdClass(),
             'aggregations' => [
                 $aggregation2->getName() => $aggregation2->toArray(),
             ],
         ];
 
-        $out[] = [
-            $aggregation,
-            $result,
+        yield [
+            'aggregation' => $aggregation,
+            'expected' => $expected,
         ];
-
-        return $out;
-    }
-
-    /**
-     * Test for global aggregation toArray() method.
-     *
-     * @dataProvider getToArrayData
-     */
-    public function testToArray(GlobalAggregation $aggregation, array $expectedResult): void
-    {
-        $this->assertEquals(
-            json_encode($expectedResult),
-            json_encode($aggregation->toArray()),
-        );
     }
 
     /**
@@ -71,6 +67,7 @@ class GlobalAggregationTest extends TestCase
     public function testSetField(): void
     {
         $this->expectException(LogicException::class);
+
         $aggregation = new GlobalAggregation('test_agg');
         $aggregation->setField('test_field');
     }

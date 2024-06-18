@@ -7,15 +7,9 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Pipeline;
 use Biano\ElasticsearchDSL\Aggregation\Pipeline\MaxBucketAggregation;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for max bucket aggregation.
- */
 class MaxBucketAggregationTest extends TestCase
 {
 
-    /**
-     * Tests toArray method.
-     */
     public function testToArray(): void
     {
         $aggregation = new MaxBucketAggregation('acme', 'test');
@@ -24,7 +18,7 @@ class MaxBucketAggregationTest extends TestCase
             'max_bucket' => ['buckets_path' => 'test'],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
 }

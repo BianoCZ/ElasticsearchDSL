@@ -10,24 +10,19 @@ use PHPUnit\Framework\TestCase;
 class AudoDateHistogramAggregationTest extends TestCase
 {
 
-    /**
-     * Tests agg.
-     */
     public function testAutoDateHistogramAggregationSetField(): void
     {
         // Case #0 terms aggregation.
         $aggregation = new AutoDateHistogramAggregation('test_agg', 'test_field');
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'auto_date_histogram' => ['field' => 'test_field'],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests setSize method.
-     */
     public function testAutoDateHistogramAggregationFormat(): void
     {
         $date = '2020-12-25';
@@ -35,7 +30,8 @@ class AudoDateHistogramAggregationTest extends TestCase
         $aggregation = new AutoDateHistogramAggregation('test_agg', 'test_field');
         $aggregation->addParameter('format', $date);
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'auto_date_histogram' => [
                 'field' => 'test_field',
                 'format' => $date,
@@ -43,24 +39,22 @@ class AudoDateHistogramAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
 
         // Case #2
         $aggregation = new AutoDateHistogramAggregation('test_agg', 'test_field', null, $date);
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'auto_date_histogram' => [
                 'field' => 'test_field',
                 'format' => $date,
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests buckets.
-     */
     public function testAutoDateHistogramAggregationBuckets(): void
     {
         // Case #1
@@ -69,37 +63,38 @@ class AudoDateHistogramAggregationTest extends TestCase
 
         $aggregation->addParameter('buckets', 5);
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'auto_date_histogram' => [
                 'field' => 'test_field',
                 'buckets' => 5,
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
 
         // Case #2
         $aggregation = new AutoDateHistogramAggregation('test_agg', 'wrong_field', 5);
         $aggregation->setField('test_field');
 
-        $result = [
+        $result = $aggregation->toArray();
+        $expected = [
             'auto_date_histogram' => [
                 'field' => 'test_field',
                 'buckets' => 5,
             ],
         ];
 
-        $this->assertEquals($aggregation->toArray(), $result);
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests getType method.
-     */
     public function testAutoDateHistogramAggregationGetType(): void
     {
         $aggregation = new AutoDateHistogramAggregation('foo', 'bar');
+
         $result = $aggregation->getType();
-        $this->assertEquals('auto_date_histogram', $result);
+
+        self::assertEquals('auto_date_histogram', $result);
     }
 
 }

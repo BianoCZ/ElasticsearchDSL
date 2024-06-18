@@ -8,15 +8,9 @@ use Biano\ElasticsearchDSL\Aggregation\Metric\TopHitsAggregation;
 use Biano\ElasticsearchDSL\Sort\FieldSort;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit tests for top hits aggregation.
- */
 class TopHitsAggregationTest extends TestCase
 {
 
-    /**
-     * Check if aggregation returns the expected array.
-     */
     public function testToArray(): void
     {
         $sort = new FieldSort('acme', FieldSort::ASC);
@@ -32,12 +26,9 @@ class TopHitsAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertSame($expected, $aggregation->toArray());
+        self::assertSame($expected, $aggregation->toArray());
     }
 
-    /**
-     * Check if parameters can be set to agg.
-     */
     public function testParametersAddition(): void
     {
         $aggregation = new TopHitsAggregation('acme', 0, 1);
@@ -53,7 +44,7 @@ class TopHitsAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertSame($expected, $aggregation->toArray());
+        self::assertSame($expected, $aggregation->toArray());
     }
 
 }

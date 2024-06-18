@@ -10,17 +10,15 @@ use PHPUnit\Framework\TestCase;
 class TypeQueryTest extends TestCase
 {
 
-    /**
-     * Test for query toArray() method.
-     */
     public function testToArray(): void
     {
         $query = new TypeQuery('foo');
-        $expectedResult = [
+
+        $expected = [
             'type' => ['value' => 'foo'],
         ];
 
-        $this->assertEquals($expectedResult, $query->toArray());
+        self::assertEquals($expected, $query->toArray());
     }
 
 }

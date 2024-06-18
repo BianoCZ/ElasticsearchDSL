@@ -8,27 +8,23 @@ use Biano\ElasticsearchDSL\Query\Span\SpanNearQuery;
 use Biano\ElasticsearchDSL\Query\Span\SpanQueryInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for SpanNearQuery.
- */
 class SpanNearQueryTest extends TestCase
 {
 
-    /**
-     * Tests for toArray().
-     */
     public function testToArray(): void
     {
-        $mock = $this->getMockBuilder(SpanQueryInterface::class)->getMock();
+        $mock = $this->createMock(SpanQueryInterface::class);
         $mock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('toArray')
             ->willReturn(['span_term' => ['key' => 'value']]);
 
         $query = new SpanNearQuery(['in_order' => false]);
         $query->setSlop(5);
         $query->addQuery($mock);
-        $result = [
+
+        $result = $query->toArray();
+        $expected = [
             'span_near' => [
                 'clauses' => [
                     0 => [
@@ -39,7 +35,8 @@ class SpanNearQueryTest extends TestCase
                 'in_order' => false,
             ],
         ];
-        $this->assertEquals($result, $query->toArray());
+
+        self::assertEquals($expected, $result);
     }
 
 }

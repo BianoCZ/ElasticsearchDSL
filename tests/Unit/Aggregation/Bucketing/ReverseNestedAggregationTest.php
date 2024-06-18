@@ -13,9 +13,6 @@ use function json_encode;
 class ReverseNestedAggregationTest extends TestCase
 {
 
-    /**
-     * Test for reverse_nested aggregation toArray() method exception.
-     */
     public function testToArray(): void
     {
         $termAggregation = new TermsAggregation('acme');
@@ -24,19 +21,16 @@ class ReverseNestedAggregationTest extends TestCase
         $aggregation->setPath('test_path');
         $aggregation->addAggregation($termAggregation);
 
-        $expectedResult = [
+        $expected = [
             'reverse_nested' => ['path' => 'test_path'],
             'aggregations' => [
                 $termAggregation->getName() => $termAggregation->toArray(),
             ],
         ];
 
-        $this->assertEquals($expectedResult, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
-    /**
-     * Test for reverse_nested aggregation toArray() without path.
-     */
     public function testToArrayNoPath(): void
     {
         $termAggregation = new TermsAggregation('acme');
@@ -44,15 +38,15 @@ class ReverseNestedAggregationTest extends TestCase
         $aggregation = new ReverseNestedAggregation('test_nested_agg');
         $aggregation->addAggregation($termAggregation);
 
-        $expectedResult = [
+        $expected = [
             'reverse_nested' => new stdClass(),
             'aggregations' => [
                 $termAggregation->getName() => $termAggregation->toArray(),
             ],
         ];
 
-        $this->assertEquals(
-            json_encode($expectedResult),
+        self::assertEquals(
+            json_encode($expected),
             json_encode($aggregation->toArray()),
         );
     }

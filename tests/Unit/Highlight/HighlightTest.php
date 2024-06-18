@@ -11,84 +11,72 @@ use StdClass;
 class HighlightTest extends TestCase
 {
 
-    /**
-     * Tests GetType method, it should return 'highlight'.
-     */
     public function testGetType(): void
     {
         $highlight = new Highlight();
+
         $result = $highlight->getType();
-        $this->assertEquals('highlight', $result);
+
+        self::assertEquals('highlight', $result);
     }
 
-    /**
-     * Tests ParametersTrait hasParameter method.
-     */
     public function testTraitHasParameter(): void
     {
         $highlight = new Highlight();
         $highlight->addParameter('_source', ['include' => ['title']]);
+
         $result = $highlight->hasParameter('_source');
-        $this->assertTrue($result);
+
+        self::assertTrue($result);
     }
 
-    /**
-     * Tests ParametersTrait removeParameter method.
-     */
     public function testTraitRemoveParameter(): void
     {
         $highlight = new Highlight();
         $highlight->addParameter('_source', ['include' => ['title']]);
         $highlight->removeParameter('_source');
+
         $result = $highlight->hasParameter('_source');
-        $this->assertFalse($result);
+
+        self::assertFalse($result);
     }
 
-    /**
-     * Tests ParametersTrait getParameter method.
-     */
     public function testTraitGetParameter(): void
     {
         $highlight = new Highlight();
         $highlight->addParameter('_source', ['include' => 'title']);
-        $expectedResult = ['include' => 'title'];
-        $this->assertEquals($expectedResult, $highlight->getParameter('_source'));
+
+        $expected = ['include' => 'title'];
+
+        self::assertEquals($expected, $highlight->getParameter('_source'));
     }
 
-    /**
-     * Tests ParametersTrait getParameters and setParameters methods.
-     */
     public function testTraitSetGetParameters(): void
     {
         $highlight = new Highlight();
         $highlight->setParameters(
             [
-                '_source',
-                ['include' => 'title'],
-                'content',
-                ['force_source' => true],
+                '_source' => ['include' => 'title'],
+                'content' => ['force_source' => true],
             ],
         );
-        $expectedResult = [
-            '_source',
-            ['include' => 'title'],
-            'content',
-            ['force_source' => true],
+        $expected = [
+            '_source' => ['include' => 'title'],
+            'content' => ['force_source' => true],
         ];
-        $this->assertEquals($expectedResult, $highlight->getParameters());
+
+        self::assertEquals($expected, $highlight->getParameters());
     }
 
-    /**
-     * Test toArray method.
-     */
     public function testToArray(): void
     {
         $highlight = new Highlight();
         $highlight->addField('ok');
         $highlight->addParameter('_source', ['include' => ['title']]);
         $highlight->setTags(['<tag>'], ['</tag>']);
+
         $result = $highlight->toArray();
-        $expectedResult = [
+        $expected = [
             'fields' => [
                 'ok' => new stdClass(),
             ],
@@ -98,7 +86,8 @@ class HighlightTest extends TestCase
             'pre_tags' => ['<tag>'],
             'post_tags' => ['</tag>'],
         ];
-        $this->assertEquals($expectedResult, $result);
+
+        self::assertEquals($expected, $result);
     }
 
 }

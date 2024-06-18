@@ -26,7 +26,8 @@ class ParentInnerHitTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $hit->toArray());
+
+        self::assertEquals($expected, $hit->toArray());
     }
 
 }

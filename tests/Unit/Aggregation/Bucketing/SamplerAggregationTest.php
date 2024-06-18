@@ -8,25 +8,18 @@ use Biano\ElasticsearchDSL\Aggregation\Bucketing\SamplerAggregation;
 use Biano\ElasticsearchDSL\Aggregation\Bucketing\TermsAggregation;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for children aggregation.
- */
 class SamplerAggregationTest extends TestCase
 {
 
-    /**
-     * Tests getType method.
-     */
     public function testGetType(): void
     {
         $aggregation = new SamplerAggregation('foo');
+
         $result = $aggregation->getType();
-        $this->assertEquals('sampler', $result);
+
+        self::assertEquals('sampler', $result);
     }
 
-    /**
-     * Tests toArray method.
-     */
     public function testToArray(): void
     {
         $termAggregation = new TermsAggregation('acme');
@@ -35,6 +28,7 @@ class SamplerAggregationTest extends TestCase
         $aggregation->addAggregation($termAggregation);
         $aggregation->setField('name');
         $aggregation->setShardSize(200);
+
         $result = $aggregation->toArray();
         $expected = [
             'sampler' => [
@@ -45,16 +39,15 @@ class SamplerAggregationTest extends TestCase
                 $termAggregation->getName() => $termAggregation->toArray(),
             ],
         ];
-        $this->assertEquals($expected, $result);
+
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests getArray method without provided shard size.
-     */
     public function testGetArrayNoShardSize(): void
     {
         $aggregation = new SamplerAggregation('foo', 'bar');
-        $this->assertEquals(['field' => 'bar'], $aggregation->getArray());
+
+        self::assertEquals(['field' => 'bar'], $aggregation->getArray());
     }
 
 }

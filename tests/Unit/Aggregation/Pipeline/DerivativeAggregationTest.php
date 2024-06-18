@@ -7,15 +7,9 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Pipeline;
 use Biano\ElasticsearchDSL\Aggregation\Pipeline\DerivativeAggregation;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for derivative aggregation.
- */
 class DerivativeAggregationTest extends TestCase
 {
 
-    /**
-     * Tests toArray method.
-     */
     public function testToArray(): void
     {
         $aggregation = new DerivativeAggregation('foo', 'foo>bar');
@@ -28,7 +22,7 @@ class DerivativeAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
 }

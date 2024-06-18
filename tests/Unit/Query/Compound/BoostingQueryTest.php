@@ -11,16 +11,10 @@ use PHPUnit\Framework\TestCase;
 class BoostingQueryTest extends TestCase
 {
 
-    /**
-     * Tests toArray().
-     */
     public function testToArray(): void
     {
-        $mock = $this->getMockBuilder(BuilderInterface::class)->getMock();
-        $mock
-            ->expects($this->any())
-            ->method('toArray')
-            ->willReturn(['term' => ['foo' => 'bar']]);
+        $mock = $this->createMock(BuilderInterface::class);
+        $mock->expects(self::any())->method('toArray')->willReturn(['term' => ['foo' => 'bar']]);
 
         $query = new BoostingQuery($mock, $mock, 0.2);
         $expected = [
@@ -31,7 +25,7 @@ class BoostingQueryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $query->toArray());
+        self::assertEquals($expected, $query->toArray());
     }
 
 }

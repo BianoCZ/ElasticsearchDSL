@@ -36,7 +36,7 @@ class BoolQuery implements BuilderInterface
     private array $container = [];
 
     /**
-     * @param array<string,array<string,\Biano\ElasticsearchDSL\BuilderInterface>|\Biano\ElasticsearchDSL\BuilderInterface> $container
+     * @param array<string,list<\Biano\ElasticsearchDSL\BuilderInterface>|\Biano\ElasticsearchDSL\BuilderInterface> $container
      */
     public function __construct(array $container = [])
     {

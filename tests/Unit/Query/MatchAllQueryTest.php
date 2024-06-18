@@ -11,23 +11,19 @@ use stdClass;
 class MatchAllQueryTest extends TestCase
 {
 
-    /**
-     * Tests toArray().
-     */
     public function testToArrayWhenThereAreNoParams(): void
     {
         $query = new MatchAllQuery();
-        $this->assertEquals(['match_all' => new stdClass()], $query->toArray());
+
+        self::assertEquals(['match_all' => new stdClass()], $query->toArray());
     }
 
-    /**
-     * Tests toArray().
-     */
     public function testToArrayWithParams(): void
     {
         $params = ['boost' => 5];
         $query = new MatchAllQuery($params);
-        $this->assertEquals(['match_all' => $params], $query->toArray());
+
+        self::assertEquals(['match_all' => $params], $query->toArray());
     }
 
 }

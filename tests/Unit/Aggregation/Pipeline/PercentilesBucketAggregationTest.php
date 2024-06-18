@@ -7,15 +7,9 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Pipeline;
 use Biano\ElasticsearchDSL\Aggregation\Pipeline\PercentilesBucketAggregation;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for percentiles bucket aggregation.
- */
 class PercentilesBucketAggregationTest extends TestCase
 {
 
-    /**
-     * Tests toArray method.
-     */
     public function testToArray(): void
     {
         $aggregation = new PercentilesBucketAggregation('acme', 'test');
@@ -28,7 +22,7 @@ class PercentilesBucketAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
 }

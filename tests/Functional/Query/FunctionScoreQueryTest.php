@@ -36,26 +36,23 @@ class FunctionScoreQueryTest extends AbstractElasticsearchTestCase
         ];
     }
 
-    /**
-     * Match all test
-     */
     public function testRandomScore(): void
     {
-        $fquery = new FunctionScoreQuery(new MatchAllQuery());
-        $fquery->addRandomFunction();
-        $fquery->addParameter('boost_mode', 'multiply');
+        $query = new FunctionScoreQuery(new MatchAllQuery());
+        $query->addRandomFunction();
+        $query->addParameter('boost_mode', 'multiply');
 
         $search = new Search();
-        $search->addQuery($fquery);
+        $search->addQuery($query);
         $results = $this->executeSearch($search);
 
-        $this->assertEquals(count($this->getDataArray()['product']), count($results));
+        self::assertEquals(count($this->getDataArray()['product']), count($results));
     }
 
     public function testScriptScore(): void
     {
-        $fquery = new FunctionScoreQuery(new MatchAllQuery());
-        $fquery->addScriptScoreFunction(
+        $query = new FunctionScoreQuery(new MatchAllQuery());
+        $query->addScriptScoreFunction(
             "
             if (doc['price'].value < params.target) 
              {
@@ -70,11 +67,11 @@ class FunctionScoreQueryTest extends AbstractElasticsearchTestCase
         );
 
         $search = new Search();
-        $search->addQuery($fquery);
+        $search->addQuery($query);
         $results = $this->executeSearch($search);
 
         foreach ($results as $document) {
-            $this->assertLessThanOrEqual(20, $document['price']);
+            self::assertLessThanOrEqual(20, $document['price']);
         }
     }
 

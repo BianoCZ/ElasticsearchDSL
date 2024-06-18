@@ -38,9 +38,6 @@ class DateHistogramAggregationTest extends AbstractElasticsearchTestCase
         ];
     }
 
-    /**
-     * Match all test
-     */
     public function testDateHistogramWithMinuteCalendarInterval(): void
     {
         $histogram = new DateHistogramAggregation('dates', 'created_at');
@@ -48,13 +45,12 @@ class DateHistogramAggregationTest extends AbstractElasticsearchTestCase
 
         $search = new Search();
         $search->addAggregation($histogram);
+
         $results = $this->executeSearch($search, true);
-        $this->assertCount(count($this->getDataArray()['products']), $results['aggregations']['dates']['buckets']);
+
+        self::assertCount(count($this->getDataArray()['products']), $results['aggregations']['dates']['buckets']);
     }
 
-    /**
-     * Match all test
-     */
     public function testDateHistogramWithMonthCalendarInterval(): void
     {
         $histogram = new DateHistogramAggregation('dates', 'created_at');
@@ -62,13 +58,12 @@ class DateHistogramAggregationTest extends AbstractElasticsearchTestCase
 
         $search = new Search();
         $search->addAggregation($histogram);
+
         $results = $this->executeSearch($search, true);
-        $this->assertCount(1, $results['aggregations']['dates']['buckets']);
+
+        self::assertCount(1, $results['aggregations']['dates']['buckets']);
     }
 
-    /**
-     * Match all test
-     */
     public function testDateHistogramWitMinuteFixedInterval(): void
     {
         $histogram = new DateHistogramAggregation('dates', 'created_at');
@@ -76,8 +71,10 @@ class DateHistogramAggregationTest extends AbstractElasticsearchTestCase
 
         $search = new Search();
         $search->addAggregation($histogram);
+
         $results = $this->executeSearch($search, true);
-        $this->assertCount(2, $results['aggregations']['dates']['buckets']);
+
+        self::assertCount(2, $results['aggregations']['dates']['buckets']);
     }
 
 }

@@ -7,78 +7,67 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Compound;
 use Biano\ElasticsearchDSL\BuilderInterface;
 use Biano\ElasticsearchDSL\Query\Compound\FunctionScoreQuery;
 use Biano\ElasticsearchDSL\Query\MatchAllQuery;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use function assert;
 
-/**
- * Tests for FunctionScoreQuery.
- */
 class FunctionScoreQueryTest extends TestCase
 {
 
     /**
-     * Data provider for testAddRandomFunction.
+     * @param array<string,mixed> $expected
      */
-    public function addRandomFunctionProvider(): array
+    #[DataProvider('providerAddRandomFunction')]
+    public function testAddRandomFunction(mixed $seed, array $expected): void
     {
-        return [
-            // Case #0. No seed.
-            [
-                'seed' => null,
-                'expectedArray' => [
-                    'query' => [],
-                    'functions' => [
-                        [
-                            'random_score' => new stdClass(),
-                        ],
+        $matchAllQuery = $this->createMock(MatchAllQuery::class);
+
+        $functionScoreQuery = new FunctionScoreQuery($matchAllQuery);
+        $functionScoreQuery->addRandomFunction($seed);
+
+        self::assertEquals(['function_score' => $expected], $functionScoreQuery->toArray());
+    }
+
+    /**
+     * @return iterable<array<string,mixed>>
+     */
+    public static function providerAddRandomFunction(): iterable
+    {
+        // Case #0. No seed.
+        yield [
+            'seed' => null,
+            'expected' => [
+                'query' => [],
+                'functions' => [
+                    [
+                        'random_score' => new stdClass(),
                     ],
                 ],
             ],
-            // Case #1. With seed.
-            [
-                'seed' => 'someSeed',
-                'expectedArray' => [
-                    'query' => [],
-                    'functions' => [
-                        [
-                            'random_score' => [ 'seed' => 'someSeed'],
-                        ],
+        ];
+
+        // Case #1. With seed.
+        yield [
+            'seed' => 'someSeed',
+            'expected' => [
+                'query' => [],
+                'functions' => [
+                    [
+                        'random_score' => ['seed' => 'someSeed'],
                     ],
                 ],
             ],
         ];
     }
 
-    /**
-     * Tests addRandomFunction method.
-     *
-     * @dataProvider addRandomFunctionProvider
-     */
-    public function testAddRandomFunction(mixed $seed, array $expectedArray): void
-    {
-        $matchAllQuery = $this->getMockBuilder(MatchAllQuery::class)->getMock();
-        assert($matchAllQuery instanceof MatchAllQuery || $matchAllQuery instanceof MockObject);
-
-        $functionScoreQuery = new FunctionScoreQuery($matchAllQuery);
-        $functionScoreQuery->addRandomFunction($seed);
-
-        $this->assertEquals(['function_score' => $expectedArray], $functionScoreQuery->toArray());
-    }
-
-    /**
-     * Tests default argument values.
-     */
     public function testAddFieldValueFactorFunction(): void
     {
-        $builderInterface = $this->getMockForAbstractClass(BuilderInterface::class);
-        assert($builderInterface instanceof BuilderInterface || $builderInterface instanceof MockObject);
-        $functionScoreQuery = new FunctionScoreQuery($builderInterface);
+        $mock = $this->createMock(BuilderInterface::class);
+        $functionScoreQuery = new FunctionScoreQuery($mock);
         $functionScoreQuery->addFieldValueFactorFunction('field1', 2);
         $functionScoreQuery->addFieldValueFactorFunction('field2', 1.5, 'ln');
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'query' => [],
                 'functions' => [

@@ -6,10 +6,8 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
 
 use Biano\ElasticsearchDSL\Highlight\Highlight;
 use Biano\ElasticsearchDSL\SearchEndpoint\HighlightEndpoint;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use function assert;
 use function json_encode;
 
 class HighlightEndpointTest extends TestCase
@@ -17,35 +15,26 @@ class HighlightEndpointTest extends TestCase
 
     public function testItCanBeInstantiated(): void
     {
-        $this->assertInstanceOf(HighlightEndpoint::class, new HighlightEndpoint());
+        self::assertInstanceOf(HighlightEndpoint::class, new HighlightEndpoint());
     }
 
-    /**
-     * Tests adding builder.
-     */
     public function testNormalization(): void
     {
         $instance = new HighlightEndpoint();
-        $normalizerInterface = $this->getMockForAbstractClass(
-            NormalizerInterface::class,
-        );
-        assert($normalizerInterface instanceof NormalizerInterface || $normalizerInterface instanceof MockObject);
+        $normalizerInterface = $this->createMock(NormalizerInterface::class);
 
-        $this->assertFalse($instance->normalize($normalizerInterface));
+        self::assertFalse($instance->normalize($normalizerInterface));
 
         $highlight = new Highlight();
         $highlight->addField('acme');
         $instance->add($highlight);
 
-        $this->assertEquals(
+        self::assertEquals(
             json_encode($highlight->toArray()),
             json_encode($instance->normalize($normalizerInterface)),
         );
     }
 
-    /**
-     * Tests if endpoint returns builders.
-     */
     public function testEndpointGetter(): void
     {
         $highlightName = 'acme_highlight';
@@ -56,8 +45,8 @@ class HighlightEndpointTest extends TestCase
         $endpoint->add($highlight, $highlightName);
         $builders = $endpoint->getAll();
 
-        $this->assertCount(1, $builders);
-        $this->assertSame($highlight, $builders[$highlightName]);
+        self::assertCount(1, $builders);
+        self::assertSame($highlight, $builders[$highlightName]);
     }
 
 }

@@ -8,20 +8,14 @@ use Biano\ElasticsearchDSL\BuilderInterface;
 use Biano\ElasticsearchDSL\Query\Span\SpanMultiTermQuery;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for SpanMultiTermQuery.
- */
 class SpanMultiTermQueryTest extends TestCase
 {
 
-    /**
-     * Test for toArray().
-     */
     public function testToArray(): void
     {
-        $mock = $this->getMockBuilder(BuilderInterface::class)->getMock();
+        $mock = $this->createMock(BuilderInterface::class);
         $mock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('toArray')
             ->willReturn(['prefix' => ['user' => ['value' => 'ki']]]);
 
@@ -34,7 +28,7 @@ class SpanMultiTermQueryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $query->toArray());
+        self::assertEquals($expected, $query->toArray());
     }
 
 }

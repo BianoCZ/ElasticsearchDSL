@@ -9,22 +9,18 @@ use Biano\ElasticsearchDSL\Query\Span\SpanQueryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for SpanContainingQuery.
- */
 class SpanContainingQueryTest extends TestCase
 {
 
-    /**
-     * Tests for toArray().
-     */
     public function testToArray(): void
     {
         $query = new SpanContainingQuery(
             $this->getSpanQueryMock('foo'),
             $this->getSpanQueryMock('bar'),
         );
-        $result = [
+
+        $result = $query->toArray();
+        $expected = [
             'span_containing' => [
                 'little' => [
                     'span_term' => ['user' => 'foo'],
@@ -34,19 +30,14 @@ class SpanContainingQueryTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($result, $query->toArray());
+
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * @returns \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getSpanQueryMock(string $value): MockObject
+    private function getSpanQueryMock(string $value): SpanQueryInterface&MockObject
     {
-        $mock = $this->getMockBuilder(SpanQueryInterface::class)->getMock();
-        $mock
-            ->expects($this->once())
-            ->method('toArray')
-            ->willReturn(['span_term' => ['user' => $value]]);
+        $mock = $this->createMock(SpanQueryInterface::class);
+        $mock->expects(self::once())->method('toArray')->willReturn(['span_term' => ['user' => $value]]);
 
         return $mock;
     }

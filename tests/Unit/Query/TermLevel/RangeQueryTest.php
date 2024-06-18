@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 class RangeQueryTest extends TestCase
 {
 
-    /**
-     * Tests toArray().
-     */
     public function testToArray(): void
     {
         $query = new RangeQuery('age', ['gte' => 10, 'lte' => 20]);
@@ -25,7 +22,7 @@ class RangeQueryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $query->toArray());
+        self::assertEquals($expected, $query->toArray());
     }
 
 }

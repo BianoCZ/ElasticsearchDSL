@@ -8,6 +8,7 @@ use Biano\ElasticsearchDSL\InnerHit\NestedInnerHit;
 use Biano\ElasticsearchDSL\Query\FullText\MatchQuery;
 use Biano\ElasticsearchDSL\Query\Joining\NestedQuery;
 use Biano\ElasticsearchDSL\Search;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -15,12 +16,19 @@ class NestedInnerHitTest extends TestCase
 {
 
     /**
-     * Data provider for testToArray().
+     * @param array<string,mixed> $expected
      */
-    public function getTestToArrayData(): array
+    #[DataProvider('provideToArray')]
+    public function testToArray(NestedInnerHit $innerHit, array $expected): void
     {
-        $out = [];
+        self::assertEquals($expected, $innerHit->toArray());
+    }
 
+    /**
+     * @return iterable<array<string,mixed>>
+     */
+    public static function provideToArray(): iterable
+    {
         $matchQuery = new MatchQuery('foo.bar.aux', 'foo');
         $nestedQuery = new NestedQuery('foo.bar', $matchQuery);
         $searchQuery = new Search();
@@ -37,18 +45,18 @@ class NestedInnerHitTest extends TestCase
         $searchQuery->addInnerHit($nestedInnerHit1);
         $searchQuery->addInnerHit($nestedInnerHit2);
 
-        $out[] = [
-            $emptyInnerHit,
-            [
+        yield [
+            'innerHit' => $emptyInnerHit,
+            'expected' => [
                 'path' => [
                     'foo' => new stdClass(),
                 ],
             ],
         ];
 
-        $out[] = [
-            $nestedInnerHit1,
-            [
+        yield [
+            'innerHit' => $nestedInnerHit1,
+            'expected' => [
                 'path' => [
                     'foo.bar.aux' => [
                         'query' => $matchQuery->toArray(),
@@ -57,9 +65,9 @@ class NestedInnerHitTest extends TestCase
             ],
         ];
 
-        $out[] = [
-            $innerHit,
-            [
+        yield [
+            'innerHit' => $innerHit,
+            'expected' => [
                 'path' => [
                     'foo' => [
                         'query' => $nestedQuery->toArray(),
@@ -83,23 +91,8 @@ class NestedInnerHitTest extends TestCase
                 ],
             ],
         ];
-
-        return $out;
     }
 
-    /**
-     * Tests toArray() method.
-     *
-     * @dataProvider getTestToArrayData
-     */
-    public function testToArray(NestedInnerHit $innerHit, array $expected): void
-    {
-        $this->assertEquals($expected, $innerHit->toArray());
-    }
-
-    /**
-     * Tests getters and setters for $name, $path and $query
-     */
     public function testGettersAndSetters(): void
     {
         $query = new MatchQuery('acme', 'test');
@@ -111,9 +104,9 @@ class NestedInnerHitTest extends TestCase
         $hit->setPath('bar');
         $hit->setSearch($search);
 
-        $this->assertEquals('foo', $hit->getName());
-        $this->assertEquals('bar', $hit->getPath());
-        $this->assertEquals($search, $hit->getSearch());
+        self::assertEquals('foo', $hit->getName());
+        self::assertEquals('bar', $hit->getPath());
+        self::assertEquals($search, $hit->getSearch());
     }
 
 }

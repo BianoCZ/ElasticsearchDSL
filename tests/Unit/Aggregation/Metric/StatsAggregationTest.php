@@ -10,28 +10,23 @@ use PHPUnit\Framework\TestCase;
 class StatsAggregationTest extends TestCase
 {
 
-    /**
-     * Test for stats aggregation toArray() method.
-     */
     public function testToArray(): void
     {
         $aggregation = new StatsAggregation('test_agg');
         $aggregation->setField('test_field');
 
-        $expectedResult = [
+        $expected = [
             'stats' => ['field' => 'test_field'],
         ];
 
-        $this->assertEquals($expectedResult, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
-    /**
-     * Tests if parameter can be passed to constructor.
-     */
     public function testConstructor(): void
     {
         $aggregation = new StatsAggregation('foo', 'fieldValue', 'scriptValue');
-        $this->assertSame(
+
+        self::assertSame(
             [
                 'stats' => [
                     'field' => 'fieldValue',

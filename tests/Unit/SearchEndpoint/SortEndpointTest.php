@@ -6,43 +6,32 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\SearchEndpoint;
 
 use Biano\ElasticsearchDSL\SearchEndpoint\SortEndpoint;
 use Biano\ElasticsearchDSL\Sort\FieldSort;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use function assert;
 
 class SortEndpointTest extends TestCase
 {
 
     public function testItCanBeInstantiated(): void
     {
-        $this->assertInstanceOf(SortEndpoint::class, new SortEndpoint());
+        self::assertInstanceOf(SortEndpoint::class, new SortEndpoint());
     }
 
-    /**
-     * Tests endpoint normalization.
-     */
     public function testNormalize(): void
     {
         $instance = new SortEndpoint();
 
-        $normalizerInterface = $this->getMockForAbstractClass(
-            NormalizerInterface::class,
-        );
-        assert($normalizerInterface instanceof NormalizerInterface || $normalizerInterface instanceof MockObject);
+        $normalizerInterface = $this->createMock(NormalizerInterface::class);
 
         $sort = new FieldSort('acme', ['order' => FieldSort::ASC]);
         $instance->add($sort);
 
-        $this->assertEquals(
+        self::assertEquals(
             [$sort->toArray()],
             $instance->normalize($normalizerInterface),
         );
     }
 
-    /**
-     * Tests if endpoint returns builders.
-     */
     public function testEndpointGetter(): void
     {
         $sortName = 'acme_sort';
@@ -51,8 +40,8 @@ class SortEndpointTest extends TestCase
         $endpoint->add($sort, $sortName);
         $builders = $endpoint->getAll();
 
-        $this->assertCount(1, $builders);
-        $this->assertSame($sort, $builders[$sortName]);
+        self::assertCount(1, $builders);
+        self::assertSame($sort, $builders[$sortName]);
     }
 
 }

@@ -6,55 +6,25 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
 use Biano\ElasticsearchDSL\Aggregation\Bucketing\GeoHashGridAggregation;
 use LogicException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for geohash grid aggregation.
- */
 class GeoHashGridAggregationTest extends TestCase
 {
 
-    /**
-     * Test if exception is thrown.
-     */
     public function testGeoHashGridAggregationException(): void
     {
         $this->expectException(LogicException::class);
-        $agg = new GeoHashGridAggregation('test_agg');
-        $agg->getArray();
+
+        $aggregation = new GeoHashGridAggregation('test_agg');
+        $aggregation->getArray();
     }
 
     /**
-     * Data provider for testGeoHashGridAggregationGetArray().
+     * @param array<string,mixed> $filterData
+     * @param array<string,mixed> $expected
      */
-    public function getArrayDataProvider(): array
-    {
-        $out = [];
-
-        $filterData = [
-            'field' => 'location',
-            'precision' => 3,
-            'size' => 10,
-            'shard_size' => 10,
-        ];
-
-        $expectedResults = [
-            'field' => 'location',
-            'precision' => 3,
-            'size' => 10,
-            'shard_size' => 10,
-        ];
-
-        $out[] = [$filterData, $expectedResults];
-
-        return $out;
-    }
-
-    /**
-     * Tests getArray method.
-     *
-     * @dataProvider getArrayDataProvider
-     */
+    #[DataProvider('provideGeoHashGridAggregationGetArray')]
     public function testGeoHashGridAggregationGetArray(array $filterData, array $expected): void
     {
         $aggregation = new GeoHashGridAggregation('foo');
@@ -64,17 +34,42 @@ class GeoHashGridAggregationTest extends TestCase
         $aggregation->setField($filterData['field']);
 
         $result = $aggregation->getArray();
-        $this->assertEquals($result, $expected);
+
+        self::assertEquals($expected, $result);
     }
 
     /**
-     * Tests getType method.
+     * @return iterable<array<string,mixed>>
      */
+    public static function provideGeoHashGridAggregationGetArray(): iterable
+    {
+        $filterData = [
+            'field' => 'location',
+            'precision' => 3,
+            'size' => 10,
+            'shard_size' => 10,
+        ];
+
+        $expected = [
+            'field' => 'location',
+            'precision' => 3,
+            'size' => 10,
+            'shard_size' => 10,
+        ];
+
+        yield [
+            'filterData' => $filterData,
+            'expected' => $expected,
+        ];
+    }
+
     public function testGeoHashGridAggregationGetType(): void
     {
         $aggregation = new GeoHashGridAggregation('foo');
+
         $result = $aggregation->getType();
-        $this->assertEquals('geohash_grid', $result);
+
+        self::assertEquals('geohash_grid', $result);
     }
 
 }

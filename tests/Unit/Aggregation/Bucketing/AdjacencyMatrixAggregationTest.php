@@ -6,41 +6,31 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Bucketing;
 
 use Biano\ElasticsearchDSL\Aggregation\Bucketing\AdjacencyMatrixAggregation;
 use Biano\ElasticsearchDSL\BuilderInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function assert;
 
-/**
- * Unit test for adjacency matrix aggregation.
- */
 class AdjacencyMatrixAggregationTest extends TestCase
 {
 
-    /**
-     * Test GetArray method.
-     */
     public function testFiltersAggregationGetArray(): void
     {
         $mock = $this->createMock(BuilderInterface::class);
         $aggregation = new AdjacencyMatrixAggregation('test_agg');
         $aggregation->addFilter('name', $mock);
+
         $result = $aggregation->getArray();
-        $this->assertArrayHasKey('filters', $result);
+
+        self::assertArrayHasKey('filters', $result);
     }
 
-    /**
-     * Tests getType method.
-     */
     public function testFiltersAggregationGetType(): void
     {
         $aggregation = new AdjacencyMatrixAggregation('foo');
+
         $result = $aggregation->getType();
-        $this->assertEquals('adjacency_matrix', $result);
+
+        self::assertEquals('adjacency_matrix', $result);
     }
 
-    /**
-     * Test for filter aggregation toArray() method.
-     */
     public function testToArray(): void
     {
         $aggregation = new AdjacencyMatrixAggregation('test_agg');
@@ -51,7 +41,7 @@ class AdjacencyMatrixAggregationTest extends TestCase
         $aggregation->addFilter('first', $filter);
         $aggregation->addFilter('second', $filter);
 
-        $results = $aggregation->toArray();
+        $result = $aggregation->toArray();
         $expected = [
             'adjacency_matrix' => [
                 'filters' => [
@@ -64,18 +54,14 @@ class AdjacencyMatrixAggregationTest extends TestCase
                 ],
             ],
         ];
-        $this->assertEquals($expected, $results);
+
+        self::assertEquals($expected, $result);
     }
 
-    /**
-     * Tests if filters can be passed to the constructor.
-     */
     public function testFilterConstructor(): void
     {
-        $builderInterface1 = $this->getMockForAbstractClass(BuilderInterface::class);
-        assert($builderInterface1 instanceof BuilderInterface || $builderInterface1 instanceof MockObject);
-        $builderInterface2 = $this->getMockForAbstractClass(BuilderInterface::class);
-        assert($builderInterface2 instanceof BuilderInterface || $builderInterface2 instanceof MockObject);
+        $builderInterface1 = $this->createMock(BuilderInterface::class);
+        $builderInterface2 = $this->createMock(BuilderInterface::class);
 
         $aggregation = new AdjacencyMatrixAggregation(
             'test',
@@ -85,7 +71,7 @@ class AdjacencyMatrixAggregationTest extends TestCase
             ],
         );
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'adjacency_matrix' => [
                     'filters' => [
@@ -99,7 +85,7 @@ class AdjacencyMatrixAggregationTest extends TestCase
 
         $aggregation = new AdjacencyMatrixAggregation('test');
 
-        $this->assertSame(
+        self::assertSame(
             [
                 'adjacency_matrix' => [
                     'filters' => [],

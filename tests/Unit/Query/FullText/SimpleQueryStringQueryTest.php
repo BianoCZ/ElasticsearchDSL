@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 class SimpleQueryStringQueryTest extends TestCase
 {
 
-    /**
-     * Tests toArray().
-     */
     public function testToArray(): void
     {
         $query = new SimpleQueryStringQuery('"fried eggs" +(eggplant | potato) -frittata');
@@ -20,7 +17,7 @@ class SimpleQueryStringQueryTest extends TestCase
             'simple_query_string' => ['query' => '"fried eggs" +(eggplant | potato) -frittata'],
         ];
 
-        $this->assertEquals($expected, $query->toArray());
+        self::assertEquals($expected, $query->toArray());
     }
 
 }

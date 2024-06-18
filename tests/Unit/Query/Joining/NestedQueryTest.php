@@ -6,50 +6,52 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Query\Joining;
 
 use Biano\ElasticsearchDSL\Query\Joining\NestedQuery;
 use Biano\ElasticsearchDSL\Query\TermLevel\TermsQuery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class NestedQueryTest extends TestCase
 {
 
     /**
-     * Data provider to testGetToArray.
+     * @param array<string,mixed> $parameters
+     * @param array<string,mixed> $expected
      */
-    public function getArrayDataProvider(): array
+     #[DataProvider('provideToArray')]
+    public function testToArray(string $path, array $parameters, array $expected): void
+    {
+        $query = new TermsQuery('foo', 'bar');
+        $query = new NestedQuery($path, $query, $parameters);
+
+        $result = $query->toArray();
+
+        self::assertEquals(['nested' => $expected], $result);
+    }
+
+    /**
+     * @return iterable<array<string,mixed>>
+     */
+    public static function provideToArray(): iterable
     {
         $query = [
             'terms' => ['foo' => 'bar'],
         ];
 
-        return [
-            'query_only' => [
-                'product.sub_item',
-                [],
-                ['path' => 'product.sub_item', 'query' => $query],
-            ],
-            'query_with_parameters' => [
-                'product.sub_item',
-                ['_cache' => true, '_name' => 'named_result'],
-                [
-                    'path' => 'product.sub_item',
-                    'query' => $query,
-                    '_cache' => true,
-                    '_name' => 'named_result',
-                ],
+        yield 'query_only' => [
+            'path' => 'product.sub_item',
+            'parameters' => [],
+            'expected' => ['path' => 'product.sub_item', 'query' => $query],
+        ];
+
+        yield 'query_with_parameters' => [
+            'path' => 'product.sub_item',
+            'parameters' => ['_cache' => true, '_name' => 'named_result'],
+            'expected' => [
+                'path' => 'product.sub_item',
+                'query' => $query,
+                '_cache' => true,
+                '_name' => 'named_result',
             ],
         ];
-    }
-
-    /**
-     * Test for query toArray() method.
-     *
-     * @dataProvider getArrayDataProvider
-     */
-    public function testToArray(string $path, array $parameters, array $expected): void
-    {
-        $query = new TermsQuery('foo', 'bar');
-        $query = new NestedQuery($path, $query, $parameters);
-        $result = $query->toArray();
-        $this->assertEquals(['nested' => $expected], $result);
     }
 
 }

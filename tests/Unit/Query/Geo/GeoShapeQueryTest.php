@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 class GeoShapeQueryTest extends TestCase
 {
 
-    /**
-     * Tests toArray() method.
-     */
     public function testToArray(): void
     {
         $filter = new GeoShapeQuery(['param1' => 'value1']);
@@ -31,12 +28,9 @@ class GeoShapeQueryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $filter->toArray());
+        self::assertEquals($expected, $filter->toArray());
     }
 
-    /**
-     * Test for toArray() in case of pre-indexed shape.
-     */
     public function testToArrayIndexed(): void
     {
         $filter = new GeoShapeQuery(['param1' => 'value1']);
@@ -57,7 +51,7 @@ class GeoShapeQueryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $filter->toArray());
+        self::assertEquals($expected, $filter->toArray());
     }
 
 }

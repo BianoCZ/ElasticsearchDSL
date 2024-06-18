@@ -8,15 +8,9 @@ use Biano\ElasticsearchDSL\Aggregation\Pipeline\BucketSelectorAggregation;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for bucket selector pipeline aggregation.
- */
 class BucketSelectorAggregationTest extends TestCase
 {
 
-    /**
-     * Tests toArray method.
-     */
     public function testToArray(): void
     {
         $aggregation = new BucketSelectorAggregation(
@@ -38,20 +32,17 @@ class BucketSelectorAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
-    /**
-     * Tests if the exception is thrown in getArray method if no
-     * buckets_path or script is set
-     */
     public function testGetArrayException(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('`test` aggregation must have script set.');
-        $agg = new BucketSelectorAggregation('test', []);
 
-        $agg->getArray();
+        $aggregation = new BucketSelectorAggregation('test', []);
+
+        $aggregation->getArray();
     }
 
 }

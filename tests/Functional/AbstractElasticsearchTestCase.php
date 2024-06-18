@@ -7,9 +7,11 @@ namespace Biano\ElasticsearchDSL\Tests\Functional;
 use Biano\ElasticsearchDSL\Search;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\ClientBuilder;
+use Http\Promise\Promise;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 use function array_filter;
+use function assert;
 
 abstract class AbstractElasticsearchTestCase extends TestCase
 {
@@ -17,7 +19,7 @@ abstract class AbstractElasticsearchTestCase extends TestCase
     /**
      * Test index name in the elasticsearch.
      */
-    public const INDEX_NAME = 'elasticsaerch-dsl-test';
+    public const INDEX_NAME = 'elasticsearch-dsl-test';
 
     private Client $client;
 
@@ -62,7 +64,7 @@ abstract class AbstractElasticsearchTestCase extends TestCase
      * Override this function in your test case and return array with mapping body.
      * More info check here: https://goo.gl/zWBree
      *
-     * @return array Mapping body
+     * @return array<string,mixed>
      */
     protected function getMapping(): array
     {
@@ -85,6 +87,8 @@ abstract class AbstractElasticsearchTestCase extends TestCase
      *          ]
      *      ]
      * Document _id can be set as it's id.
+     *
+     * @return array<string,mixed>
      */
     protected function getDataArray(): array
     {
@@ -101,8 +105,7 @@ abstract class AbstractElasticsearchTestCase extends TestCase
     /**
      * Execute search to the elasticsearch and handle results.
      *
-     * @param \Biano\ElasticsearchDSL\Search $search    Search object.
-     * @param bool $returnRaw Return raw response from the client.
+     * @return array<string,mixed>
      *
      * @throws \Elastic\Elasticsearch\Exception\ClientResponseException
      * @throws \Elastic\Elasticsearch\Exception\MissingParameterException
@@ -116,6 +119,7 @@ abstract class AbstractElasticsearchTestCase extends TestCase
                 'body' => $search->toArray(),
             ]),
         );
+        assert(!$response instanceof Promise);
 
         if ($returnRaw) {
             return $response->asArray();

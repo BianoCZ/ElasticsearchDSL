@@ -8,56 +8,53 @@ use Biano\ElasticsearchDSL\Aggregation\Metric\GeoBoundsAggregation;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for geo bounds aggregation.
- */
 class GeoBoundsAggregationTest extends TestCase
 {
 
-    /**
-     * Test if exception is thrown.
-     */
     public function testGeoBoundsAggregationException(): void
     {
         $this->expectException(LogicException::class);
-        $agg = new GeoBoundsAggregation('test_agg');
-        $agg->getArray();
+
+        $aggregation = new GeoBoundsAggregation('test_agg');
+        $aggregation->getArray();
     }
 
-    /**
-     * Tests getType method.
-     */
     public function testGeoBoundsAggregationGetType(): void
     {
-        $agg = new GeoBoundsAggregation('foo');
-        $result = $agg->getType();
-        $this->assertEquals('geo_bounds', $result);
+        $aggregation = new GeoBoundsAggregation('foo');
+
+        $result = $aggregation->getType();
+
+        self::assertEquals('geo_bounds', $result);
     }
 
-    /**
-     * Tests getArray method.
-     */
     public function testGeoBoundsAggregationGetArray(): void
     {
-        $agg = new GeoBoundsAggregation('foo');
-        $agg->setField('bar');
-        $agg->setWrapLongitude(true);
-        $result = [
+        $aggregation = new GeoBoundsAggregation('foo');
+        $aggregation->setField('bar');
+        $aggregation->setWrapLongitude(true);
+
+        $result = $aggregation->toArray();
+        $expected = [
             'geo_bounds' => [
                 'field' => 'bar',
                 'wrap_longitude' => true,
             ],
         ];
-        $this->assertEquals($result, $agg->toArray(), 'when wraplongitude is true');
 
-        $agg->setWrapLongitude(false);
-        $result = [
+        self::assertEquals($expected, $result);
+
+        $aggregation->setWrapLongitude(false);
+
+        $result = $aggregation->toArray();
+        $expected = [
             'geo_bounds' => [
                 'field' => 'bar',
                 'wrap_longitude' => false,
             ],
         ];
-        $this->assertEquals($result, $agg->toArray(), 'when wraplongitude is false');
+
+        self::assertEquals($expected, $result);
     }
 
 }

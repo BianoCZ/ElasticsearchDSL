@@ -24,19 +24,15 @@ class MatchAllQueryTest extends AbstractElasticsearchTestCase
         ];
     }
 
-    /**
-     * Match all test
-     */
     public function testMatchAll(): void
     {
         $search = new Search();
         $matchAll = new MatchAllQuery();
 
         $search->addQuery($matchAll);
-        $q = $search->getQueries();
         $results = $this->executeSearch($search);
 
-        $this->assertEquals($this->getDataArray()['product'], $results);
+        self::assertEquals($this->getDataArray()['product'], $results);
     }
 
 }

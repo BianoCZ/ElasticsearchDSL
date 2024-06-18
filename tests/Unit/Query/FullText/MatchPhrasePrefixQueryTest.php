@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 class MatchPhrasePrefixQueryTest extends TestCase
 {
 
-    /**
-     * Tests toArray().
-     */
     public function testToArray(): void
     {
         $query = new MatchPhrasePrefixQuery('message', 'this is a test');
@@ -22,7 +19,7 @@ class MatchPhrasePrefixQueryTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $query->toArray());
+        self::assertEquals($expected, $query->toArray());
     }
 
 }

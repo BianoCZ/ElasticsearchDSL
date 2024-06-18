@@ -7,15 +7,9 @@ namespace Biano\ElasticsearchDSL\Tests\Unit\Aggregation\Pipeline;
 use Biano\ElasticsearchDSL\Aggregation\Pipeline\SerialDifferencingAggregation;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Unit test for serial differencing aggregation.
- */
 class SerialDifferencingAggregationTest extends TestCase
 {
 
-    /**
-     * Tests toArray method.
-     */
     public function testToArray(): void
     {
         $aggregation = new SerialDifferencingAggregation('acme', 'test');
@@ -28,7 +22,7 @@ class SerialDifferencingAggregationTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $aggregation->toArray());
+        self::assertEquals($expected, $aggregation->toArray());
     }
 
 }

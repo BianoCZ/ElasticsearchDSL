@@ -15,30 +15,21 @@ class InnerHitsEndpointTest extends TestCase
 
     public function testItCanBeInstantiated(): void
     {
-        $this->assertInstanceOf(
-            InnerHitsEndpoint::class,
-            new InnerHitsEndpoint(),
-        );
+        self::assertInstanceOf(InnerHitsEndpoint::class, new InnerHitsEndpoint());
     }
 
-    /**
-     * Tests if endpoint returns builders.
-     */
     public function testEndpointGetter(): void
     {
         $hitName = 'foo';
-        $innerHit = $this->getMockBuilder(BuilderInterface::class)->getMock();
+        $innerHit = $this->createMock(BuilderInterface::class);
         $endpoint = new InnerHitsEndpoint();
         $endpoint->add($innerHit, $hitName);
         $builders = $endpoint->getAll();
 
-        $this->assertCount(1, $builders);
-        $this->assertSame($innerHit, $builders[$hitName]);
+        self::assertCount(1, $builders);
+        self::assertSame($innerHit, $builders[$hitName]);
     }
 
-    /**
-     * Tests normalize method
-     */
     public function testNormalization(): void
     {
         $normalizer = $this->createMock(NormalizerInterface::class);
@@ -52,7 +43,7 @@ class InnerHitsEndpointTest extends TestCase
             'foo' => ['foo' => 'bar'],
         ];
 
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $endpoint->normalize($normalizer),
         );
