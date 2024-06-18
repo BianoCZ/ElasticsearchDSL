@@ -17,14 +17,14 @@ class TermsQuery implements BuilderInterface
 
     private string $field;
 
-    /** @var list<string>|string */
-    private string|array $terms;
+    /** @var list<string|int|float|bool>|string|int|float|bool */
+    private string|int|float|bool|array $terms;
 
     /**
-     * @param list<string>|string $terms
+     * @param list<string|int|float|bool>|string|int|float|bool $terms
      * @param array<string,mixed> $parameters
      */
-    public function __construct(string $field, string|array $terms, array $parameters = [])
+    public function __construct(string $field, string|int|float|bool|array $terms, array $parameters = [])
     {
         $this->field = $field;
         $this->terms = $terms;
