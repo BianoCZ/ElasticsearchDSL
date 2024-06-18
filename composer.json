@@ -1,7 +1,9 @@
 {
     "name": "biano/elasticsearch-dsl",
-    "description": "Elasticsearch DSL library",
     "type": "library",
+    "description": "Elasticsearch DSL library",
+    "keywords": ["elasticsearch", "elasticsearch DSL", "DSL"],
+    "homepage": "http://github.com/bianocz/elasticsearch-dsl-php",
     "license": "MIT",
     "authors": [
         {
