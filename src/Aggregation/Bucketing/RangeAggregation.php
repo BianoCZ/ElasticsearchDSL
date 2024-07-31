@@ -15,13 +15,13 @@ use function array_values;
 class RangeAggregation extends AbstractBucketingAggregation
 {
 
-    /** @var list<array<string,mixed>> */
+    /** @var list<array<string,int|float|string>> */
     private array $ranges = [];
 
     private bool $keyed = false;
 
     /**
-     * @param list<array<string,string>> $ranges
+     * @param list<array<string,int|float|string|null>> $ranges
      */
     public function __construct(string $name, ?string $field = null, array $ranges = [], bool $keyed = false)
     {
@@ -36,7 +36,7 @@ class RangeAggregation extends AbstractBucketingAggregation
         }
 
         foreach ($ranges as $range) {
-            $this->addRange($range['from'] ?? null, $range['to'] ?? null, $range['key'] ?? null);
+            $this->addRange($range['from'] ?? null, $range['to'] ?? null, ($range['key'] ?? null) !== null ? (string) $range['key'] : null);
         }
     }
 
